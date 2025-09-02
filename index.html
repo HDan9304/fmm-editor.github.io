@@ -59,8 +59,7 @@
     }
 
     .field input,
-    #preview,
-    #finalResults {
+    #results {
       width: 100%;
       padding: 10px;
       border: 1px solid #444;
@@ -75,8 +74,7 @@
     .field input[type="text"] { text-transform: capitalize; }
 
     .field input:focus,
-    #preview:focus,
-    #finalResults:focus {
+    #results:focus {
       border-color: #FE6F21;
       background: #2b2c3f;
       box-shadow: 0 0 6px rgba(254, 111, 33, 0.6);
@@ -96,22 +94,17 @@
       color: #FE6F21;
     }
 
-    #preview, #finalResults {
+    #results {
       font-weight: 500;
       white-space: pre-wrap;
       padding: 16px 12px;
       font-family: 'Poppins', monospace;
       font-size: 14px;
-      min-height: 60px;
-      margin-bottom: 10px;
-    }
-
-    /* Make Final Results scrollable with spacing */
-    #finalResults {
+      min-height: 120px;
       max-height: 300px;
       overflow-y: auto;
-      line-height: 1.6;        /* Better spacing between lines */
-      white-space: pre-wrap;   /* Preserve newlines */
+      line-height: 1.6; /* Spaced lines */
+      margin-bottom: 10px;
     }
 
     /* Buttons */
@@ -175,34 +168,28 @@
       <input type="text" id="newShortName" oninput="capitalizeFirstLetter(this)">
     </div>
     <div class="field"><label for="yearOfBirth">Year of Birth</label>
-      <input type="number" id="yearOfBirth" oninput="updateResult()">
+      <input type="number" id="yearOfBirth">
     </div>
     <div class="field"><label for="ca">CA (0–100)</label>
-      <input type="number" id="ca" min="0" max="100" oninput="validateRangePercent(this)">
+      <input type="number" id="ca" min="0" max="100">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
     <div class="field"><label for="pa">PA (0–100)</label>
-      <input type="number" id="pa" min="0" max="100" oninput="validateRangePercent(this)">
+      <input type="number" id="pa" min="0" max="100">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
     <div class="field"><label for="newClub">New Club</label>
       <input type="text" id="newClub" oninput="capitalizeFirstLetter(this)">
     </div>
 
-    <!-- Preview -->
-    <div class="result-label">Preview</div>
-    <div id="preview" contenteditable="true"></div>
-
-    <!-- Add Button -->
-    <button class="btn full-width" onclick="addToResults()">Add to Results</button>
-
-    <!-- Final Results -->
-    <div class="result-label">Final Results</div>
-    <div id="finalResults" contenteditable="true" oninput="saveResults()"></div>
+    <!-- Results -->
+    <div class="result-label">Results</div>
+    <div id="results" contenteditable="true" oninput="saveResults()"></div>
 
     <!-- Actions -->
+    <button class="btn full-width" onclick="addResult()">Add Result</button>
     <div class="actions-row">
-      <button class="btn" style="flex: 1" onclick="copyFinalResults()">Copy All</button>
+      <button class="btn" style="flex: 1" onclick="copyResults()">Copy All</button>
       <button class="btn btn-secondary" style="flex: 1" onclick="clearResults()">Clear</button>
     </div>
     <div id="copyStatus" class="copy-status"></div>
@@ -215,15 +202,6 @@
       if (el.value.length > 0) {
         el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
       }
-      updateResult();
-    }
-
-    function validateRangePercent(el) {
-      if (el.value !== "") {
-        const n = Math.max(0, Math.min(100, Number(el.value)));
-        el.value = isNaN(n) ? "" : n;
-      }
-      updateResult();
     }
 
     function convertTo200Scale(value) {
@@ -236,6 +214,8 @@
       const first = document.getElementById("firstName").value.trim();
       const last = document.getElementById("lastName").value.trim();
       const currentClub = document.getElementById("currentClub").value.trim();
+      if (!first || !last || !currentClub) return "";
+
       const newFirst = document.getElementById("newFirstName").value;
       const newLast = document.getElementById("newLastName").value;
       const shortName = document.getElementById("newShortName").value;
@@ -247,41 +227,25 @@
       return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
     }
 
-    function updateResult() {
-      const first = document.getElementById("firstName").value.trim();
-      const last = document.getElementById("lastName").value.trim();
-      const currentClub = document.getElementById("currentClub").value.trim();
-      const previewEl = document.getElementById("preview");
-
-      if (!first || !last || !currentClub) {
-        previewEl.textContent = "";
-        return;
-      }
-      if (document.activeElement === previewEl) return;
-
-      previewEl.textContent = buildResult();
-    }
-
-    function addToResults() {
-      const previewEl = document.getElementById("preview");
-      const finalEl = document.getElementById("finalResults");
-      const line = previewEl.textContent.trim();
-      if (line !== "") {
-        finalEl.textContent += (finalEl.textContent ? "\n" : "") + line;
-        finalEl.scrollTop = finalEl.scrollHeight;
+    function addResult() {
+      const resultsEl = document.getElementById("results");
+      const line = buildResult();
+      if (line) {
+        resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
+        resultsEl.scrollTop = resultsEl.scrollHeight;
         saveResults();
       }
     }
 
     function clearResults() {
-      document.getElementById("finalResults").textContent = "";
+      document.getElementById("results").textContent = "";
       saveResults();
       setCopyStatus("");
     }
 
-    function copyFinalResults() {
-      const finalEl = document.getElementById("finalResults");
-      const text = finalEl.textContent.trim();
+    function copyResults() {
+      const resultsEl = document.getElementById("results");
+      const text = resultsEl.textContent.trim();
       if (text !== "") {
         navigator.clipboard.writeText(text).then(() => {
           setCopyStatus("Copied all results ✅");
@@ -296,14 +260,14 @@
     }
 
     function saveResults() {
-      const text = document.getElementById("finalResults").textContent;
+      const text = document.getElementById("results").textContent;
       localStorage.setItem(STORAGE_KEY, text);
     }
 
     function loadResults() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        document.getElementById("finalResults").textContent = saved;
+        document.getElementById("results").textContent = saved;
       }
     }
 
