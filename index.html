@@ -78,7 +78,7 @@
       background: #242537;
       color: #f5f5f5;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, padding-left 0.2s;
     }
     /* Visual capitalization while typing */
     .field input[type="text"] { text-transform: capitalize; }
@@ -152,14 +152,18 @@
     /* ===== Searchable dropdown with SQUARE logo icon inside input ===== */
     .combo { position: relative; }
 
+    /* Default: NO reserved space for logo */
     .combo input {
       width: 100%;
-      padding: 10px 10px 10px 42px; /* space for logo on the left */
+      padding: 10px; /* normal padding */
       border: 1px solid #444;
       border-radius: 12px;
       background: #242537;
       color: #f5f5f5;
     }
+
+    /* Only when a logo is present, add left padding */
+    .combo.has-logo input { padding-left: 42px; }
 
     .combo-logo {
       position: absolute;
@@ -171,9 +175,11 @@
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
-      display: none;
       pointer-events: none;
+      display: none; /* default hidden */
     }
+    /* Show logo only when selected */
+    .combo.has-logo .combo-logo { display: block; }
 
     .combo-panel {
       position: absolute;
@@ -298,12 +304,8 @@
       { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
       { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
       { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
-      { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" },
-      { name: "Arsenal", logo: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" },
-      { name: "Chelsea", logo: "logos/chelsea.png" },
-      { name: "Bayern Munich", logo: "logos/bayern.png" },
-      { name: "Juventus", logo: "logos/juventus.png" }
-      // Add more clubs as needed
+      { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
+      // add more...
     ];
 
     /* ===== Utilities ===== */
@@ -394,7 +396,7 @@
       if (saved) document.getElementById("results").textContent = saved;
     }
 
-    /* Clear all input fields + hide logos */
+    /* Clear all input fields + remove logos and their left padding */
     function clearAllInputs() {
       const ids = [
         "firstName","lastName","currentClub","newClub",
@@ -405,10 +407,9 @@
         const el = document.getElementById(id);
         if (el) el.value = "";
       });
-      const lc = document.getElementById("logoCurrent");
-      const ln = document.getElementById("logoNew");
-      if (lc) lc.style.display = "none";
-      if (ln) ln.style.display = "none";
+      // Remove logo & padding state
+      document.getElementById("comboCurrent").classList.remove("has-logo");
+      document.getElementById("comboNew").classList.remove("has-logo");
     }
 
     /* ===== Searchable dropdown with square logo inside input ===== */
@@ -471,10 +472,10 @@
       function select(idx) {
         const club = visibleItems[idx];
         if (!club) return;
-        input.value = club.name;       // show text in input
-        logo.style.display = "block";  // show logo
+        input.value = club.name;              // show text in input
         logo.src = club.logo || FALLBACK_LOGO;
         logo.onerror = () => { logo.src = FALLBACK_LOGO; };
+        combo.classList.add("has-logo");      // show logo + add left padding
         close();
       }
 
@@ -499,8 +500,8 @@
       });
 
       input.addEventListener("input", () => {
-        // Hide logo until selection confirmed again
-        logo.style.display = "none";
+        // Remove logo & padding while user is typing a new query
+        combo.classList.remove("has-logo");
         render(filter(input.value));
         open();
       });
