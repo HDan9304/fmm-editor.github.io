@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Club Editor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Player Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Poppins font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,6 +14,7 @@
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #101123;
+      /* dotted halftone pattern */
       background-image: radial-gradient(#2b2c3f 1px, transparent 1px);
       background-size: 20px 20px;
       margin: 0;
@@ -26,7 +27,7 @@
     }
 
     .container {
-      background: #18192B;
+      background: #18192B;            /* Big box */
       padding: 20px;
       border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -34,7 +35,7 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      border: 2px solid #FE6F21;
+      border: 2px solid #FE6F21;      /* Accent border */
     }
 
     h2 {
@@ -66,17 +67,19 @@
       padding: 10px;
       border: 1px solid #444;
       border-radius: 8px;
-      font-size: 16px;
-      background: #242537;
+      font-size: 14px;
+      background: #242537;            /* Small boxes */
       color: #f5f5f5;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
 
+    /* Capitalize visually for text inputs */
     .field input[type="text"] {
       text-transform: capitalize;
     }
 
+    /* Soft orange glow on focus */
     .field input:focus,
     #result:focus {
       border-color: #FE6F21;
@@ -104,9 +107,10 @@
       padding: 16px 12px;
       font-family: 'Poppins', monospace;
       font-size: 14px;
-      min-height: 100px;
+      min-height: 120px;
     }
 
+    /* Tooltip + Copy button */
     .tooltip {
       position: relative;
       display: flex;
@@ -164,21 +168,31 @@
 </head>
 <body>
   <div class="container">
-    <h2>Club Data Input</h2>
+    <h2>Player Data Input</h2>
 
     <div class="field">
-      <label for="clubName">Name (Full) <span class="required">*</span></label>
-      <input type="text" id="clubName" required oninput="capitalizeFirstLetter(this)">
+      <label for="firstName">First Name <span class="required">*</span></label>
+      <input type="text" id="firstName" required oninput="capitalizeFirstLetter(this)">
     </div>
 
     <div class="field">
-      <label for="nation">Nation <span class="required">*</span></label>
-      <input type="text" id="nation" required oninput="capitalizeFirstLetter(this)">
+      <label for="lastName">Last Name <span class="required">*</span></label>
+      <input type="text" id="lastName" required oninput="capitalizeFirstLetter(this)">
     </div>
 
     <div class="field">
-      <label for="newName">New Name</label>
-      <input type="text" id="newName" oninput="capitalizeFirstLetter(this)">
+      <label for="currentClub">Current Club <span class="required">*</span></label>
+      <input type="text" id="currentClub" required oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <div class="field">
+      <label for="newFirstName">New First Name</label>
+      <input type="text" id="newFirstName" oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <div class="field">
+      <label for="newLastName">New Last Name</label>
+      <input type="text" id="newLastName" oninput="capitalizeFirstLetter(this)">
     </div>
 
     <div class="field">
@@ -187,21 +201,28 @@
     </div>
 
     <div class="field">
-      <label for="abbreviation">Abbreviation (3 Letters)</label>
-      <input type="text" id="abbreviation" maxlength="3" style="text-transform: uppercase;" oninput="updateResult()">
+      <label for="yearOfBirth">Year of Birth</label>
+      <input type="number" id="yearOfBirth" oninput="updateResult()">
     </div>
 
     <div class="field">
-      <label for="reputation">Reputation (0–100)</label>
-      <input type="number" id="reputation" min="0" max="100" oninput="validateReputation(this)">
-      <div class="hint">Converted to 0–10000 in result: (a ÷ 100) × 10000</div>
+      <label for="ca">CA (0–100)</label>
+      <input type="number" id="ca" min="0" max="100" oninput="validateRangePercent(this)">
+      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
 
     <div class="field">
-      <label for="newLeague">New League</label>
-      <input type="text" id="newLeague" oninput="capitalizeFirstLetter(this)">
+      <label for="pa">PA (0–100)</label>
+      <input type="number" id="pa" min="0" max="100" oninput="validateRangePercent(this)">
+      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
 
+    <div class="field">
+      <label for="newClub">New Club</label>
+      <input type="text" id="newClub" oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <!-- Result section -->
     <div class="result-label">Result</div>
     <div id="result" contenteditable="true"></div>
 
@@ -221,7 +242,7 @@
       updateResult();
     }
 
-    function validateReputation(el) {
+    function validateRangePercent(el) {
       if (el.value !== "") {
         const n = Math.max(0, Math.min(100, Number(el.value)));
         el.value = isNaN(n) ? "" : n;
@@ -229,31 +250,38 @@
       updateResult();
     }
 
-    function convertReputation(value) {
+    function convertTo200Scale(value) {
       if (value === "" || isNaN(Number(value))) return "";
       const num = Math.max(0, Math.min(100, Number(value)));
-      return Math.round((num / 100) * 10000);
+      return Math.round((num / 100) * 200);
     }
 
     function buildResult() {
-      const name = document.getElementById("clubName").value.trim();
-      const nation = document.getElementById("nation").value.trim();
-      const newName = document.getElementById("newName").value;
-      const newShort = document.getElementById("newShortName").value;
-      const abbr = document.getElementById("abbreviation").value.toUpperCase();
-      const repPercent = document.getElementById("reputation").value;
-      const rep = convertReputation(repPercent);
-      const newLeague = document.getElementById("newLeague").value;
+      const first = document.getElementById("firstName").value.trim();
+      const last = document.getElementById("lastName").value.trim();
+      const currentClub = document.getElementById("currentClub").value.trim();
+      const newFirst = document.getElementById("newFirstName").value;
+      const newLast = document.getElementById("newLastName").value;
+      const shortName = document.getElementById("newShortName").value;
+      const year = document.getElementById("yearOfBirth").value;
 
-      return `"CLUB" "${name}" "${nation}" "${newName}" "${newShort}" "${abbr}" "${rep}" "${newLeague}"\n\n`;
+      const caPercent = document.getElementById("ca").value;
+      const paPercent = document.getElementById("pa").value;
+      const ca = convertTo200Scale(caPercent);
+      const pa = convertTo200Scale(paPercent);
+
+      const newClub = document.getElementById("newClub").value;
+
+      return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"\n\n`;
     }
 
     function updateResult() {
-      const name = document.getElementById("clubName").value.trim();
-      const nation = document.getElementById("nation").value.trim();
+      const first = document.getElementById("firstName").value.trim();
+      const last = document.getElementById("lastName").value.trim();
+      const currentClub = document.getElementById("currentClub").value.trim();
       const resultEl = document.getElementById("result");
 
-      if (!name || !nation) {
+      if (!first || !last || !currentClub) {
         resultEl.textContent = "";
         return;
       }
@@ -278,7 +306,8 @@
     }
 
     function resetTooltip() {
-      document.getElementById("tooltipText").innerHTML = "Copy to clipboard";
+      const tooltip = document.getElementById("tooltipText");
+      tooltip.innerHTML = "Copy to clipboard";
     }
   </script>
 </body>
