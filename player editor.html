@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Player Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Poppins font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #101123;
+      /* dotted halftone pattern */
+      background-image: radial-gradient(#2b2c3f 1px, transparent 1px);
+      background-size: 20px 20px;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      min-height: 100vh;
+      color: #f5f5f5;
+    }
+
+    .container {
+      background: #18192B;            /* Big box */
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      max-width: 500px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      border: 2px solid #FE6F21;      /* Accent border */
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .field { margin-bottom: 15px; }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #dddddd;
+      font-size: 14px;
+    }
+
+    .field label .required {
+      color: #FE6F21;
+      font-weight: bold;
+    }
+
+    .field input,
+    #result {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #242537;            /* Small boxes */
+      color: #f5f5f5;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    /* Capitalize visually for text inputs */
+    .field input[type="text"] {
+      text-transform: capitalize;
+    }
+
+    /* Soft orange glow on focus */
+    .field input:focus,
+    #result:focus {
+      border-color: #FE6F21;
+      background: #2b2c3f;
+      box-shadow: 0 0 6px rgba(254, 111, 33, 0.6);
+    }
+
+    .hint {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #bdbdbd;
+    }
+
+    .result-label {
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #FE6F21;
+    }
+
+    #result {
+      font-weight: 500;
+      white-space: pre-wrap;
+      padding: 16px 12px;
+      font-family: 'Poppins', monospace;
+      font-size: 14px;
+      min-height: 120px;
+    }
+
+    /* Tooltip + Copy button */
+    .tooltip {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 140px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 150%;
+      left: 50%;
+      margin-left: -70px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 13px;
+    }
+
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #555 transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+    .copy-btn {
+      background: #FE6F21;
+      border: none;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+
+    .copy-btn:hover { background: #ff7f3b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Player Data Input</h2>
+
+    <div class="field">
+      <label for="firstName">First Name <span class="required">*</span></label>
+      <input type="text" id="firstName" required oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <div class="field">
+      <label for="lastName">Last Name <span class="required">*</span></label>
+      <input type="text" id="lastName" required oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <div class="field">
+      <label for="currentClub">Current Club <span class="required">*</span></label>
+      <input type="text" id="currentClub" required oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <div class="field">
+      <label for="newFirstName">New First Name</label>
+      <input type="text" id="newFirstName" oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <div class="field">
+      <label for="newLastName">New Last Name</label>
+      <input type="text" id="newLastName" oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <div class="field">
+      <label for="newShortName">New Short Name</label>
+      <input type="text" id="newShortName" oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <div class="field">
+      <label for="yearOfBirth">Year of Birth</label>
+      <input type="number" id="yearOfBirth" oninput="updateResult()">
+    </div>
+
+    <div class="field">
+      <label for="ca">CA (0–100)</label>
+      <input type="number" id="ca" min="0" max="100" oninput="validateRangePercent(this)">
+      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
+    </div>
+
+    <div class="field">
+      <label for="pa">PA (0–100)</label>
+      <input type="number" id="pa" min="0" max="100" oninput="validateRangePercent(this)">
+      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
+    </div>
+
+    <div class="field">
+      <label for="newClub">New Club</label>
+      <input type="text" id="newClub" oninput="capitalizeFirstLetter(this)">
+    </div>
+
+    <!-- Result section -->
+    <div class="result-label">Result</div>
+    <div id="result" contenteditable="true"></div>
+
+    <div class="tooltip">
+      <button class="copy-btn" onclick="copyResult()" onmouseout="resetTooltip()">
+        <span class="tooltiptext" id="tooltipText">Copy to clipboard</span>
+        Copy Result
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function capitalizeFirstLetter(el) {
+      if (el.value.length > 0) {
+        el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
+      }
+      updateResult();
+    }
+
+    function validateRangePercent(el) {
+      if (el.value !== "") {
+        const n = Math.max(0, Math.min(100, Number(el.value)));
+        el.value = isNaN(n) ? "" : n;
+      }
+      updateResult();
+    }
+
+    function convertTo200Scale(value) {
+      if (value === "" || isNaN(Number(value))) return "";
+      const num = Math.max(0, Math.min(100, Number(value)));
+      return Math.round((num / 100) * 200);
+    }
+
+    function buildResult() {
+      const first = document.getElementById("firstName").value.trim();
+      const last = document.getElementById("lastName").value.trim();
+      const currentClub = document.getElementById("currentClub").value.trim();
+      const newFirst = document.getElementById("newFirstName").value;
+      const newLast = document.getElementById("newLastName").value;
+      const shortName = document.getElementById("newShortName").value;
+      const year = document.getElementById("yearOfBirth").value;
+
+      const caPercent = document.getElementById("ca").value;
+      const paPercent = document.getElementById("pa").value;
+      const ca = convertTo200Scale(caPercent);
+      const pa = convertTo200Scale(paPercent);
+
+      const newClub = document.getElementById("newClub").value;
+
+      return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"\n\n`;
+    }
+
+    function updateResult() {
+      const first = document.getElementById("firstName").value.trim();
+      const last = document.getElementById("lastName").value.trim();
+      const currentClub = document.getElementById("currentClub").value.trim();
+      const resultEl = document.getElementById("result");
+
+      if (!first || !last || !currentClub) {
+        resultEl.textContent = "";
+        return;
+      }
+
+      if (document.activeElement === resultEl) return;
+
+      resultEl.textContent = buildResult();
+    }
+
+    function copyResult() {
+      const resultEl = document.getElementById("result");
+      const text = resultEl.textContent.trim();
+
+      if (text !== "") {
+        navigator.clipboard.writeText(text).then(() => {
+          const tooltip = document.getElementById("tooltipText");
+          tooltip.innerHTML = "Copied!";
+        }).catch(err => {
+          alert("Copy failed: " + err);
+        });
+      }
+    }
+
+    function resetTooltip() {
+      const tooltip = document.getElementById("tooltipText");
+      tooltip.innerHTML = "Copy to clipboard";
+    }
+  </script>
+</body>
+</html>
