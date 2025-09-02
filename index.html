@@ -9,6 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <style>
+    :root{
+      /* Pink gradient theme */
+      --grad-start:#FF7AD9;
+      --grad-end:#FF3D7F;
+      --accent:#FF5AC8;        /* solid accent for borders/glow */
+    }
+
     * { box-sizing: border-box; }
 
     body {
@@ -26,7 +33,7 @@
     }
 
     .container {
-      background: #18192B;           /* Big box */
+      background: #18192B;
       padding: 20px;
       border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -34,8 +41,11 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      border: 2px solid #FE6F21;     /* Accent */
       gap: 6px;
+
+      /* gradient border */
+      border: 2px solid transparent;
+      border-image: linear-gradient(90deg,var(--grad-start),var(--grad-end)) 1;
     }
 
     h2 {
@@ -54,7 +64,7 @@
       color: #ddd;
       font-size: 14px;
     }
-    .field label .required { color: #FE6F21; font-weight: 700; }
+    .field label .required { color: var(--accent); font-weight: 700; }
 
     /* Inputs + results */
     .field input,
@@ -64,19 +74,17 @@
       border: 1px solid #444;
       border-radius: 8px;
       font-size: 14px;
-      background: #242537;           /* Small boxes */
+      background: #242537;
       color: #f5f5f5;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    /* Visual capitalization while typing */
-    .field input[type="text"] { text-transform: capitalize; }
 
     .field input:focus,
     #results:focus {
-      border-color: #FE6F21;
+      border-color: var(--accent);
       background: #2b2c3f;
-      box-shadow: 0 0 6px rgba(254, 111, 33, 0.6);
+      box-shadow: 0 0 8px rgba(255, 90, 200, 0.55);
     }
 
     .result-label {
@@ -84,7 +92,7 @@
       margin-bottom: 6px;
       font-size: 15px;
       font-weight: 600;
-      color: #FE6F21;
+      color: var(--accent);
     }
 
     #results {
@@ -97,40 +105,40 @@
       max-height: 300px;
       overflow-y: auto;
       line-height: 1.6;
-      margin-bottom: 14px; /* space above buttons to prevent collision */
+      margin-bottom: 14px; /* space above buttons */
     }
 
     /* Buttons */
     .btn {
-      background: #FE6F21;
       border: none;
       color: white;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 12px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
+      background: linear-gradient(90deg,var(--grad-start),var(--grad-end));
     }
-    .btn:hover { background: #ff7f3b; }
+    .btn:hover {
+      filter: brightness(1.06);
+    }
 
     .btn-secondary {
       background: transparent;
-      border: 2px solid #FE6F21;
-      color: #FE6F21;
+      border: 2px solid var(--accent);
+      color: var(--accent);
     }
-    .btn-secondary:hover { background: rgba(254,111,33,0.08); }
+    .btn-secondary:hover {
+      background: rgba(255,90,200,0.08);
+    }
 
-    .full-width {
-      width: 100%;
-      margin: 6px 0 10px;  /* spacing so it never collides */
-      display: block;
-    }
+    .full-width { width: 100%; margin: 6px 0 10px; display: block; }
 
     .actions-row {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;   /* safe on narrow screens */
+      flex-wrap: wrap;
     }
     .actions-row .btn { flex: 1 1 0; }
 
@@ -158,13 +166,12 @@
       top: 50%;
       left: 10px;
       transform: translateY(-50%);
-      width: 20px;
-      height: 20px;
-      border-radius: 6px;           /* square-ish corners */
+      width: 20px; height: 20px;
+      border-radius: 6px;       /* square-ish */
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
-      display: none; /* shown after selection */
+      display: none;
       pointer-events: none;
     }
 
@@ -178,34 +185,28 @@
       max-height: 260px;
       overflow-y: auto;
       padding: 6px;
-      display: none;  /* toggled when open */
+      display: none;
       z-index: 999;
     }
     .combo.open .combo-panel { display: block; }
 
     .combo-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      color: #f5f5f5;
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 14px; color: #f5f5f5;
     }
     .combo-item:hover,
     .combo-item.active {
       background: #2b2c3f;
-      outline: 1px solid #FE6F21;
+      outline: 1px solid var(--accent);
     }
     .combo-item img {
-      width: 22px;
-      height: 22px;
-      border-radius: 6px;           /* square-ish corners in list too */
+      width: 22px; height: 22px;
+      border-radius: 6px;       /* square-ish in list */
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
     }
+    .hint { font-size:12px; color:#bdbdbd; margin-top:4px; }
   </style>
 </head>
 <body>
@@ -231,6 +232,7 @@
         <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
         <div class="combo-panel"></div>
       </div>
+      <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
     </div>
 
     <!-- New Club -->
@@ -241,6 +243,7 @@
         <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" />
         <div class="combo-panel"></div>
       </div>
+      <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
     </div>
 
     <!-- Other fields -->
@@ -248,21 +251,18 @@
     <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" /></div>
     <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" /></div>
 
-    <div class="field">
-      <label for="yearOfBirth">Year of Birth</label>
-      <input id="yearOfBirth" type="number" inputmode="numeric" />
-    </div>
+    <div class="field"><label for="yearOfBirth">Year of Birth</label><input id="yearOfBirth" type="number" inputmode="numeric" /></div>
 
     <div class="field">
       <label for="ca">CA (0–100)</label>
       <input id="ca" type="number" min="0" max="100" inputmode="numeric" oninput="validatePercent(this)" />
-      <div class="hint" style="font-size:12px;color:#bdbdbd;margin-top:4px;">Converted to 0–200 in result: (a ÷ 100) × 200</div>
+      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
 
     <div class="field">
       <label for="pa">PA (0–100)</label>
       <input id="pa" type="number" min="0" max="100" inputmode="numeric" oninput="validatePercent(this)" />
-      <div class="hint" style="font-size:12px;color:#bdbdbd;margin-top:4px;">Converted to 0–200 in result: (a ÷ 100) × 200</div>
+      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
 
     <!-- Results -->
@@ -281,15 +281,15 @@
   <script>
     const STORAGE_KEY = "playerEditorResults";
 
-    /* SQUARE fallback logo (data URI) */
+    /* Square fallback logo (data URI) using pink accent */
     const FALLBACK_LOGO =
       'data:image/svg+xml;utf8,' +
       encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
         <rect width="100%" height="100%" fill="#18192B"/>
-        <rect x="18" y="18" width="28" height="28" rx="4" ry="4" fill="#FE6F21"/>
+        <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
       </svg>`);
 
-    /* Club list: mix local and web URLs */
+    /* Clubs: mix local and web URLs */
     const clubs = [
       { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
       { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
@@ -313,15 +313,15 @@
       let n = parseInt(el.value, 10);
       if (isNaN(n)) { el.value = ""; return; }
       if (n < 0) n = 0;
-      if (n > 100) n = 100;     // hard clamp to 0–100
+      if (n > 100) n = 100;     // clamp to 0–100
       el.value = n;
     }
 
     function convertTo200Scale(v) {
       if (v === "" || isNaN(Number(v))) return "";
-      const num = Math.max(0, Math.min(100, Number(v))); // clamp 0–100
+      const num = Math.max(0, Math.min(100, Number(v)));
       const scaled = Math.round((num / 100) * 200);
-      return Math.max(0, Math.min(200, scaled));         // final clamp 0–200
+      return Math.max(0, Math.min(200, scaled)); // final clamp 0–200
     }
 
     function buildResult() {
@@ -350,7 +350,7 @@
         resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
         resultsEl.scrollTop = resultsEl.scrollHeight;
         saveResults();
-        clearAllInputs();                // NEW: auto-clear inputs after adding
+        clearAllInputs();                 // auto-clear after adding
         document.getElementById("firstName").focus();
       } else {
         alert("Please fill in First Name, Last Name, and Current Club.");
@@ -385,7 +385,7 @@
       if (saved) document.getElementById("results").textContent = saved;
     }
 
-    /* NEW: Clear all input fields + hide logos */
+    /* Clear all input fields + hide logos */
     function clearAllInputs() {
       const ids = [
         "firstName","lastName","currentClub","newClub",
@@ -396,14 +396,13 @@
         const el = document.getElementById(id);
         if (el) el.value = "";
       });
-      // Hide logos after clearing
       const lc = document.getElementById("logoCurrent");
       const ln = document.getElementById("logoNew");
       if (lc) lc.style.display = "none";
       if (ln) ln.style.display = "none";
     }
 
-    /* ===== Searchable dropdown with logo icon inside input ===== */
+    /* ===== Searchable dropdown with square logo inside input ===== */
     function initCombo(comboId, inputId, logoId) {
       const combo = document.getElementById(comboId);
       const input = document.getElementById(inputId);
@@ -463,8 +462,8 @@
       function select(idx) {
         const club = visibleItems[idx];
         if (!club) return;
-        input.value = club.name;       // text shows in the input (single source of truth)
-        logo.style.display = "block";  // show logo icon
+        input.value = club.name;       // show text in input
+        logo.style.display = "block";  // show logo
         logo.src = club.logo || FALLBACK_LOGO;
         logo.onerror = () => { logo.src = FALLBACK_LOGO; };
         close();
@@ -491,7 +490,7 @@
       });
 
       input.addEventListener("input", () => {
-        // hide logo until a selection is confirmed again
+        // Hide logo until selection confirmed again
         logo.style.display = "none";
         render(filter(input.value));
         open();
