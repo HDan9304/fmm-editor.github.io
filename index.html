@@ -71,6 +71,7 @@
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
 
+    /* Visual capitalization while typing */
     .field input[type="text"] { text-transform: capitalize; }
 
     .field input:focus,
@@ -198,10 +199,20 @@
   <script>
     const STORAGE_KEY = "playerEditorResults";
 
+    /* Keep inputs looking nice while typing (cap first char of the field) */
     function capitalizeFirstLetter(el) {
       if (el.value.length > 0) {
+        // Trim leading spaces first, then capitalize first visible letter
+        el.value = el.value.replace(/^\s+/, "");
         el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
       }
+    }
+
+    /* Ensure result uses Capitalized Words regardless of how the user typed */
+    function capWords(str) {
+      const s = String(str).trim();
+      // Uppercase the first letter of each word; leave the rest as-is
+      return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
     }
 
     function convertTo200Scale(value) {
@@ -211,18 +222,20 @@
     }
 
     function buildResult() {
-      const first = document.getElementById("firstName").value.trim();
-      const last = document.getElementById("lastName").value.trim();
-      const currentClub = document.getElementById("currentClub").value.trim();
+      // Read and normalize text fields to ensure capitalization in the output
+      const first = capWords(document.getElementById("firstName").value);
+      const last = capWords(document.getElementById("lastName").value);
+      const currentClub = capWords(document.getElementById("currentClub").value);
+
       if (!first || !last || !currentClub) return "";
 
-      const newFirst = document.getElementById("newFirstName").value;
-      const newLast = document.getElementById("newLastName").value;
-      const shortName = document.getElementById("newShortName").value;
-      const year = document.getElementById("yearOfBirth").value;
+      const newFirst = capWords(document.getElementById("newFirstName").value);
+      const newLast = capWords(document.getElementById("newLastName").value);
+      const shortName = capWords(document.getElementById("newShortName").value);
+      const year = document.getElementById("yearOfBirth").value.trim();
       const ca = convertTo200Scale(document.getElementById("ca").value);
       const pa = convertTo200Scale(document.getElementById("pa").value);
-      const newClub = document.getElementById("newClub").value;
+      const newClub = capWords(document.getElementById("newClub").value);
 
       return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
     }
@@ -234,6 +247,8 @@
         resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
         resultsEl.scrollTop = resultsEl.scrollHeight;
         saveResults();
+      } else {
+        alert("Please fill in First Name, Last Name, and Current Club.");
       }
     }
 
