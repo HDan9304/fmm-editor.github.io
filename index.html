@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Player Editor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Poppins font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <style>
     * { box-sizing: border-box; }
@@ -46,7 +46,6 @@
     }
 
     .field { margin-bottom: 15px; }
-
     .field label {
       display: block;
       margin-bottom: 6px;
@@ -54,7 +53,6 @@
       color: #dddddd;
       font-size: 14px;
     }
-
     .field label .required {
       color: #FE6F21;
       font-weight: bold;
@@ -74,9 +72,7 @@
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
 
-    .field input[type="text"] {
-      text-transform: capitalize;
-    }
+    .field input[type="text"] { text-transform: capitalize; }
 
     .field input:focus,
     #preview:focus,
@@ -110,14 +106,14 @@
       margin-bottom: 10px;
     }
 
-    .button-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
+    /* Make Final Results scrollable */
+    #finalResults {
+      max-height: 300px;
+      overflow-y: auto;
     }
 
+    /* Buttons */
     .btn {
-      flex: 1;
       background: #FE6F21;
       border: none;
       color: white;
@@ -128,54 +124,38 @@
       cursor: pointer;
       text-align: center;
     }
-
     .btn:hover { background: #ff7f3b; }
 
-    .tooltip {
-      position: relative;
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid #FE6F21;
+      color: #FE6F21;
+    }
+    .btn-secondary:hover {
+      background: rgba(254,111,33,0.08);
+    }
+
+    .full-width { width: 100%; }
+
+    .actions-row {
       display: flex;
-      justify-content: center;
-      margin-top: 12px;
-      width: 100%;
+      gap: 10px;
+      margin-top: 6px;
     }
 
-    .tooltip .tooltiptext {
-      visibility: hidden;
-      width: 140px;
-      background-color: #555;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px;
-      position: absolute;
-      z-index: 1;
-      bottom: 150%;
-      left: 50%;
-      margin-left: -70px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 13px;
+    .copy-status {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #9ad29a;
+      min-height: 16px; /* reserve space so layout doesn't jump */
     }
-
-    .tooltip .tooltiptext::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: #555 transparent transparent transparent;
-    }
-
-    .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Player Data Input</h2>
 
-    <!-- Fields -->
+    <!-- Inputs -->
     <div class="field">
       <label for="firstName">First Name <span class="required">*</span></label>
       <input type="text" id="firstName" required oninput="capitalizeFirstLetter(this)">
@@ -188,27 +168,34 @@
       <label for="currentClub">Current Club <span class="required">*</span></label>
       <input type="text" id="currentClub" required oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field"><label for="newFirstName">New First Name</label>
+    <div class="field">
+      <label for="newFirstName">New First Name</label>
       <input type="text" id="newFirstName" oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field"><label for="newLastName">New Last Name</label>
+    <div class="field">
+      <label for="newLastName">New Last Name</label>
       <input type="text" id="newLastName" oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field"><label for="newShortName">New Short Name</label>
+    <div class="field">
+      <label for="newShortName">New Short Name</label>
       <input type="text" id="newShortName" oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field"><label for="yearOfBirth">Year of Birth</label>
+    <div class="field">
+      <label for="yearOfBirth">Year of Birth</label>
       <input type="number" id="yearOfBirth" oninput="updateResult()">
     </div>
-    <div class="field"><label for="ca">CA (0–100)</label>
+    <div class="field">
+      <label for="ca">CA (0–100)</label>
       <input type="number" id="ca" min="0" max="100" oninput="validateRangePercent(this)">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
-    <div class="field"><label for="pa">PA (0–100)</label>
+    <div class="field">
+      <label for="pa">PA (0–100)</label>
       <input type="number" id="pa" min="0" max="100" oninput="validateRangePercent(this)">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
-    <div class="field"><label for="newClub">New Club</label>
+    <div class="field">
+      <label for="newClub">New Club</label>
       <input type="text" id="newClub" oninput="capitalizeFirstLetter(this)">
     </div>
 
@@ -216,23 +203,19 @@
     <div class="result-label">Preview</div>
     <div id="preview" contenteditable="true"></div>
 
-    <!-- Buttons -->
-    <div class="button-group">
-      <button class="btn" onclick="addToResults()">Add to Results</button>
-      <button class="btn" onclick="clearResults()">Clear Results</button>
-    </div>
+    <!-- Primary action under preview -->
+    <button class="btn full-width" onclick="addToResults()">Add to Results</button>
 
     <!-- Final Results -->
     <div class="result-label">Final Results</div>
     <div id="finalResults" contenteditable="true"></div>
 
-    <!-- Copy Button -->
-    <div class="tooltip">
-      <button class="btn" onclick="copyFinalResults()" onmouseout="resetTooltip()">
-        <span class="tooltiptext" id="tooltipText">Copy to clipboard</span>
-        Copy All Results
-      </button>
+    <!-- Actions below final results -->
+    <div class="actions-row">
+      <button class="btn" style="flex: 1" onclick="copyFinalResults()">Copy All</button>
+      <button class="btn btn-secondary" style="flex: 1" onclick="clearResults()">Clear</button>
     </div>
+    <div id="copyStatus" class="copy-status"></div>
   </div>
 
   <script>
@@ -286,7 +269,6 @@
         previewEl.textContent = "";
         return;
       }
-
       if (document.activeElement === previewEl) return;
 
       previewEl.textContent = buildResult();
@@ -295,33 +277,33 @@
     function addToResults() {
       const previewEl = document.getElementById("preview");
       const finalEl = document.getElementById("finalResults");
-
       const line = previewEl.textContent.trim();
       if (line !== "") {
-        finalEl.textContent += line + "\n";
+        finalEl.textContent += (finalEl.textContent ? "\n" : "") + line;
+        // Optional: auto-scroll to bottom when new line added
+        finalEl.scrollTop = finalEl.scrollHeight;
       }
     }
 
     function clearResults() {
       document.getElementById("finalResults").textContent = "";
+      setCopyStatus(""); // clear status message
     }
 
     function copyFinalResults() {
       const finalEl = document.getElementById("finalResults");
       const text = finalEl.textContent.trim();
-
       if (text !== "") {
         navigator.clipboard.writeText(text).then(() => {
-          const tooltip = document.getElementById("tooltipText");
-          tooltip.innerHTML = "Copied!";
+          setCopyStatus("Copied all results ✅");
         }).catch(err => {
           alert("Copy failed: " + err);
         });
       }
     }
 
-    function resetTooltip() {
-      document.getElementById("tooltipText").innerHTML = "Copy to clipboard";
+    function setCopyStatus(msg) {
+      document.getElementById("copyStatus").textContent = msg;
     }
   </script>
 </body>
