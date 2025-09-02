@@ -14,7 +14,6 @@
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #101123;
-      /* dotted halftone pattern */
       background-image: radial-gradient(#2b2c3f 1px, transparent 1px);
       background-size: 20px 20px;
       margin: 0;
@@ -27,7 +26,7 @@
     }
 
     .container {
-      background: #18192B;            /* Big box */
+      background: #18192B;
       padding: 20px;
       border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -35,7 +34,7 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      border: 2px solid #FE6F21;      /* Accent border */
+      border: 2px solid #FE6F21;
     }
 
     h2 {
@@ -62,26 +61,26 @@
     }
 
     .field input,
-    #result {
+    #preview,
+    #finalResults {
       width: 100%;
       padding: 10px;
       border: 1px solid #444;
       border-radius: 8px;
       font-size: 14px;
-      background: #242537;            /* Small boxes */
+      background: #242537;
       color: #f5f5f5;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
 
-    /* Capitalize visually for text inputs */
     .field input[type="text"] {
       text-transform: capitalize;
     }
 
-    /* Soft orange glow on focus */
     .field input:focus,
-    #result:focus {
+    #preview:focus,
+    #finalResults:focus {
       border-color: #FE6F21;
       background: #2b2c3f;
       box-shadow: 0 0 6px rgba(254, 111, 33, 0.6);
@@ -101,16 +100,37 @@
       color: #FE6F21;
     }
 
-    #result {
+    #preview, #finalResults {
       font-weight: 500;
       white-space: pre-wrap;
       padding: 16px 12px;
       font-family: 'Poppins', monospace;
       font-size: 14px;
-      min-height: 120px;
+      min-height: 60px;
+      margin-bottom: 10px;
     }
 
-    /* Tooltip + Copy button */
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      flex: 1;
+      background: #FE6F21;
+      border: none;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn:hover { background: #ff7f3b; }
+
     .tooltip {
       position: relative;
       display: flex;
@@ -149,87 +169,68 @@
     }
 
     .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
-
-    .copy-btn {
-      background: #FE6F21;
-      border: none;
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
-      text-align: center;
-    }
-
-    .copy-btn:hover { background: #ff7f3b; }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Player Data Input</h2>
 
+    <!-- Fields -->
     <div class="field">
       <label for="firstName">First Name <span class="required">*</span></label>
       <input type="text" id="firstName" required oninput="capitalizeFirstLetter(this)">
     </div>
-
     <div class="field">
       <label for="lastName">Last Name <span class="required">*</span></label>
       <input type="text" id="lastName" required oninput="capitalizeFirstLetter(this)">
     </div>
-
     <div class="field">
       <label for="currentClub">Current Club <span class="required">*</span></label>
       <input type="text" id="currentClub" required oninput="capitalizeFirstLetter(this)">
     </div>
-
-    <div class="field">
-      <label for="newFirstName">New First Name</label>
+    <div class="field"><label for="newFirstName">New First Name</label>
       <input type="text" id="newFirstName" oninput="capitalizeFirstLetter(this)">
     </div>
-
-    <div class="field">
-      <label for="newLastName">New Last Name</label>
+    <div class="field"><label for="newLastName">New Last Name</label>
       <input type="text" id="newLastName" oninput="capitalizeFirstLetter(this)">
     </div>
-
-    <div class="field">
-      <label for="newShortName">New Short Name</label>
+    <div class="field"><label for="newShortName">New Short Name</label>
       <input type="text" id="newShortName" oninput="capitalizeFirstLetter(this)">
     </div>
-
-    <div class="field">
-      <label for="yearOfBirth">Year of Birth</label>
+    <div class="field"><label for="yearOfBirth">Year of Birth</label>
       <input type="number" id="yearOfBirth" oninput="updateResult()">
     </div>
-
-    <div class="field">
-      <label for="ca">CA (0–100)</label>
+    <div class="field"><label for="ca">CA (0–100)</label>
       <input type="number" id="ca" min="0" max="100" oninput="validateRangePercent(this)">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
-
-    <div class="field">
-      <label for="pa">PA (0–100)</label>
+    <div class="field"><label for="pa">PA (0–100)</label>
       <input type="number" id="pa" min="0" max="100" oninput="validateRangePercent(this)">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
-
-    <div class="field">
-      <label for="newClub">New Club</label>
+    <div class="field"><label for="newClub">New Club</label>
       <input type="text" id="newClub" oninput="capitalizeFirstLetter(this)">
     </div>
 
-    <!-- Result section -->
-    <div class="result-label">Result</div>
-    <div id="result" contenteditable="true"></div>
+    <!-- Preview -->
+    <div class="result-label">Preview</div>
+    <div id="preview" contenteditable="true"></div>
 
+    <!-- Buttons -->
+    <div class="button-group">
+      <button class="btn" onclick="addToResults()">Add to Results</button>
+      <button class="btn" onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <!-- Final Results -->
+    <div class="result-label">Final Results</div>
+    <div id="finalResults" contenteditable="true"></div>
+
+    <!-- Copy Button -->
     <div class="tooltip">
-      <button class="copy-btn" onclick="copyResult()" onmouseout="resetTooltip()">
+      <button class="btn" onclick="copyFinalResults()" onmouseout="resetTooltip()">
         <span class="tooltiptext" id="tooltipText">Copy to clipboard</span>
-        Copy Result
+        Copy All Results
       </button>
     </div>
   </div>
@@ -272,28 +273,42 @@
 
       const newClub = document.getElementById("newClub").value;
 
-      return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"\n\n`;
+      return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
     }
 
     function updateResult() {
       const first = document.getElementById("firstName").value.trim();
       const last = document.getElementById("lastName").value.trim();
       const currentClub = document.getElementById("currentClub").value.trim();
-      const resultEl = document.getElementById("result");
+      const previewEl = document.getElementById("preview");
 
       if (!first || !last || !currentClub) {
-        resultEl.textContent = "";
+        previewEl.textContent = "";
         return;
       }
 
-      if (document.activeElement === resultEl) return;
+      if (document.activeElement === previewEl) return;
 
-      resultEl.textContent = buildResult();
+      previewEl.textContent = buildResult();
     }
 
-    function copyResult() {
-      const resultEl = document.getElementById("result");
-      const text = resultEl.textContent.trim();
+    function addToResults() {
+      const previewEl = document.getElementById("preview");
+      const finalEl = document.getElementById("finalResults");
+
+      const line = previewEl.textContent.trim();
+      if (line !== "") {
+        finalEl.textContent += line + "\n";
+      }
+    }
+
+    function clearResults() {
+      document.getElementById("finalResults").textContent = "";
+    }
+
+    function copyFinalResults() {
+      const finalEl = document.getElementById("finalResults");
+      const text = finalEl.textContent.trim();
 
       if (text !== "") {
         navigator.clipboard.writeText(text).then(() => {
@@ -306,8 +321,7 @@
     }
 
     function resetTooltip() {
-      const tooltip = document.getElementById("tooltipText");
-      tooltip.innerHTML = "Copy to clipboard";
+      document.getElementById("tooltipText").innerHTML = "Copy to clipboard";
     }
   </script>
 </body>
