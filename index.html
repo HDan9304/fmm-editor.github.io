@@ -4,511 +4,164 @@
   <meta charset="UTF-8" />
   <title>Player Editor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Poppins font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
-
   <style>
     * { box-sizing: border-box; }
-
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #101123;
       background-image: radial-gradient(#2b2c3f 1px, transparent 1px);
       background-size: 20px 20px;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 20px;
-      min-height: 100vh;
-      color: #f5f5f5;
+      margin: 0; padding: 20px;
+      display: flex; justify-content: center; align-items: flex-start;
+      min-height: 100vh; color: #f5f5f5;
     }
-
     .container {
-      background: #18192B;
-      padding: 20px;
-      border-radius: 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      max-width: 520px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
+      background: #18192B; padding: 20px;
+      border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      max-width: 520px; width: 100%; display: flex; flex-direction: column;
       border: 2px solid #FE6F21;
     }
-
     h2 { margin: 0 0 18px; font-size: 22px; font-weight: 600; color: #fff; text-align: center; }
-
     .field { margin-bottom: 15px; }
-    .field label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-      color: #ddd;
-      font-size: 14px;
-    }
+    .field label { display: block; margin-bottom: 6px; font-weight: 500; color: #ddd; font-size: 14px; }
     .field label .required { color: #FE6F21; font-weight: bold; }
-
-    .field input,
+    .field input, #results {
+      width: 100%; padding: 10px; border: 1px solid #444; border-radius: 8px;
+      font-size: 14px; background: #242537; color: #f5f5f5; outline: none;
+    }
+    .field input:focus, #results:focus { border-color: #FE6F21; background: #2b2c3f; box-shadow: 0 0 6px rgba(254,111,33,0.6); }
+    .hint { font-size: 12px; color: #bdbdbd; margin-top: 4px; }
+    .result-label { margin: 20px 0 8px; font-size: 15px; font-weight: 600; color: #FE6F21; }
     #results {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #444;
-      border-radius: 8px;
-      font-size: 14px;
-      background: #242537;
-      color: #f5f5f5;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      font-family: 'Poppins', monospace; font-size: 14px;
+      min-height: 120px; max-height: 300px; overflow-y: auto;
+      line-height: 1.6; padding: 16px 12px; white-space: pre-wrap;
     }
-
-    .field input[type="text"] { text-transform: capitalize; }
-
-    .field input:focus,
-    #results:focus {
-      border-color: #FE6F21;
-      background: #2b2c3f;
-      box-shadow: 0 0 6px rgba(254,111,33,0.6);
-    }
-
-    .hint { margin-top: 4px; font-size: 12px; color: #bdbdbd; }
-
-    .result-label { margin-top: 20px; margin-bottom: 8px; font-size: 15px; font-weight: 600; color: #FE6F21; }
-
-    #results {
-      font-weight: 500;
-      white-space: pre-wrap;
-      padding: 16px 12px;
-      font-family: 'Poppins', monospace;
-      font-size: 14px;
-      min-height: 120px;
-      max-height: 300px;
-      overflow-y: auto;
-      line-height: 1.6;
-      margin-bottom: 10px;
-    }
-
-    /* Buttons */
     .btn {
-      background: #FE6F21;
-      border: none;
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
+      background: #FE6F21; border: none; color: white; padding: 12px;
+      border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
     }
     .btn:hover { background: #ff7f3b; }
-
-    .btn-secondary {
-      background: transparent;
-      border: 2px solid #FE6F21;
-      color: #FE6F21;
-    }
+    .btn-secondary { background: transparent; border: 2px solid #FE6F21; color: #FE6F21; }
     .btn-secondary:hover { background: rgba(254,111,33,0.08); }
-
     .full-width { width: 100%; }
-
     .actions-row { display: flex; gap: 10px; margin-top: 6px; }
     .copy-status { margin-top: 6px; font-size: 12px; color: #9ad29a; min-height: 16px; }
 
-    /* ===== Autocomplete (searchable dropdown) ===== */
+    /* Combo dropdown styles */
     .combo { position: relative; }
-    .combo input { caret-color: #fff; }
-
     .combo-panel {
-      position: absolute; left: 0; right: 0; top: calc(100% + 6px);
-      background: #242537;
-      border: 1px solid #444;
-      border-radius: 10px;
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: #242537; border: 1px solid #444; border-radius: 10px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-      max-height: 260px; overflow-y: auto;
-      padding: 6px; z-index: 999; display: none;
+      max-height: 260px; overflow-y: auto; padding: 6px;
+      display: none; z-index: 999;
     }
     .combo.open .combo-panel { display: block; }
-
     .combo-item {
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      color: #f5f5f5;
       display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 14px;
     }
-    .combo-item:hover,
-    .combo-item.active { background: #2b2c3f; outline: 1px solid #FE6F21; }
-
-    .combo-item img {
-      width: 22px; height: 22px; object-fit: contain;
-      background: #18192B; border-radius: 4px;
-      border: 1px solid #3a3b4f;
-    }
-
-    .combo-empty { padding: 10px 12px; color: #bbb; font-size: 13px; }
-
-    /* Selected club chip */
+    .combo-item:hover, .combo-item.active { background: #2b2c3f; outline: 1px solid #FE6F21; }
+    .combo-item img { width: 22px; height: 22px; border-radius: 4px; object-fit: contain; background: #18192B; }
     .club-chip {
-      margin-top: 8px;
-      display: inline-flex; align-items: center; gap: 8px;
-      background: #242537;
-      border: 1px solid #444;
-      padding: 6px 10px; border-radius: 999px;
-      font-size: 13px; color: #ddd;
-      max-width: 100%;
+      margin-top: 8px; display: inline-flex; align-items: center; gap: 8px;
+      background: #242537; border: 1px solid #444;
+      padding: 6px 10px; border-radius: 999px; font-size: 13px; color: #ddd;
     }
-    .club-chip img {
-      width: 20px; height: 20px; object-fit: contain;
-      background: #18192B; border-radius: 50%;
-      border: 1px solid #3a3b4f;
-    }
+    .club-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: contain; background: #18192B; }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Player Data Input</h2>
 
-    <!-- Inputs -->
+    <!-- Basic fields -->
+    <div class="field"><label>First Name <span class="required">*</span></label><input id="firstName"></div>
+    <div class="field"><label>Last Name <span class="required">*</span></label><input id="lastName"></div>
+
+    <!-- Current Club -->
     <div class="field">
-      <label for="firstName">First Name <span class="required">*</span></label>
-      <input type="text" id="firstName" required oninput="capFirstChar(this)">
+      <label>Current Club <span class="required">*</span></label>
+      <div class="combo" id="comboCurrent"><input id="currentClub" placeholder="Search club…"><div class="combo-panel"></div></div>
+      <div id="chipCurrent" class="club-chip" style="display:none;"><img><span></span></div>
     </div>
 
+    <!-- New Club -->
     <div class="field">
-      <label for="lastName">Last Name <span class="required">*</span></label>
-      <input type="text" id="lastName" required oninput="capFirstChar(this)">
+      <label>New Club</label>
+      <div class="combo" id="comboNew"><input id="newClub" placeholder="Search club…"><div class="combo-panel"></div></div>
+      <div id="chipNew" class="club-chip" style="display:none;"><img><span></span></div>
     </div>
 
-    <!-- Searchable dropdown for Current Club with logos -->
-    <div class="field">
-      <label for="currentClub">Current Club <span class="required">*</span></label>
-      <div class="combo" id="clubCombo">
-        <input type="text" id="currentClub" autocomplete="off" placeholder="Search club…" required />
-        <div class="combo-panel" id="clubList"></div>
-      </div>
-      <div id="clubChip" class="club-chip" style="display:none;">
-        <img id="clubChipImg" alt="" />
-        <span id="clubChipName"></span>
-      </div>
-      <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
-    </div>
-
-    <div class="field">
-      <label for="newFirstName">New First Name</label>
-      <input type="text" id="newFirstName" oninput="capFirstChar(this)">
-    </div>
-
-    <div class="field">
-      <label for="newLastName">New Last Name</label>
-      <input type="text" id="newLastName" oninput="capFirstChar(this)">
-    </div>
-
-    <div class="field">
-      <label for="newShortName">New Short Name</label>
-      <input type="text" id="newShortName" oninput="capFirstChar(this)">
-    </div>
-
-    <div class="field">
-      <label for="yearOfBirth">Year of Birth</label>
-      <input type="number" id="yearOfBirth">
-    </div>
-
-    <div class="field">
-      <label for="ca">CA (0–100)</label>
-      <input type="number" id="ca" min="0" max="100">
-      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
-    </div>
-
-    <div class="field">
-      <label for="pa">PA (0–100)</label>
-      <input type="number" id="pa" min="0" max="100">
-      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
-    </div>
-
-    <div class="field">
-      <label for="newClub">New Club</label>
-      <input type="text" id="newClub" oninput="capFirstChar(this)">
-    </div>
+    <!-- Other fields -->
+    <div class="field"><label>New First Name</label><input id="newFirstName"></div>
+    <div class="field"><label>New Last Name</label><input id="newLastName"></div>
+    <div class="field"><label>New Short Name</label><input id="newShortName"></div>
+    <div class="field"><label>Year of Birth</label><input type="number" id="yearOfBirth"></div>
+    <div class="field"><label>CA (0–100)</label><input type="number" id="ca"></div>
+    <div class="field"><label>PA (0–100)</label><input type="number" id="pa"></div>
 
     <!-- Results -->
     <div class="result-label">Results</div>
-    <div id="results" contenteditable="true" oninput="saveResults()"></div>
-
-    <!-- Actions -->
+    <div id="results" contenteditable="true"></div>
     <button class="btn full-width" onclick="addResult()">Add Result</button>
     <div class="actions-row">
-      <button class="btn" style="flex: 1" onclick="copyResults()">Copy All</button>
-      <button class="btn btn-secondary" style="flex: 1" onclick="clearResults()">Clear</button>
+      <button class="btn" onclick="copyResults()">Copy All</button>
+      <button class="btn btn-secondary" onclick="clearResults()">Clear</button>
     </div>
     <div id="copyStatus" class="copy-status"></div>
   </div>
 
   <script>
-    const STORAGE_KEY = "playerEditorResults";
-
-    /* ========= Utilities ========= */
-    function capWords(str) {
-      const s = String(str || "").trim();
-      return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
-    }
-    function capFirstChar(el) {
-      if (!el.value) return;
-      el.value = el.value.replace(/^\s+/, "");
-      el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
-    }
-    function convertTo200Scale(v) {
-      if (v === "" || isNaN(Number(v))) return "";
-      const num = Math.max(0, Math.min(100, Number(v)));
-      return Math.round((num / 100) * 200);
-    }
+    const STORAGE_KEY = "playerResults";
+    const clubs = [
+      { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
+      { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
+      { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
+      { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
+    ];
+    const fallback = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#18192B"/><circle cx="32" cy="32" r="20" fill="#FE6F21"/></svg>');
 
     function buildResult() {
-      const first = capWords(document.getElementById("firstName").value);
-      const last = capWords(document.getElementById("lastName").value);
-      const currentClub = capWords(document.getElementById("currentClub").value);
-      if (!first || !last || !currentClub) return "";
-
-      const newFirst = capWords(document.getElementById("newFirstName").value);
-      const newLast = capWords(document.getElementById("newLastName").value);
-      const shortName = capWords(document.getElementById("newShortName").value);
-      const year = (document.getElementById("yearOfBirth").value || "").trim();
-      const ca = convertTo200Scale(document.getElementById("ca").value);
-      const pa = convertTo200Scale(document.getElementById("pa").value);
-      const newClub = capWords(document.getElementById("newClub").value);
-
-      return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
+      const f = id=>document.getElementById(id).value.trim();
+      if(!f("firstName")||!f("lastName")||!f("currentClub")) return "";
+      const scale=v=>v?Math.round(Math.min(100,Math.max(0,Number(v)))/100*200):"";
+      return `"PLAYER" "${f("firstName")}" "${f("lastName")}" "${f("currentClub")}" "${f("newFirstName")}" "${f("newLastName")}" "${f("newShortName")}" "${f("yearOfBirth")}" "${scale(f("ca"))}" "${scale(f("pa"))}" "${f("newClub")}"`;
     }
+    function addResult(){const r=document.getElementById("results");const line=buildResult();if(line){r.textContent+=(r.textContent?"\n":"")+line;localStorage.setItem(STORAGE_KEY,r.textContent);}}
+    function copyResults(){navigator.clipboard.writeText(document.getElementById("results").textContent);}
+    function clearResults(){document.getElementById("results").textContent="";localStorage.removeItem(STORAGE_KEY);}
+    window.onload=()=>{document.getElementById("results").textContent=localStorage.getItem(STORAGE_KEY)||"";}
 
-    function addResult() {
-      const resultsEl = document.getElementById("results");
-      const line = buildResult();
-      if (line) {
-        resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
-        resultsEl.scrollTop = resultsEl.scrollHeight;
-        saveResults();
-      } else {
-        alert("Please fill in First Name, Last Name, and Current Club.");
-      }
-    }
-
-    function clearResults() {
-      document.getElementById("results").textContent = "";
-      saveResults();
-      setCopyStatus("");
-    }
-
-    function copyResults() {
-      const resultsEl = document.getElementById("results");
-      const text = resultsEl.textContent.trim();
-      if (text) {
-        navigator.clipboard.writeText(text).then(() => setCopyStatus("Copied all results ✅"))
-          .catch(err => alert("Copy failed: " + err));
-      }
-    }
-    function setCopyStatus(msg) { document.getElementById("copyStatus").textContent = msg; }
-    function saveResults() {
-      const text = document.getElementById("results").textContent;
-      localStorage.setItem(STORAGE_KEY, text);
-    }
-    function loadResults() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) document.getElementById("results").textContent = saved;
-    }
-
-    /* ========= Club list with logos =========
-       Replace logo paths with your real files/URLs. */
-    const FALLBACK_LOGO =
-      'data:image/svg+xml;utf8,' +
-      encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
-        <rect width="100%" height="100%" fill="#18192B"/>
-        <circle cx="32" cy="32" r="20" fill="#FE6F21"/>
-      </svg>`);
-
-    const clubs = [
-      { name: "Arsenal",               logo: "logos/arsenal.png" },
-      { name: "Aston Villa",           logo: "logos/aston-villa.png" },
-      { name: "Brighton & Hove Albion",logo: "logos/brighton.png" },
-      { name: "Chelsea",               logo: "logos/chelsea.png" },
-      { name: "Everton",               logo: "logos/everton.png" },
-      { name: "Fulham",                logo: "logos/fulham.png" },
-      { name: "Liverpool",             logo: "logos/liverpool.png" },
-      { name: "Manchester City",       logo: "logos/man-city.png" },
-      { name: "Manchester United",     logo: "logos/man-united.png" },
-      { name: "Newcastle United",      logo: "logos/newcastle.png" },
-      { name: "Tottenham Hotspur",     logo: "logos/tottenham.png" },
-      { name: "West Ham United",       logo: "logos/west-ham.png" },
-      { name: "Wolverhampton Wanderers",logo:"logos/wolves.png" },
-      { name: "AC Milan",              logo: "logos/ac-milan.png" },
-      { name: "Inter Milan",           logo: "logos/inter.png" },
-      { name: "Juventus",              logo: "logos/juventus.png" },
-      { name: "Napoli",                logo: "logos/napoli.png" },
-      { name: "Roma",                  logo: "logos/roma.png" },
-      { name: "Lazio",                 logo: "logos/lazio.png" },
-      { name: "Barcelona",             logo: "logos/barcelona.png" },
-      { name: "Real Madrid",           logo: "logos/real-madrid.png" },
-      { name: "Atlético Madrid",       logo: "logos/atletico.png" },
-      { name: "Sevilla",               logo: "logos/sevilla.png" },
-      { name: "Valencia",              logo: "logos/valencia.png" },
-      { name: "Bayern Munich",         logo: "logos/bayern.png" },
-      { name: "Borussia Dortmund",     logo: "logos/dortmund.png" },
-      { name: "RB Leipzig",            logo: "logos/rb-leipzig.png" },
-      { name: "PSG",                   logo: "logos/psg.png" },
-      { name: "Monaco",                logo: "logos/monaco.png" },
-      { name: "Ajax",                  logo: "logos/ajax.png" },
-      { name: "Feyenoord",             logo: "logos/feyenoord.png" },
-      { name: "PSV Eindhoven",         logo: "logos/psv.png" },
-      { name: "Benfica",               logo: "logos/benfica.png" },
-      { name: "Porto",                 logo: "logos/porto.png" },
-      { name: "Sporting CP",           logo: "logos/sporting.png" },
-      { name: "Celtic",                logo: "logos/celtic.png" },
-      { name: "Rangers",               logo: "logos/rangers.png" },
-      { name: "Galatasaray",           logo: "logos/galatasaray.png" },
-      { name: "Fenerbahçe",            logo: "logos/fenerbahce.png" },
-      { name: "Besiktas",              logo: "logos/besiktas.png" }
-    ];
-
-    // Autocomplete elements
-    const clubInput = document.getElementById("currentClub");
-    const clubList  = document.getElementById("clubList");
-    const clubCombo = document.getElementById("clubCombo");
-    const clubChip  = document.getElementById("clubChip");
-    const clubChipImg = document.getElementById("clubChipImg");
-    const clubChipName = document.getElementById("clubChipName");
-
-    let activeIndex = -1;         // for keyboard navigation
-    let visibleItems = [];        // currently rendered items
-    let selectedLogo = "";        // logo for the selected club (for the chip)
-
-    function openCombo() { clubCombo.classList.add("open"); }
-    function closeCombo() { clubCombo.classList.remove("open"); activeIndex = -1; }
-    function isOpen() { return clubCombo.classList.contains("open"); }
-
-    function filterClubs(q) {
-      const query = (q || "").toLowerCase().trim();
-      if (!query) return clubs.slice(0, 50);
-      return clubs.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
-    }
-
-    function renderList(items) {
-      clubList.innerHTML = "";
-      visibleItems = items;
-      if (items.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "combo-empty";
-        empty.textContent = "No matches";
-        clubList.appendChild(empty);
-        return;
-      }
-      items.forEach((club, idx) => {
-        const div = document.createElement("div");
-        div.className = "combo-item";
-        div.dataset.index = idx;
-
-        const img = document.createElement("img");
-        img.src = club.logo || FALLBACK_LOGO;
-        img.alt = club.name;
-        img.onerror = () => { img.src = FALLBACK_LOGO; };
-
-        const span = document.createElement("span");
-        span.textContent = club.name;
-
-        div.appendChild(img);
-        div.appendChild(span);
-
-        div.addEventListener("mousedown", (e) => {
-          e.preventDefault(); // prevent blur before click
-          selectByIndex(idx);
+    /* Generic dropdown builder for Current/New club */
+    function initCombo(comboId,inputId,chipId){
+      const combo=document.getElementById(comboId);
+      const input=document.getElementById(inputId);
+      const panel=combo.querySelector(".combo-panel");
+      const chip=document.getElementById(chipId);
+      const chipImg=chip.querySelector("img");
+      const chipSpan=chip.querySelector("span");
+      let visible=[],active=-1;
+      function render(list){
+        panel.innerHTML="";visible=list;
+        list.forEach((c,i)=>{
+          const item=document.createElement("div");item.className="combo-item";item.dataset.index=i;
+          const img=document.createElement("img");img.src=c.logo||fallback;img.onerror=()=>img.src=fallback;
+          const span=document.createElement("span");span.textContent=c.name;
+          item.append(img,span);item.onclick=()=>select(i);panel.appendChild(item);
         });
-        clubList.appendChild(div);
-      });
-    }
-
-    function selectByIndex(idx) {
-      if (idx < 0 || idx >= visibleItems.length) return;
-      const club = visibleItems[idx];
-      clubInput.value = club.name;
-      selectedLogo = club.logo || "";
-      showClubChip(club.name, selectedLogo);
-      closeCombo();
-    }
-
-    function showClubChip(name, logoUrl) {
-      clubChipName.textContent = name;
-      clubChipImg.src = logoUrl || FALLBACK_LOGO;
-      clubChipImg.alt = name;
-      clubChipImg.onerror = () => { clubChipImg.src = FALLBACK_LOGO; };
-      clubChip.style.display = name ? "inline-flex" : "none";
-    }
-
-    function moveActive(delta) {
-      if (!isOpen()) openCombo();
-      const items = clubList.querySelectorAll(".combo-item");
-      if (items.length === 0) return;
-      activeIndex = (activeIndex + delta + items.length) % items.length;
-      items.forEach(el => el.classList.remove("active"));
-      const activeEl = items[activeIndex];
-      activeEl.classList.add("active");
-
-      // ensure active item visible
-      const panelRect = clubList.getBoundingClientRect();
-      const itemRect  = activeEl.getBoundingClientRect();
-      if (itemRect.top < panelRect.top) clubList.scrollTop -= (panelRect.top - itemRect.top);
-      if (itemRect.bottom > panelRect.bottom) clubList.scrollTop += (itemRect.bottom - panelRect.bottom);
-    }
-
-    // Events for combo
-    clubInput.addEventListener("focus", () => {
-      renderList(filterClubs(clubInput.value));
-      openCombo();
-    });
-
-    clubInput.addEventListener("input", () => {
-      // user is typing; clear chip if text no longer matches selected
-      selectedLogo = "";
-      showClubChip("", "");
-      renderList(filterClubs(clubInput.value));
-      openCombo();
-    });
-
-    clubInput.addEventListener("keydown", (e) => {
-      if (!isOpen() && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-        renderList(filterClubs(clubInput.value));
-        openCombo();
       }
-      switch (e.key) {
-        case "ArrowDown":
-          e.preventDefault(); moveActive(1); break;
-        case "ArrowUp":
-          e.preventDefault(); moveActive(-1); break;
-        case "Enter":
-          if (isOpen()) {
-            e.preventDefault();
-            if (activeIndex >= 0) selectByIndex(activeIndex);
-            else if (visibleItems.length > 0) selectByIndex(0);
-          }
-          break;
-        case "Escape":
-          closeCombo(); break;
+      function select(i){
+        const c=visible[i];input.value=c.name;chip.style.display="inline-flex";chipImg.src=c.logo||fallback;chipSpan.textContent=c.name;panel.style.display="none";
       }
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!clubCombo.contains(e.target)) closeCombo();
-    });
-
-    /* ========= Persistence ========= */
-    function loadResults() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) document.getElementById("results").textContent = saved;
+      input.onfocus=()=>{render(clubs);panel.style.display="block";};
+      input.oninput=()=>{render(clubs.filter(c=>c.name.toLowerCase().includes(input.value.toLowerCase())));panel.style.display="block";chip.style.display="none";};
+      document.addEventListener("click",e=>{if(!combo.contains(e.target))panel.style.display="none";});
     }
-    function saveResults() {
-      const text = document.getElementById("results").textContent;
-      localStorage.setItem(STORAGE_KEY, text);
-    }
-    function setCopyStatus(msg) { document.getElementById("copyStatus").textContent = msg; }
-
-    window.onload = loadResults;
+    initCombo("comboCurrent","currentClub","chipCurrent");
+    initCombo("comboNew","newClub","chipNew");
   </script>
 </body>
 </html>
