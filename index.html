@@ -33,19 +33,20 @@
     }
 
     .container {
-      background: #18192B;
+      /* Rounded container with gradient border */
+      border-radius: 22px;
+      background:
+        linear-gradient(#18192B, #18192B) padding-box,
+        linear-gradient(90deg,var(--grad-start),var(--grad-end)) border-box;
+      border: 2px solid transparent;
+
       padding: 20px;
-      border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
       max-width: 520px;
       width: 100%;
       display: flex;
       flex-direction: column;
       gap: 6px;
-
-      /* gradient border */
-      border: 2px solid transparent;
-      border-image: linear-gradient(90deg,var(--grad-start),var(--grad-end)) 1;
     }
 
     h2 {
@@ -72,13 +73,15 @@
       width: 100%;
       padding: 10px;
       border: 1px solid #444;
-      border-radius: 8px;
+      border-radius: 12px;
       font-size: 14px;
       background: #242537;
       color: #f5f5f5;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
+    /* Visual capitalization while typing */
+    .field input[type="text"] { text-transform: capitalize; }
 
     .field input:focus,
     #results:focus {
@@ -106,6 +109,7 @@
       overflow-y: auto;
       line-height: 1.6;
       margin-bottom: 14px; /* space above buttons */
+      border-radius: 12px;
     }
 
     /* Buttons */
@@ -113,25 +117,21 @@
       border: none;
       color: white;
       padding: 12px;
-      border-radius: 12px;
+      border-radius: 14px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
       background: linear-gradient(90deg,var(--grad-start),var(--grad-end));
     }
-    .btn:hover {
-      filter: brightness(1.06);
-    }
+    .btn:hover { filter: brightness(1.06); }
 
     .btn-secondary {
       background: transparent;
       border: 2px solid var(--accent);
       color: var(--accent);
     }
-    .btn-secondary:hover {
-      background: rgba(255,90,200,0.08);
-    }
+    .btn-secondary:hover { background: rgba(255,90,200,0.08); }
 
     .full-width { width: 100%; margin: 6px 0 10px; display: block; }
 
@@ -156,7 +156,7 @@
       width: 100%;
       padding: 10px 10px 10px 42px; /* space for logo on the left */
       border: 1px solid #444;
-      border-radius: 8px;
+      border-radius: 12px;
       background: #242537;
       color: #f5f5f5;
     }
@@ -180,7 +180,7 @@
       left: 0; right: 0; top: calc(100% + 6px);
       background: #242537;
       border: 1px solid #444;
-      border-radius: 10px;
+      border-radius: 12px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.35);
       max-height: 260px;
       overflow-y: auto;
@@ -192,7 +192,7 @@
 
     .combo-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 14px; color: #f5f5f5;
+      padding: 8px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; color: #f5f5f5;
     }
     .combo-item:hover,
     .combo-item.active {
@@ -251,7 +251,11 @@
     <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" /></div>
     <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" /></div>
 
-    <div class="field"><label for="yearOfBirth">Year of Birth</label><input id="yearOfBirth" type="number" inputmode="numeric" /></div>
+    <div class="field">
+      <label for="yearOfBirth">Year of Birth (4 digits)</label>
+      <!-- Use text + JS to strictly enforce 4 digits -->
+      <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" oninput="limitYear(this)" />
+    </div>
 
     <div class="field">
       <label for="ca">CA (0–100)</label>
@@ -306,6 +310,11 @@
     function capWords(str) {
       const s = String(str || "").trim();
       return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
+    }
+
+    function limitYear(el){
+      // keep digits only and at most 4 chars
+      el.value = el.value.replace(/\D+/g, '').slice(0, 4);
     }
 
     function validatePercent(el) {
