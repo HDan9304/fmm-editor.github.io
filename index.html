@@ -14,7 +14,6 @@
     body {
       font-family: 'Poppins', sans-serif;
       background-color: #101123;
-      /* dotted halftone pattern */
       background-image: radial-gradient(#2b2c3f 1px, transparent 1px);
       background-size: 20px 20px;
       margin: 0;
@@ -67,19 +66,17 @@
       padding: 10px;
       border: 1px solid #444;
       border-radius: 8px;
-      font-size: 16px; /* prevent zoom on mobile */
+      font-size: 16px;
       background: #242537;
       color: #f5f5f5;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
 
-    /* Capitalize visually */
     .field input[type="text"] {
       text-transform: capitalize;
     }
 
-    /* Glow on focus */
     .field input:focus,
     #result:focus {
       border-color: #FE6F21;
@@ -110,7 +107,6 @@
       min-height: 100px;
     }
 
-    /* Tooltip + Copy button */
     .tooltip {
       position: relative;
       display: flex;
@@ -176,8 +172,8 @@
     </div>
 
     <div class="field">
-      <label for="nation">Nation</label>
-      <input type="text" id="nation" oninput="capitalizeFirstLetter(this)">
+      <label for="nation">Nation <span class="required">*</span></label>
+      <input type="text" id="nation" required oninput="capitalizeFirstLetter(this)">
     </div>
 
     <div class="field">
@@ -206,7 +202,6 @@
       <input type="text" id="newLeague" oninput="capitalizeFirstLetter(this)">
     </div>
 
-    <!-- Result section -->
     <div class="result-label">Result</div>
     <div id="result" contenteditable="true"></div>
 
@@ -242,7 +237,7 @@
 
     function buildResult() {
       const name = document.getElementById("clubName").value.trim();
-      const nation = document.getElementById("nation").value;
+      const nation = document.getElementById("nation").value.trim();
       const newName = document.getElementById("newName").value;
       const newShort = document.getElementById("newShortName").value;
       const abbr = document.getElementById("abbreviation").value.toUpperCase();
@@ -255,9 +250,10 @@
 
     function updateResult() {
       const name = document.getElementById("clubName").value.trim();
+      const nation = document.getElementById("nation").value.trim();
       const resultEl = document.getElementById("result");
 
-      if (!name) {
+      if (!name || !nation) {
         resultEl.textContent = "";
         return;
       }
