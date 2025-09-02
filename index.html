@@ -141,7 +141,7 @@
       min-height: 16px;
     }
 
-    /* ===== Searchable dropdown with logo icon INSIDE the input ===== */
+    /* ===== Searchable dropdown with SQUARE logo icon inside input ===== */
     .combo { position: relative; }
 
     .combo input {
@@ -160,7 +160,7 @@
       transform: translateY(-50%);
       width: 20px;
       height: 20px;
-      border-radius: 50%;
+      border-radius: 6px;           /* square-ish corners */
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
@@ -201,7 +201,7 @@
     .combo-item img {
       width: 22px;
       height: 22px;
-      border-radius: 4px;
+      border-radius: 6px;           /* square-ish corners in list too */
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
@@ -281,10 +281,13 @@
   <script>
     const STORAGE_KEY = "playerEditorResults";
 
-    /* Fallback logo (data URI) */
+    /* SQUARE fallback logo (data URI) */
     const FALLBACK_LOGO =
       'data:image/svg+xml;utf8,' +
-      encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="#18192B"/><circle cx="32" cy="32" r="20" fill="#FE6F21"/></svg>');
+      encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+        <rect width="100%" height="100%" fill="#18192B"/>
+        <rect x="18" y="18" width="28" height="28" rx="4" ry="4" fill="#FE6F21"/>
+      </svg>`);
 
     /* Club list: mix local and web URLs */
     const clubs = [
@@ -347,6 +350,8 @@
         resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
         resultsEl.scrollTop = resultsEl.scrollHeight;
         saveResults();
+        clearAllInputs();                // NEW: auto-clear inputs after adding
+        document.getElementById("firstName").focus();
       } else {
         alert("Please fill in First Name, Last Name, and Current Club.");
       }
@@ -378,6 +383,24 @@
     function loadResults() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) document.getElementById("results").textContent = saved;
+    }
+
+    /* NEW: Clear all input fields + hide logos */
+    function clearAllInputs() {
+      const ids = [
+        "firstName","lastName","currentClub","newClub",
+        "newFirstName","newLastName","newShortName",
+        "yearOfBirth","ca","pa"
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+      });
+      // Hide logos after clearing
+      const lc = document.getElementById("logoCurrent");
+      const ln = document.getElementById("logoNew");
+      if (lc) lc.style.display = "none";
+      if (ln) ln.style.display = "none";
     }
 
     /* ===== Searchable dropdown with logo icon inside input ===== */
