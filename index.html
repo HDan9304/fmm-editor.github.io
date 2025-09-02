@@ -37,26 +37,17 @@
       border: 2px solid #FE6F21;
     }
 
-    h2 {
-      margin: 0 0 18px;
-      font-size: 22px;
-      font-weight: 600;
-      color: #ffffff;
-      text-align: center;
-    }
+    h2 { margin: 0 0 18px; font-size: 22px; font-weight: 600; color: #fff; text-align: center; }
 
     .field { margin-bottom: 15px; }
     .field label {
       display: block;
       margin-bottom: 6px;
       font-weight: 500;
-      color: #dddddd;
+      color: #ddd;
       font-size: 14px;
     }
-    .field label .required {
-      color: #FE6F21;
-      font-weight: bold;
-    }
+    .field label .required { color: #FE6F21; font-weight: bold; }
 
     .field input,
     #results {
@@ -71,29 +62,18 @@
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
 
-    /* Visual capitalization while typing */
     .field input[type="text"] { text-transform: capitalize; }
 
     .field input:focus,
     #results:focus {
       border-color: #FE6F21;
       background: #2b2c3f;
-      box-shadow: 0 0 6px rgba(254, 111, 33, 0.6);
+      box-shadow: 0 0 6px rgba(254,111,33,0.6);
     }
 
-    .hint {
-      margin-top: 4px;
-      font-size: 12px;
-      color: #bdbdbd;
-    }
+    .hint { margin-top: 4px; font-size: 12px; color: #bdbdbd; }
 
-    .result-label {
-      margin-top: 20px;
-      margin-bottom: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #FE6F21;
-    }
+    .result-label { margin-top: 20px; margin-bottom: 8px; font-size: 15px; font-weight: 600; color: #FE6F21; }
 
     #results {
       font-weight: 500;
@@ -104,7 +84,7 @@
       min-height: 120px;
       max-height: 300px;
       overflow-y: auto;
-      line-height: 1.6; /* Spaced lines */
+      line-height: 1.6;
       margin-bottom: 10px;
     }
 
@@ -128,20 +108,48 @@
       color: #FE6F21;
     }
     .btn-secondary:hover { background: rgba(254,111,33,0.08); }
-
     .full-width { width: 100%; }
 
-    .actions-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 6px;
-    }
+    .actions-row { display: flex; gap: 10px; margin-top: 6px; }
+    .copy-status { margin-top: 6px; font-size: 12px; color: #9ad29a; min-height: 16px; }
 
-    .copy-status {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #9ad29a;
-      min-height: 16px;
+    /* ===== Autocomplete (searchable dropdown) styles ===== */
+    .combo {
+      position: relative;
+    }
+    .combo input {
+      caret-color: #fff;
+    }
+    .combo-panel {
+      position: absolute;
+      left: 0; right: 0; top: calc(100% + 6px);
+      background: #242537;
+      border: 1px solid #444;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 6px;
+      z-index: 999;
+      display: none;   /* toggled to block when open */
+    }
+    .combo.open .combo-panel { display: block; }
+    .combo-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #f5f5f5;
+    }
+    .combo-item:hover,
+    .combo-item.active {
+      background: #2b2c3f;
+      outline: 1px solid #FE6F21;
+    }
+    .combo-empty {
+      padding: 10px 12px;
+      color: #bbb;
+      font-size: 13px;
     }
   </style>
 </head>
@@ -150,37 +158,61 @@
     <h2>Player Data Input</h2>
 
     <!-- Inputs -->
-    <div class="field"><label for="firstName">First Name <span class="required">*</span></label>
-      <input type="text" id="firstName" required oninput="capitalizeFirstLetter(this)">
+    <div class="field">
+      <label for="firstName">First Name <span class="required">*</span></label>
+      <input type="text" id="firstName" required oninput="capFirstChar(this)">
     </div>
-    <div class="field"><label for="lastName">Last Name <span class="required">*</span></label>
-      <input type="text" id="lastName" required oninput="capitalizeFirstLetter(this)">
+
+    <div class="field">
+      <label for="lastName">Last Name <span class="required">*</span></label>
+      <input type="text" id="lastName" required oninput="capFirstChar(this)">
     </div>
-    <div class="field"><label for="currentClub">Current Club <span class="required">*</span></label>
-      <input type="text" id="currentClub" required oninput="capitalizeFirstLetter(this)">
+
+    <!-- Searchable dropdown for Current Club -->
+    <div class="field">
+      <label for="currentClub">Current Club <span class="required">*</span></label>
+      <div class="combo" id="clubCombo">
+        <input type="text" id="currentClub" autocomplete="off" placeholder="Search club…" required />
+        <div class="combo-panel" id="clubList"></div>
+      </div>
+      <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
     </div>
-    <div class="field"><label for="newFirstName">New First Name</label>
-      <input type="text" id="newFirstName" oninput="capitalizeFirstLetter(this)">
+
+    <div class="field">
+      <label for="newFirstName">New First Name</label>
+      <input type="text" id="newFirstName" oninput="capFirstChar(this)">
     </div>
-    <div class="field"><label for="newLastName">New Last Name</label>
-      <input type="text" id="newLastName" oninput="capitalizeFirstLetter(this)">
+
+    <div class="field">
+      <label for="newLastName">New Last Name</label>
+      <input type="text" id="newLastName" oninput="capFirstChar(this)">
     </div>
-    <div class="field"><label for="newShortName">New Short Name</label>
-      <input type="text" id="newShortName" oninput="capitalizeFirstLetter(this)">
+
+    <div class="field">
+      <label for="newShortName">New Short Name</label>
+      <input type="text" id="newShortName" oninput="capFirstChar(this)">
     </div>
-    <div class="field"><label for="yearOfBirth">Year of Birth</label>
+
+    <div class="field">
+      <label for="yearOfBirth">Year of Birth</label>
       <input type="number" id="yearOfBirth">
     </div>
-    <div class="field"><label for="ca">CA (0–100)</label>
+
+    <div class="field">
+      <label for="ca">CA (0–100)</label>
       <input type="number" id="ca" min="0" max="100">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
-    <div class="field"><label for="pa">PA (0–100)</label>
+
+    <div class="field">
+      <label for="pa">PA (0–100)</label>
       <input type="number" id="pa" min="0" max="100">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
-    <div class="field"><label for="newClub">New Club</label>
-      <input type="text" id="newClub" oninput="capitalizeFirstLetter(this)">
+
+    <div class="field">
+      <label for="newClub">New Club</label>
+      <input type="text" id="newClub" oninput="capFirstChar(this)">
     </div>
 
     <!-- Results -->
@@ -199,40 +231,32 @@
   <script>
     const STORAGE_KEY = "playerEditorResults";
 
-    /* Keep inputs looking nice while typing (cap first char of the field) */
-    function capitalizeFirstLetter(el) {
-      if (el.value.length > 0) {
-        // Trim leading spaces first, then capitalize first visible letter
-        el.value = el.value.replace(/^\s+/, "");
-        el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
-      }
-    }
-
-    /* Ensure result uses Capitalized Words regardless of how the user typed */
+    /* ===== Utilities ===== */
     function capWords(str) {
-      const s = String(str).trim();
-      // Uppercase the first letter of each word; leave the rest as-is
+      const s = String(str || "").trim();
       return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
     }
-
-    function convertTo200Scale(value) {
-      if (value === "" || isNaN(Number(value))) return "";
-      const num = Math.max(0, Math.min(100, Number(value)));
+    function capFirstChar(el) {
+      if (!el.value) return;
+      el.value = el.value.replace(/^\s+/, "");
+      el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
+    }
+    function convertTo200Scale(v) {
+      if (v === "" || isNaN(Number(v))) return "";
+      const num = Math.max(0, Math.min(100, Number(v)));
       return Math.round((num / 100) * 200);
     }
 
     function buildResult() {
-      // Read and normalize text fields to ensure capitalization in the output
       const first = capWords(document.getElementById("firstName").value);
       const last = capWords(document.getElementById("lastName").value);
       const currentClub = capWords(document.getElementById("currentClub").value);
-
       if (!first || !last || !currentClub) return "";
 
       const newFirst = capWords(document.getElementById("newFirstName").value);
       const newLast = capWords(document.getElementById("newLastName").value);
       const shortName = capWords(document.getElementById("newShortName").value);
-      const year = document.getElementById("yearOfBirth").value.trim();
+      const year = (document.getElementById("yearOfBirth").value || "").trim();
       const ca = convertTo200Scale(document.getElementById("ca").value);
       const pa = convertTo200Scale(document.getElementById("pa").value);
       const newClub = capWords(document.getElementById("newClub").value);
@@ -251,40 +275,157 @@
         alert("Please fill in First Name, Last Name, and Current Club.");
       }
     }
-
     function clearResults() {
       document.getElementById("results").textContent = "";
       saveResults();
       setCopyStatus("");
     }
-
     function copyResults() {
       const resultsEl = document.getElementById("results");
       const text = resultsEl.textContent.trim();
-      if (text !== "") {
-        navigator.clipboard.writeText(text).then(() => {
-          setCopyStatus("Copied all results ✅");
-        }).catch(err => {
-          alert("Copy failed: " + err);
-        });
+      if (text) {
+        navigator.clipboard.writeText(text).then(() => setCopyStatus("Copied all results ✅"))
+          .catch(err => alert("Copy failed: " + err));
       }
     }
-
-    function setCopyStatus(msg) {
-      document.getElementById("copyStatus").textContent = msg;
-    }
-
+    function setCopyStatus(msg) { document.getElementById("copyStatus").textContent = msg; }
     function saveResults() {
       const text = document.getElementById("results").textContent;
       localStorage.setItem(STORAGE_KEY, text);
     }
-
     function loadResults() {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        document.getElementById("results").textContent = saved;
-      }
+      if (saved) document.getElementById("results").textContent = saved;
     }
+
+    /* ===== Searchable Club Dropdown ===== */
+    // Replace/expand this array with your full club list (can be thousands)
+    const clubs = [
+      "Arsenal", "Aston Villa", "Brighton & Hove Albion", "Chelsea", "Everton",
+      "Fulham", "Liverpool", "Manchester City", "Manchester United", "Newcastle United",
+      "Tottenham Hotspur", "West Ham United", "Wolverhampton Wanderers",
+      "AC Milan", "Inter Milan", "Juventus", "Napoli", "Roma", "Lazio",
+      "Barcelona", "Real Madrid", "Atlético Madrid", "Sevilla", "Valencia",
+      "Bayern Munich", "Borussia Dortmund", "RB Leipzig", "PSG", "Monaco",
+      "Ajax", "Feyenoord", "PSV Eindhoven", "Benfica", "Porto", "Sporting CP",
+      "Celtic", "Rangers", "Galatasaray", "Fenerbahçe", "Besiktas"
+    ];
+
+    const clubInput = document.getElementById("currentClub");
+    const clubList = document.getElementById("clubList");
+    const clubCombo = document.getElementById("clubCombo");
+    let activeIndex = -1;   // for keyboard navigation
+    let visibleItems = [];  // currently rendered items
+
+    function openCombo() { clubCombo.classList.add("open"); }
+    function closeCombo() { clubCombo.classList.remove("open"); activeIndex = -1; }
+    function isOpen() { return clubCombo.classList.contains("open"); }
+
+    function filterClubs(q) {
+      const query = (q || "").toLowerCase().trim();
+      if (!query) return clubs.slice(0, 50); // show top N when empty
+      // contains-match, case-insensitive
+      return clubs.filter(c => c.toLowerCase().includes(query)).slice(0, 100);
+    }
+
+    function renderList(items) {
+      clubList.innerHTML = "";
+      visibleItems = items;
+      if (items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "combo-empty";
+        empty.textContent = "No matches";
+        clubList.appendChild(empty);
+        return;
+      }
+      items.forEach((name, idx) => {
+        const div = document.createElement("div");
+        div.className = "combo-item";
+        div.textContent = name;
+        div.dataset.index = idx;
+        div.addEventListener("mousedown", (e) => {
+          // mousedown to prevent input blur before click
+          e.preventDefault();
+          selectByIndex(idx);
+        });
+        clubList.appendChild(div);
+      });
+    }
+
+    function selectByIndex(idx) {
+      if (idx < 0 || idx >= visibleItems.length) return;
+      clubInput.value = visibleItems[idx];
+      closeCombo();
+    }
+
+    function moveActive(delta) {
+      if (!isOpen()) openCombo();
+      const items = clubList.querySelectorAll(".combo-item");
+      if (items.length === 0) return;
+      activeIndex = (activeIndex + delta + items.length) % items.length;
+      items.forEach(el => el.classList.remove("active"));
+      const activeEl = items[activeIndex];
+      activeEl.classList.add("active");
+      // ensure visible
+      const panelRect = clubList.getBoundingClientRect();
+      const itemRect = activeEl.getBoundingClientRect();
+      if (itemRect.top < panelRect.top) clubList.scrollTop -= (panelRect.top - itemRect.top);
+      if (itemRect.bottom > panelRect.bottom) clubList.scrollTop += (itemRect.bottom - panelRect.bottom);
+    }
+
+    clubInput.addEventListener("focus", () => {
+      renderList(filterClubs(clubInput.value));
+      openCombo();
+    });
+
+    clubInput.addEventListener("input", () => {
+      // don't force capitalization while searching; keep user control
+      const items = filterClubs(clubInput.value);
+      renderList(items);
+      openCombo();
+    });
+
+    clubInput.addEventListener("keydown", (e) => {
+      if (!isOpen() && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+        renderList(filterClubs(clubInput.value));
+        openCombo();
+      }
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          moveActive(1);
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          moveActive(-1);
+          break;
+        case "Enter":
+          if (isOpen()) {
+            e.preventDefault();
+            if (activeIndex >= 0) selectByIndex(activeIndex);
+            else if (visibleItems.length > 0) selectByIndex(0);
+          }
+          break;
+        case "Escape":
+          closeCombo();
+          break;
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!clubCombo.contains(e.target)) closeCombo();
+    });
+
+    /* ===== Results persistence ===== */
+    function loadResults() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) document.getElementById("results").textContent = saved;
+    }
+    function saveResults() {
+      const text = document.getElementById("results").textContent;
+      localStorage.setItem(STORAGE_KEY, text);
+    }
+    function setCopyStatus(msg) { document.getElementById("copyStatus").textContent = msg; }
 
     window.onload = loadResults;
   </script>
