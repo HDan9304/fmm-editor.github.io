@@ -106,10 +106,12 @@
       margin-bottom: 10px;
     }
 
-    /* Make Final Results scrollable */
+    /* Make Final Results scrollable with spacing */
     #finalResults {
       max-height: 300px;
       overflow-y: auto;
+      line-height: 1.6;        /* Better spacing between lines */
+      white-space: pre-wrap;   /* Preserve newlines */
     }
 
     /* Buttons */
@@ -293,13 +295,11 @@
       document.getElementById("copyStatus").textContent = msg;
     }
 
-    // Save to localStorage
     function saveResults() {
       const text = document.getElementById("finalResults").textContent;
       localStorage.setItem(STORAGE_KEY, text);
     }
 
-    // Load from localStorage
     function loadResults() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -307,7 +307,6 @@
       }
     }
 
-    // Initialize
     window.onload = loadResults;
   </script>
 </body>
