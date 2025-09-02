@@ -30,7 +30,7 @@
       padding: 20px;
       border-radius: 14px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      max-width: 500px;
+      max-width: 520px;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -108,48 +108,60 @@
       color: #FE6F21;
     }
     .btn-secondary:hover { background: rgba(254,111,33,0.08); }
+
     .full-width { width: 100%; }
 
     .actions-row { display: flex; gap: 10px; margin-top: 6px; }
     .copy-status { margin-top: 6px; font-size: 12px; color: #9ad29a; min-height: 16px; }
 
-    /* ===== Autocomplete (searchable dropdown) styles ===== */
-    .combo {
-      position: relative;
-    }
-    .combo input {
-      caret-color: #fff;
-    }
+    /* ===== Autocomplete (searchable dropdown) ===== */
+    .combo { position: relative; }
+    .combo input { caret-color: #fff; }
+
     .combo-panel {
-      position: absolute;
-      left: 0; right: 0; top: calc(100% + 6px);
+      position: absolute; left: 0; right: 0; top: calc(100% + 6px);
       background: #242537;
       border: 1px solid #444;
       border-radius: 10px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-      max-height: 240px;
-      overflow-y: auto;
-      padding: 6px;
-      z-index: 999;
-      display: none;   /* toggled to block when open */
+      max-height: 260px; overflow-y: auto;
+      padding: 6px; z-index: 999; display: none;
     }
     .combo.open .combo-panel { display: block; }
+
     .combo-item {
-      padding: 10px 12px;
+      padding: 8px 10px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
       color: #f5f5f5;
+      display: flex; align-items: center; gap: 10px;
     }
     .combo-item:hover,
-    .combo-item.active {
-      background: #2b2c3f;
-      outline: 1px solid #FE6F21;
+    .combo-item.active { background: #2b2c3f; outline: 1px solid #FE6F21; }
+
+    .combo-item img {
+      width: 22px; height: 22px; object-fit: contain;
+      background: #18192B; border-radius: 4px;
+      border: 1px solid #3a3b4f;
     }
-    .combo-empty {
-      padding: 10px 12px;
-      color: #bbb;
-      font-size: 13px;
+
+    .combo-empty { padding: 10px 12px; color: #bbb; font-size: 13px; }
+
+    /* Selected club chip */
+    .club-chip {
+      margin-top: 8px;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #242537;
+      border: 1px solid #444;
+      padding: 6px 10px; border-radius: 999px;
+      font-size: 13px; color: #ddd;
+      max-width: 100%;
+    }
+    .club-chip img {
+      width: 20px; height: 20px; object-fit: contain;
+      background: #18192B; border-radius: 50%;
+      border: 1px solid #3a3b4f;
     }
   </style>
 </head>
@@ -168,12 +180,16 @@
       <input type="text" id="lastName" required oninput="capFirstChar(this)">
     </div>
 
-    <!-- Searchable dropdown for Current Club -->
+    <!-- Searchable dropdown for Current Club with logos -->
     <div class="field">
       <label for="currentClub">Current Club <span class="required">*</span></label>
       <div class="combo" id="clubCombo">
         <input type="text" id="currentClub" autocomplete="off" placeholder="Search club…" required />
         <div class="combo-panel" id="clubList"></div>
+      </div>
+      <div id="clubChip" class="club-chip" style="display:none;">
+        <img id="clubChipImg" alt="" />
+        <span id="clubChipName"></span>
       </div>
       <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
     </div>
@@ -231,7 +247,7 @@
   <script>
     const STORAGE_KEY = "playerEditorResults";
 
-    /* ===== Utilities ===== */
+    /* ========= Utilities ========= */
     function capWords(str) {
       const s = String(str || "").trim();
       return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
@@ -275,11 +291,13 @@
         alert("Please fill in First Name, Last Name, and Current Club.");
       }
     }
+
     function clearResults() {
       document.getElementById("results").textContent = "";
       saveResults();
       setCopyStatus("");
     }
+
     function copyResults() {
       const resultsEl = document.getElementById("results");
       const text = resultsEl.textContent.trim();
@@ -298,24 +316,69 @@
       if (saved) document.getElementById("results").textContent = saved;
     }
 
-    /* ===== Searchable Club Dropdown ===== */
-    // Replace/expand this array with your full club list (can be thousands)
+    /* ========= Club list with logos =========
+       Replace logo paths with your real files/URLs. */
+    const FALLBACK_LOGO =
+      'data:image/svg+xml;utf8,' +
+      encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+        <rect width="100%" height="100%" fill="#18192B"/>
+        <circle cx="32" cy="32" r="20" fill="#FE6F21"/>
+      </svg>`);
+
     const clubs = [
-      "Arsenal", "Aston Villa", "Brighton & Hove Albion", "Chelsea", "Everton",
-      "Fulham", "Liverpool", "Manchester City", "Manchester United", "Newcastle United",
-      "Tottenham Hotspur", "West Ham United", "Wolverhampton Wanderers",
-      "AC Milan", "Inter Milan", "Juventus", "Napoli", "Roma", "Lazio",
-      "Barcelona", "Real Madrid", "Atlético Madrid", "Sevilla", "Valencia",
-      "Bayern Munich", "Borussia Dortmund", "RB Leipzig", "PSG", "Monaco",
-      "Ajax", "Feyenoord", "PSV Eindhoven", "Benfica", "Porto", "Sporting CP",
-      "Celtic", "Rangers", "Galatasaray", "Fenerbahçe", "Besiktas"
+      { name: "Arsenal",               logo: "logos/arsenal.png" },
+      { name: "Aston Villa",           logo: "logos/aston-villa.png" },
+      { name: "Brighton & Hove Albion",logo: "logos/brighton.png" },
+      { name: "Chelsea",               logo: "logos/chelsea.png" },
+      { name: "Everton",               logo: "logos/everton.png" },
+      { name: "Fulham",                logo: "logos/fulham.png" },
+      { name: "Liverpool",             logo: "logos/liverpool.png" },
+      { name: "Manchester City",       logo: "logos/man-city.png" },
+      { name: "Manchester United",     logo: "logos/man-united.png" },
+      { name: "Newcastle United",      logo: "logos/newcastle.png" },
+      { name: "Tottenham Hotspur",     logo: "logos/tottenham.png" },
+      { name: "West Ham United",       logo: "logos/west-ham.png" },
+      { name: "Wolverhampton Wanderers",logo:"logos/wolves.png" },
+      { name: "AC Milan",              logo: "logos/ac-milan.png" },
+      { name: "Inter Milan",           logo: "logos/inter.png" },
+      { name: "Juventus",              logo: "logos/juventus.png" },
+      { name: "Napoli",                logo: "logos/napoli.png" },
+      { name: "Roma",                  logo: "logos/roma.png" },
+      { name: "Lazio",                 logo: "logos/lazio.png" },
+      { name: "Barcelona",             logo: "logos/barcelona.png" },
+      { name: "Real Madrid",           logo: "logos/real-madrid.png" },
+      { name: "Atlético Madrid",       logo: "logos/atletico.png" },
+      { name: "Sevilla",               logo: "logos/sevilla.png" },
+      { name: "Valencia",              logo: "logos/valencia.png" },
+      { name: "Bayern Munich",         logo: "logos/bayern.png" },
+      { name: "Borussia Dortmund",     logo: "logos/dortmund.png" },
+      { name: "RB Leipzig",            logo: "logos/rb-leipzig.png" },
+      { name: "PSG",                   logo: "logos/psg.png" },
+      { name: "Monaco",                logo: "logos/monaco.png" },
+      { name: "Ajax",                  logo: "logos/ajax.png" },
+      { name: "Feyenoord",             logo: "logos/feyenoord.png" },
+      { name: "PSV Eindhoven",         logo: "logos/psv.png" },
+      { name: "Benfica",               logo: "logos/benfica.png" },
+      { name: "Porto",                 logo: "logos/porto.png" },
+      { name: "Sporting CP",           logo: "logos/sporting.png" },
+      { name: "Celtic",                logo: "logos/celtic.png" },
+      { name: "Rangers",               logo: "logos/rangers.png" },
+      { name: "Galatasaray",           logo: "logos/galatasaray.png" },
+      { name: "Fenerbahçe",            logo: "logos/fenerbahce.png" },
+      { name: "Besiktas",              logo: "logos/besiktas.png" }
     ];
 
+    // Autocomplete elements
     const clubInput = document.getElementById("currentClub");
-    const clubList = document.getElementById("clubList");
+    const clubList  = document.getElementById("clubList");
     const clubCombo = document.getElementById("clubCombo");
-    let activeIndex = -1;   // for keyboard navigation
-    let visibleItems = [];  // currently rendered items
+    const clubChip  = document.getElementById("clubChip");
+    const clubChipImg = document.getElementById("clubChipImg");
+    const clubChipName = document.getElementById("clubChipName");
+
+    let activeIndex = -1;         // for keyboard navigation
+    let visibleItems = [];        // currently rendered items
+    let selectedLogo = "";        // logo for the selected club (for the chip)
 
     function openCombo() { clubCombo.classList.add("open"); }
     function closeCombo() { clubCombo.classList.remove("open"); activeIndex = -1; }
@@ -323,9 +386,8 @@
 
     function filterClubs(q) {
       const query = (q || "").toLowerCase().trim();
-      if (!query) return clubs.slice(0, 50); // show top N when empty
-      // contains-match, case-insensitive
-      return clubs.filter(c => c.toLowerCase().includes(query)).slice(0, 100);
+      if (!query) return clubs.slice(0, 50);
+      return clubs.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
     }
 
     function renderList(items) {
@@ -338,14 +400,24 @@
         clubList.appendChild(empty);
         return;
       }
-      items.forEach((name, idx) => {
+      items.forEach((club, idx) => {
         const div = document.createElement("div");
         div.className = "combo-item";
-        div.textContent = name;
         div.dataset.index = idx;
+
+        const img = document.createElement("img");
+        img.src = club.logo || FALLBACK_LOGO;
+        img.alt = club.name;
+        img.onerror = () => { img.src = FALLBACK_LOGO; };
+
+        const span = document.createElement("span");
+        span.textContent = club.name;
+
+        div.appendChild(img);
+        div.appendChild(span);
+
         div.addEventListener("mousedown", (e) => {
-          // mousedown to prevent input blur before click
-          e.preventDefault();
+          e.preventDefault(); // prevent blur before click
           selectByIndex(idx);
         });
         clubList.appendChild(div);
@@ -354,8 +426,19 @@
 
     function selectByIndex(idx) {
       if (idx < 0 || idx >= visibleItems.length) return;
-      clubInput.value = visibleItems[idx];
+      const club = visibleItems[idx];
+      clubInput.value = club.name;
+      selectedLogo = club.logo || "";
+      showClubChip(club.name, selectedLogo);
       closeCombo();
+    }
+
+    function showClubChip(name, logoUrl) {
+      clubChipName.textContent = name;
+      clubChipImg.src = logoUrl || FALLBACK_LOGO;
+      clubChipImg.alt = name;
+      clubChipImg.onerror = () => { clubChipImg.src = FALLBACK_LOGO; };
+      clubChip.style.display = name ? "inline-flex" : "none";
     }
 
     function moveActive(delta) {
@@ -366,22 +449,25 @@
       items.forEach(el => el.classList.remove("active"));
       const activeEl = items[activeIndex];
       activeEl.classList.add("active");
-      // ensure visible
+
+      // ensure active item visible
       const panelRect = clubList.getBoundingClientRect();
-      const itemRect = activeEl.getBoundingClientRect();
+      const itemRect  = activeEl.getBoundingClientRect();
       if (itemRect.top < panelRect.top) clubList.scrollTop -= (panelRect.top - itemRect.top);
       if (itemRect.bottom > panelRect.bottom) clubList.scrollTop += (itemRect.bottom - panelRect.bottom);
     }
 
+    // Events for combo
     clubInput.addEventListener("focus", () => {
       renderList(filterClubs(clubInput.value));
       openCombo();
     });
 
     clubInput.addEventListener("input", () => {
-      // don't force capitalization while searching; keep user control
-      const items = filterClubs(clubInput.value);
-      renderList(items);
+      // user is typing; clear chip if text no longer matches selected
+      selectedLogo = "";
+      showClubChip("", "");
+      renderList(filterClubs(clubInput.value));
       openCombo();
     });
 
@@ -392,13 +478,9 @@
       }
       switch (e.key) {
         case "ArrowDown":
-          e.preventDefault();
-          moveActive(1);
-          break;
+          e.preventDefault(); moveActive(1); break;
         case "ArrowUp":
-          e.preventDefault();
-          moveActive(-1);
-          break;
+          e.preventDefault(); moveActive(-1); break;
         case "Enter":
           if (isOpen()) {
             e.preventDefault();
@@ -407,8 +489,7 @@
           }
           break;
         case "Escape":
-          closeCombo();
-          break;
+          closeCombo(); break;
       }
     });
 
@@ -416,7 +497,7 @@
       if (!clubCombo.contains(e.target)) closeCombo();
     });
 
-    /* ===== Results persistence ===== */
+    /* ========= Persistence ========= */
     function loadResults() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) document.getElementById("results").textContent = saved;
