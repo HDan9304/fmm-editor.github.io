@@ -131,9 +131,7 @@
       border: 2px solid #FE6F21;
       color: #FE6F21;
     }
-    .btn-secondary:hover {
-      background: rgba(254,111,33,0.08);
-    }
+    .btn-secondary:hover { background: rgba(254,111,33,0.08); }
 
     .full-width { width: 100%; }
 
@@ -147,7 +145,7 @@
       margin-top: 6px;
       font-size: 12px;
       color: #9ad29a;
-      min-height: 16px; /* reserve space so layout doesn't jump */
+      min-height: 16px;
     }
   </style>
 </head>
@@ -156,46 +154,36 @@
     <h2>Player Data Input</h2>
 
     <!-- Inputs -->
-    <div class="field">
-      <label for="firstName">First Name <span class="required">*</span></label>
+    <div class="field"><label for="firstName">First Name <span class="required">*</span></label>
       <input type="text" id="firstName" required oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field">
-      <label for="lastName">Last Name <span class="required">*</span></label>
+    <div class="field"><label for="lastName">Last Name <span class="required">*</span></label>
       <input type="text" id="lastName" required oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field">
-      <label for="currentClub">Current Club <span class="required">*</span></label>
+    <div class="field"><label for="currentClub">Current Club <span class="required">*</span></label>
       <input type="text" id="currentClub" required oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field">
-      <label for="newFirstName">New First Name</label>
+    <div class="field"><label for="newFirstName">New First Name</label>
       <input type="text" id="newFirstName" oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field">
-      <label for="newLastName">New Last Name</label>
+    <div class="field"><label for="newLastName">New Last Name</label>
       <input type="text" id="newLastName" oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field">
-      <label for="newShortName">New Short Name</label>
+    <div class="field"><label for="newShortName">New Short Name</label>
       <input type="text" id="newShortName" oninput="capitalizeFirstLetter(this)">
     </div>
-    <div class="field">
-      <label for="yearOfBirth">Year of Birth</label>
+    <div class="field"><label for="yearOfBirth">Year of Birth</label>
       <input type="number" id="yearOfBirth" oninput="updateResult()">
     </div>
-    <div class="field">
-      <label for="ca">CA (0–100)</label>
+    <div class="field"><label for="ca">CA (0–100)</label>
       <input type="number" id="ca" min="0" max="100" oninput="validateRangePercent(this)">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
-    <div class="field">
-      <label for="pa">PA (0–100)</label>
+    <div class="field"><label for="pa">PA (0–100)</label>
       <input type="number" id="pa" min="0" max="100" oninput="validateRangePercent(this)">
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
-    <div class="field">
-      <label for="newClub">New Club</label>
+    <div class="field"><label for="newClub">New Club</label>
       <input type="text" id="newClub" oninput="capitalizeFirstLetter(this)">
     </div>
 
@@ -203,14 +191,14 @@
     <div class="result-label">Preview</div>
     <div id="preview" contenteditable="true"></div>
 
-    <!-- Primary action under preview -->
+    <!-- Add Button -->
     <button class="btn full-width" onclick="addToResults()">Add to Results</button>
 
     <!-- Final Results -->
     <div class="result-label">Final Results</div>
-    <div id="finalResults" contenteditable="true"></div>
+    <div id="finalResults" contenteditable="true" oninput="saveResults()"></div>
 
-    <!-- Actions below final results -->
+    <!-- Actions -->
     <div class="actions-row">
       <button class="btn" style="flex: 1" onclick="copyFinalResults()">Copy All</button>
       <button class="btn btn-secondary" style="flex: 1" onclick="clearResults()">Clear</button>
@@ -219,6 +207,8 @@
   </div>
 
   <script>
+    const STORAGE_KEY = "playerEditorResults";
+
     function capitalizeFirstLetter(el) {
       if (el.value.length > 0) {
         el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
@@ -248,12 +238,8 @@
       const newLast = document.getElementById("newLastName").value;
       const shortName = document.getElementById("newShortName").value;
       const year = document.getElementById("yearOfBirth").value;
-
-      const caPercent = document.getElementById("ca").value;
-      const paPercent = document.getElementById("pa").value;
-      const ca = convertTo200Scale(caPercent);
-      const pa = convertTo200Scale(paPercent);
-
+      const ca = convertTo200Scale(document.getElementById("ca").value);
+      const pa = convertTo200Scale(document.getElementById("pa").value);
       const newClub = document.getElementById("newClub").value;
 
       return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
@@ -280,14 +266,15 @@
       const line = previewEl.textContent.trim();
       if (line !== "") {
         finalEl.textContent += (finalEl.textContent ? "\n" : "") + line;
-        // Optional: auto-scroll to bottom when new line added
         finalEl.scrollTop = finalEl.scrollHeight;
+        saveResults();
       }
     }
 
     function clearResults() {
       document.getElementById("finalResults").textContent = "";
-      setCopyStatus(""); // clear status message
+      saveResults();
+      setCopyStatus("");
     }
 
     function copyFinalResults() {
@@ -305,6 +292,23 @@
     function setCopyStatus(msg) {
       document.getElementById("copyStatus").textContent = msg;
     }
+
+    // Save to localStorage
+    function saveResults() {
+      const text = document.getElementById("finalResults").textContent;
+      localStorage.setItem(STORAGE_KEY, text);
+    }
+
+    // Load from localStorage
+    function loadResults() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        document.getElementById("finalResults").textContent = saved;
+      }
+    }
+
+    // Initialize
+    window.onload = loadResults;
   </script>
 </body>
 </html>
