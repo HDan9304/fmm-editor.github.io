@@ -27,6 +27,31 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/d/d0/Brighton_and_Hove_Albion_FC_crest.svg"
   },
 {
+    "common": "Burnley",
+    "official": "Burnley",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/6/6d/Burnley_FC_Logo.svg"
+  },
+{
+    "common": "Chelsea",
+    "official": "Chelsea",
+    "logo": "https://en.m.wikipedia.org/wiki/Chelsea_F.C.#/media/File%3AChelsea_FC.svg"
+  },
+{
+    "common": "Crystal Palace",
+    "official": "Crystal Palace",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/a/a2/Crystal_Palace_FC_logo_%282022%29.svg"
+  },
+{
+    "common": "Everton",
+    "official": "Everton",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg"
+  },
+{
+    "common": "Fulham",
+    "official": "Fulham",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg"
+  },
+{
     "common": "Leeds",
     "official": "Leeds United",
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/54/Leeds_United_F.C._logo.svg"
