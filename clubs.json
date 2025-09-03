@@ -34,5 +34,13 @@
     "official": "Paris Saint-Germain",
     "logo": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
     "aliases": ["Paris SG", "Paris Saint Germain"]
+    [
+  {
+    "common": "Bournemouth",
+    "official": "AFC Bournemouth",
+    "aliases": [
+      "Bournemouth"
+    ],
+    "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e5/AFC_Bournemouth_%282013%29.svg/152px-AFC_Bournemouth_%282013%29.svg.png"
   }
 ]
