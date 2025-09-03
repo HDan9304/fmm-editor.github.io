@@ -67,9 +67,8 @@
     }
     .field label .required { color: var(--accent); font-weight: 700; }
 
-    /* Inputs + results */
-    .field input,
-    #results {
+    /* Inputs */
+    .field input {
       width: 100%;
       padding: 10px;
       border: 1px solid #444;
@@ -82,8 +81,7 @@
     }
     .field input[type="text"] { text-transform: capitalize; }
 
-    .field input:focus,
-    #results:focus {
+    .field input:focus {
       border-color: var(--accent);
       background: #2b2c3f;
       box-shadow: 0 0 8px rgba(255, 90, 200, 0.55);
@@ -105,19 +103,52 @@
       color: var(--accent);
     }
 
+    /* Results list */
     #results {
-      font-weight: 500;
-      white-space: pre-wrap;
-      padding: 16px 12px;
-      font-family: 'Poppins', monospace;
-      font-size: 14px;
-      min-height: 120px;
+      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 12px;
+      background: #242537;
       max-height: 300px;
       overflow-y: auto;
-      line-height: 1.6;
-      margin-bottom: 14px; /* space above buttons */
-      border-radius: 12px;
+      margin-bottom: 14px;
     }
+    .res-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #242537;
+      outline: 1px solid rgba(255,90,200,0.15);
+      margin-bottom: 8px;
+    }
+    .res-text {
+      flex: 1 1 auto;
+      min-height: 18px;
+      line-height: 1.6;
+      font-family: 'Poppins', monospace;
+      font-size: 14px;
+      color: #f5f5f5;
+      outline: none;
+    }
+    .res-text[contenteditable="true"]:focus {
+      background: #2b2c3f;
+      box-shadow: inset 0 0 0 1px var(--accent), 0 0 8px rgba(255, 90, 200, 0.35);
+      border-radius: 6px;
+      padding: 2px 4px;
+    }
+    .icon-btn {
+      border: none;
+      background: transparent;
+      color: #ff9bd9;
+      font-size: 16px;
+      line-height: 1;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .icon-btn:hover { background: rgba(255,90,200,0.1); }
 
     /* Buttons */
     .btn {
@@ -156,28 +187,23 @@
       min-height: 16px;
     }
 
-    /* ===== Searchable dropdown with SQUARE logo icon inside input ===== */
+    /* Combo (searchable dropdown with square logo inside input) */
     .combo { position: relative; }
-    /* Default: NO reserved space for logo */
     .combo input { padding: 10px; }
-    /* Only when a logo is present, add left padding */
     .combo.has-logo input { padding-left: 42px; }
-
     .combo-logo {
       position: absolute;
-      top: 50%;
-      left: 10px;
+      top: 50%; left: 10px;
       transform: translateY(-50%);
       width: 20px; height: 20px;
-      border-radius: 6px;       /* square-ish */
+      border-radius: 6px;
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
       pointer-events: none;
-      display: none; /* default hidden */
+      display: none;
     }
     .combo.has-logo .combo-logo { display: block; }
-
     .combo-panel {
       position: absolute;
       left: 0; right: 0; top: calc(100% + 6px);
@@ -192,19 +218,17 @@
       z-index: 999;
     }
     .combo.open .combo-panel { display: block; }
-
     .combo-item {
       display: flex; align-items: center; gap: 10px;
       padding: 8px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; color: #f5f5f5;
     }
-    .combo-item:hover,
-    .combo-item.active {
+    .combo-item:hover, .combo-item.active {
       background: #2b2c3f;
       outline: 1px solid var(--accent);
     }
     .combo-item img {
       width: 22px; height: 22px;
-      border-radius: 6px;       /* square-ish in list */
+      border-radius: 6px;
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
@@ -274,13 +298,13 @@
 
     <!-- Results -->
     <div class="result-label">Results</div>
-    <div id="results" contenteditable="true"></div>
+    <div id="results"></div>
 
     <!-- Buttons -->
-    <button class="btn full-width" onclick="addResult()">Add Result</button>
+    <button class="btn full-width" id="addBtn">Add Result</button>
     <div class="actions-row">
-      <button class="btn" onclick="copyResults()">Copy All</button>
-      <button class="btn btn-secondary" onclick="clearResults()">Clear</button>
+      <button class="btn" id="copyBtn">Copy All</button>
+      <button class="btn btn-secondary" id="clearBtn">Clear</button>
     </div>
     <div id="copyStatus" class="copy-status"></div>
   </div>
@@ -302,7 +326,6 @@
       { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
       { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
       { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
-      // add more...
     ];
 
     /* ===== Utilities ===== */
@@ -367,59 +390,117 @@
       return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
     }
 
+    /* ===== Results rendering (per-line) ===== */
+    function makeLineEl(text){
+      const line = document.createElement('div');
+      line.className = 'res-line';
+
+      const span = document.createElement('span');
+      span.className = 'res-text';
+      span.contentEditable = 'true';
+      span.textContent = text;
+
+      const del = document.createElement('button');
+      del.className = 'icon-btn';
+      del.title = 'Delete line';
+      del.textContent = '🗑';
+
+      del.addEventListener('click', () => {
+        line.remove();
+        saveResults();
+      });
+
+      span.addEventListener('input', () => {
+        saveResults();
+      });
+
+      line.append(span, del);
+      return line;
+    }
+
+    function appendResultLine(text){
+      const results = document.getElementById('results');
+      results.appendChild(makeLineEl(text));
+      results.scrollTop = results.scrollHeight;
+      saveResults();
+    }
+
+    function getAllLines(){
+      return Array.from(document.querySelectorAll('#results .res-text'))
+              .map(el => el.textContent);
+    }
+
+    function renderFromLines(lines){
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+      lines.forEach(t => {
+        if (t && String(t).trim() !== '') results.appendChild(makeLineEl(t));
+      });
+    }
+
+    /* ===== Storage (backward compatible) ===== */
+    function saveResults(){
+      const lines = getAllLines();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+    }
+
+    function loadResults(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+
+      let lines = [];
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          lines = parsed;
+        } else {
+          throw new Error('not array');
+        }
+      } catch (e) {
+        // Backward compatibility with plain text storage
+        lines = raw.split(/\n/);
+      }
+      renderFromLines(lines);
+    }
+
+    /* ===== Actions ===== */
     function addResult() {
-      // Block add if year is filled but invalid
-      const yearEl = document.getElementById('yearOfBirth');
       if (!isYearValidOrEmpty()) {
+        const yearEl = document.getElementById('yearOfBirth');
         yearEl.classList.add('error');
         document.getElementById('yearWarn').style.display = 'block';
         alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).');
         return;
       }
 
-      const resultsEl = document.getElementById("results");
       const line = buildResult();
       if (line) {
-        resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
-        resultsEl.scrollTop = resultsEl.scrollHeight;
-        saveResults();
+        appendResultLine(line);
         clearAllInputs();
       } else {
         alert("Please fill in First Name, Last Name, and Current Club.");
       }
     }
 
-    function clearResults() {
-      document.getElementById("results").textContent = "";
+    function clearResults(){
+      document.getElementById('results').innerHTML = '';
       saveResults();
-      setCopyStatus("");
+      setCopyStatus('');
     }
 
-    function copyResults() {
-      const text = document.getElementById("results").textContent.trim();
+    function copyResults(){
+      const text = getAllLines().join('\n').trim();
       if (text) {
-        navigator.clipboard.writeText(text).then(() => {
-          setCopyStatus("Copied all results ✅");
-        }).catch(err => {
-          alert("Copy failed: " + err);
-        });
+        navigator.clipboard.writeText(text)
+          .then(() => setCopyStatus('Copied all results ✅'))
+          .catch(err => alert('Copy failed: ' + err));
       }
     }
 
-    function setCopyStatus(msg) {
-      document.getElementById("copyStatus").textContent = msg;
+    function setCopyStatus(msg){
+      document.getElementById('copyStatus').textContent = msg || '';
     }
 
-    function saveResults() {
-      localStorage.setItem(STORAGE_KEY, document.getElementById("results").textContent);
-    }
-
-    function loadResults() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) document.getElementById("results").textContent = saved;
-    }
-
-    /* Clear inputs + logos */
     function clearAllInputs() {
       const ids = [
         "firstName","lastName","currentClub","newClub",
@@ -486,7 +567,7 @@
           item.append(img, span);
 
           item.addEventListener("mousedown", (e) => {
-            e.preventDefault();  // keep focus on input
+            e.preventDefault();
             select(idx);
           });
 
@@ -558,20 +639,4 @@
     window.onload = function() {
       loadResults();
       initCombo("comboCurrent", "currentClub", "logoCurrent");
-      initCombo("comboNew",     "newClub",     "logoNew");
-
-      // Enter-to-Add globally (but ignore if a combo dropdown is open or results box focused)
-      document.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter') return;
-        const active = document.activeElement;
-        const isResults = active && (active.id === 'results' || active.isContentEditable);
-        const comboOpen = document.querySelector('.combo.open');
-        if (!isResults && !comboOpen) {
-          e.preventDefault();
-          addResult();
-        }
-      });
-    };
-  </script>
-</body>
-</html>
+      initCombo("comboNew
