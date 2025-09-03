@@ -244,16 +244,30 @@
     .combo-item:hover, .combo-item.active { background:rgba(43,44,63,.12); outline:1px solid var(--accent); }
     .combo-item img { width:22px; height:22px; border-radius:4px; object-fit:contain; background:transparent; border:0; box-shadow:none; }
 
-    /* Range (slider) styles */
-    .range-wrap { margin-top:6px; }
+    /* Number + Slider paired */
+    .num-range {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    @media (max-width: 560px) {
+      .num-range { grid-template-columns: 1fr; }
+    }
+
+    /* Range (slider) styles with instant fill using CSS var */
     input[type="range"] {
+      --fill: 0%;
       -webkit-appearance: none;
       width: 100%;
       height: 6px;
       border-radius: 999px;
-      background: linear-gradient(90deg,var(--grad-start),var(--grad-end)) 0/0% 100% no-repeat, #3a3b52;
+      background:
+        linear-gradient(90deg,var(--grad-start),var(--grad-end)) 0/var(--fill) 100% no-repeat,
+        #3a3b52;
       outline: none;
       border: 1px solid var(--border);
+      transition: background-size .0s; /* instant */
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
@@ -393,7 +407,7 @@
           <div id="yearWarn" class="req-msg">Year should be between 1900 and 2025.</div>
         </div>
 
-        <!-- CA with slider -->
+        <!-- CA paired with slider -->
         <div class="field">
           <div class="field-label">
             <label for="ca">CA</label>
@@ -403,13 +417,13 @@
             </span>
             <span class="mini-note" id="caOut">→ 0–200: —</span>
           </div>
-          <input id="ca" type="number" min="0" max="100" inputmode="numeric" />
-          <div class="range-wrap">
+          <div class="num-range">
+            <input id="ca" type="number" min="0" max="100" inputmode="numeric" />
             <input id="caSlider" type="range" min="0" max="100" step="1" />
           </div>
         </div>
 
-        <!-- PA with slider -->
+        <!-- PA paired with slider -->
         <div class="field">
           <div class="field-label">
             <label for="pa">PA</label>
@@ -419,8 +433,8 @@
             </span>
             <span class="mini-note" id="paOut">→ 0–200: —</span>
           </div>
-          <input id="pa" type="number" min="0" max="100" inputmode="numeric" />
-          <div class="range-wrap">
+          <div class="num-range">
+            <input id="pa" type="number" min="0" max="100" inputmode="numeric" />
             <input id="paSlider" type="range" min="0" max="100" step="1" />
           </div>
         </div>
@@ -551,30 +565,30 @@
       }
       function clampPercent(el){ if (el.value === "") return; let n=parseInt(el.value,10); if(isNaN(n)){el.value=""; return;} el.value=Math.max(0, Math.min(100, n)); }
 
-      /* Range helpers */
+      /* Range helpers (instant fill via CSS var) */
       function setRangeFill(slider) {
-        const v = Number(slider.value)||0;
-        slider.style.backgroundSize = v + "% 100%";
+        const v = Math.max(0, Math.min(100, Number(slider.value)||0));
+        slider.style.setProperty('--fill', v + '%');
       }
       function bindNumberAndSlider(numId, sliderId, outId){
         const num = $(numId), slider = $(sliderId), out = $(outId);
         const updateOut = () => { const converted = convertTo200Scale(num.value); out.textContent = "→ 0–200: " + (converted === "" ? "—" : converted); };
 
-        // number -> slider
-        num.addEventListener('input', () => {
+        const syncFromNumber = () => {
           if (num.value === "") { slider.value = 0; setRangeFill(slider); updateOut(); return; }
           clampPercent(num);
           slider.value = num.value;
           setRangeFill(slider);
           updateOut();
-        });
-
-        // slider -> number
-        slider.addEventListener('input', () => {
+        };
+        const syncFromSlider = () => {
           num.value = slider.value;
           setRangeFill(slider);
           updateOut();
-        });
+        };
+
+        num.addEventListener('input', syncFromNumber);
+        slider.addEventListener('input', syncFromSlider);
 
         // init
         setRangeFill(slider);
@@ -656,8 +670,7 @@
         }
         function tipDuration(tipEl){
           const len = (tipEl.textContent || '').trim().length;
-          // ~25ms per char, min 1400ms, max 5200ms
-          return Math.max(1400, Math.min(5200, 25 * len));
+          return Math.max(1400, Math.min(5200, 25 * len)); // ~25ms/char
         }
         function openTip(h){
           const tip = h.querySelector('.tip');
@@ -682,12 +695,11 @@
         if (!isYearValidOrEmpty()) { $('yearOfBirth').classList.add('error'); $('yearWarn').style.display='block'; alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).'); return; }
         const line = buildResult(); if (!line) return;
         appendResultLine(line);
-        ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa","caSlider","paSlider"].forEach(id=>{ const el=$(id); if(el) el.value=""; });
-        // Reset sliders to 0
-        setRangeFill($('caSlider')); setRangeFill($('paSlider'));
+        ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"].forEach(id=>{ const el=$(id); if(el) el.value=""; });
+        // Reset sliders visually
+        ["caSlider","paSlider"].forEach(id => { const s=$(id); if(s){ s.value=0; setRangeFill(s); }});
         ["comboCurrent","comboNew"].forEach(id=>{ const c=$(id); if(c){ c.classList.remove("has-logo"); const img=c.querySelector(".combo-logo"); if(img) img.style.display="none"; }});
         $('yearWarn').style.display='none'; $('yearOfBirth').classList.remove('error');
-        // update mini-notes
         $('caOut').textContent = "→ 0–200: —";
         $('paOut').textContent = "→ 0–200: —";
       }
@@ -711,7 +723,7 @@
         $('ca').addEventListener('input', e => clampPercent(e.target));
         $('pa').addEventListener('input', e => clampPercent(e.target));
 
-        // Bind sliders
+        // Bind and sync sliders with numbers (instant fill)
         bindNumberAndSlider('ca','caSlider','caOut');
         bindNumberAndSlider('pa','paSlider','paOut');
 
