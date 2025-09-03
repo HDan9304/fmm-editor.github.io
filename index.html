@@ -10,10 +10,10 @@
 
   <style>
     :root{
+      /* Pink gradient theme */
       --grad-start:#FF7AD9;
       --grad-end:#FF3D7F;
       --accent:#FF5AC8;
-      --error:#FF4D9A;
     }
 
     * { box-sizing: border-box; }
@@ -41,7 +41,7 @@
 
       padding: 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      max-width: 560px;
+      max-width: 520px;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -56,7 +56,7 @@
       text-align: center;
     }
 
-    .field { margin-bottom: 12px; }
+    .field { margin-bottom: 10px; }
     .field label {
       display: block;
       margin-bottom: 6px;
@@ -66,19 +66,18 @@
     }
     .field label .required { color: var(--accent); font-weight: 700; }
 
+    /* Inputs + results */
     .field input,
     #results {
       width: 100%;
       padding: 10px;
       border: 1px solid #444;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 16px; /* prevents iOS zoom */
       background: #242537;
       color: #f5f5f5;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, padding-left 0.2s;
-      /* iOS: prevent zoom on focus */
-      font-size: 16px;
     }
     .field input[type="text"] { text-transform: capitalize; }
 
@@ -89,16 +88,8 @@
       box-shadow: 0 0 8px rgba(255, 90, 200, 0.55);
     }
 
-    .error {
-      border-color: var(--error) !important;
-      box-shadow: 0 0 8px rgba(255, 77, 154, 0.6) !important;
-    }
-
-    .hint { font-size:12px; color:#bdbdbd; margin-top:4px; }
-    .warn { color: var(--error); display:none; }
-
     .result-label {
-      margin-top: 8px;
+      margin-top: 10px;
       margin-bottom: 6px;
       font-size: 15px;
       font-weight: 600;
@@ -110,14 +101,16 @@
       white-space: pre-wrap;
       padding: 16px 12px;
       font-family: 'Poppins', monospace;
+      font-size: 14px;
       min-height: 120px;
       max-height: 300px;
       overflow-y: auto;
       line-height: 1.6;
-      margin-bottom: 14px;
+      margin-bottom: 14px; /* space above buttons */
       border-radius: 12px;
     }
 
+    /* Buttons */
     .btn {
       border: none;
       color: white;
@@ -140,13 +133,12 @@
 
     .full-width { width: 100%; margin: 6px 0 10px; display: block; }
 
-    .actions-row, .file-row {
+    .actions-row {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 2px;
     }
-    .actions-row .btn, .file-row .btn { flex: 1 1 0; }
+    .actions-row .btn { flex: 1 1 0; }
 
     .copy-status {
       margin-top: 6px;
@@ -155,22 +147,25 @@
       min-height: 16px;
     }
 
-    /* Combo (searchable dropdown with logo inside) */
+    /* ===== Searchable dropdown with SQUARE logo icon inside input ===== */
     .combo { position: relative; }
+    /* Default: NO reserved space for logo */
     .combo input { padding: 10px; }
+    /* Only when a logo is present, add left padding */
     .combo.has-logo input { padding-left: 42px; }
 
     .combo-logo {
       position: absolute;
-      top: 50%; left: 10px;
+      top: 50%;
+      left: 10px;
       transform: translateY(-50%);
       width: 20px; height: 20px;
-      border-radius: 6px;
+      border-radius: 6px;       /* square-ish */
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
       pointer-events: none;
-      display: none;
+      display: none; /* default hidden */
     }
     .combo.has-logo .combo-logo { display: block; }
 
@@ -193,29 +188,20 @@
       display: flex; align-items: center; gap: 10px;
       padding: 8px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; color: #f5f5f5;
     }
-    .combo-item:hover, .combo-item.active {
+    .combo-item:hover,
+    .combo-item.active {
       background: #2b2c3f;
       outline: 1px solid var(--accent);
     }
     .combo-item img {
       width: 22px; height: 22px;
-      border-radius: 6px;
+      border-radius: 6px;       /* square-ish in list */
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
     }
 
-    /* Sliders */
-    .range-row {
-      display: grid;
-      grid-template-columns: 1fr 90px;
-      gap: 10px;
-      align-items: center;
-    }
-    input[type="range"]{
-      accent-color: #ff5ac8;
-      width: 100%;
-    }
+    .hint { font-size:12px; color:#bdbdbd; margin-top:4px; }
   </style>
 </head>
 <body>
@@ -225,12 +211,12 @@
     <!-- Basic fields -->
     <div class="field">
       <label for="firstName">First Name <span class="required">*</span></label>
-      <input id="firstName" type="text" autocomplete="off" enterkeyhint="done" />
+      <input id="firstName" type="text" autocomplete="off" />
     </div>
 
     <div class="field">
       <label for="lastName">Last Name <span class="required">*</span></label>
-      <input id="lastName" type="text" autocomplete="off" enterkeyhint="done" />
+      <input id="lastName" type="text" autocomplete="off" />
     </div>
 
     <!-- Current Club -->
@@ -238,7 +224,7 @@
       <label for="currentClub">Current Club <span class="required">*</span></label>
       <div class="combo" id="comboCurrent">
         <img id="logoCurrent" class="combo-logo" alt="">
-        <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" enterkeyhint="done" />
+        <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
         <div class="combo-panel"></div>
       </div>
       <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
@@ -249,41 +235,31 @@
       <label for="newClub">New Club</label>
       <div class="combo" id="comboNew">
         <img id="logoNew" class="combo-logo" alt="">
-        <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" enterkeyhint="done" />
+        <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" />
         <div class="combo-panel"></div>
       </div>
       <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
     </div>
 
     <!-- Other fields -->
-    <div class="field"><label for="newFirstName">New First Name</label><input id="newFirstName" type="text" autocomplete="off" enterkeyhint="done" /></div>
-    <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" enterkeyhint="done" /></div>
-    <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" enterkeyhint="done" /></div>
+    <div class="field"><label for="newFirstName">New First Name</label><input id="newFirstName" type="text" autocomplete="off" /></div>
+    <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" /></div>
+    <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" /></div>
 
-    <!-- Year with guardrails -->
     <div class="field">
       <label for="yearOfBirth">Year of Birth (4 digits)</label>
-      <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" enterkeyhint="done" />
-      <div id="yearWarn" class="hint warn">Year should be between 1900 and 2025.</div>
+      <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" oninput="limitYear(this)" />
     </div>
 
-    <!-- CA slider + number -->
     <div class="field">
       <label for="ca">CA (0–100)</label>
-      <div class="range-row">
-        <input id="caRange" type="range" min="0" max="100" value="0" />
-        <input id="ca" type="number" min="0" max="100" inputmode="numeric" value="0" />
-      </div>
+      <input id="ca" type="number" min="0" max="100" inputmode="numeric" oninput="validatePercent(this)" />
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
 
-    <!-- PA slider + number -->
     <div class="field">
       <label for="pa">PA (0–100)</label>
-      <div class="range-row">
-        <input id="paRange" type="range" min="0" max="100" value="0" />
-        <input id="pa" type="number" min="0" max="100" inputmode="numeric" value="0" />
-      </div>
+      <input id="pa" type="number" min="0" max="100" inputmode="numeric" oninput="validatePercent(this)" />
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
 
@@ -292,314 +268,266 @@
     <div id="results" contenteditable="true"></div>
 
     <!-- Buttons -->
-    <button class="btn full-width" id="addBtn">Add Result</button>
+    <button class="btn full-width" onclick="addResult()">Add Result</button>
     <div class="actions-row">
-      <button class="btn" id="copyBtn">Copy All</button>
-      <button class="btn btn-secondary" id="clearBtn">Clear</button>
-    </div>
-    <div class="file-row">
-      <button class="btn btn-secondary" id="downloadBtn">Download .txt</button>
-      <button class="btn btn-secondary" id="uploadBtn">Upload .txt</button>
-      <input id="fileInput" type="file" accept=".txt,text/plain" style="display:none" />
+      <button class="btn" onclick="copyResults()">Copy All</button>
+      <button class="btn btn-secondary" onclick="clearResults()">Clear</button>
     </div>
     <div id="copyStatus" class="copy-status"></div>
   </div>
 
   <script>
-    (function(){
-      "use strict";
+    const STORAGE_KEY = "playerEditorResults";
 
-      /* ==== Config & Data ==== */
-      const STORAGE_KEY = "playerEditorResults";
-      const YEAR_MIN = 1900;
-      const YEAR_MAX = 2025;
+    /* Square fallback logo (data URI) using pink accent */
+    const FALLBACK_LOGO =
+      'data:image/svg+xml;utf8,' +
+      encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+        <rect width="100%" height="100%" fill="#18192B"/>
+        <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
+      </svg>`);
 
-      const FALLBACK_LOGO =
-        'data:image/svg+xml;utf8,' +
-        encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
-          <rect width="100%" height="100%" fill="#18192B"/>
-          <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
-        </svg>`);
+    /* Clubs: mix local and web URLs */
+    const clubs = [
+      { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
+      { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
+      { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
+      { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
+      // add more...
+    ];
 
-      const clubs = [
-        { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
-        { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
-        { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
-        { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
-        // add more...
-      ];
+    /* ===== Utilities ===== */
+    function capWords(str) {
+      const s = String(str || "").trim();
+      return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
+    }
 
-      /* ==== Utilities ==== */
-      function capWords(str) {
-        const s = String(str || "").trim();
-        return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
-      }
+    function limitYear(el){
+      // keep digits only and at most 4 chars
+      el.value = el.value.replace(/\D+/g, '').slice(0, 4);
+    }
 
-      function clamp01(n){ return Math.max(0, Math.min(100, n)); }
+    function validatePercent(el) {
+      if (el.value === "") return;
+      let n = parseInt(el.value, 10);
+      if (isNaN(n)) { el.value = ""; return; }
+      if (n < 0) n = 0;
+      if (n > 100) n = 100;     // clamp to 0–100
+      el.value = n;
+    }
 
-      function setCopyStatus(msg) {
-        const el = document.getElementById("copyStatus");
-        if (el) el.textContent = msg || "";
-      }
+    function convertTo200Scale(value) {
+      if (value === "" || isNaN(Number(value))) return "";
+      const num = Math.max(0, Math.min(100, Number(value)));
+      return Math.round((num / 100) * 200);
+    }
 
-      function saveResults() {
-        const el = document.getElementById("results");
-        if (el) localStorage.setItem(STORAGE_KEY, el.textContent);
-      }
+    function buildResult() {
+      const g = id => document.getElementById(id).value.trim();
 
-      function loadResults() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        const el = document.getElementById("results");
-        if (el && saved != null) el.textContent = saved;
-      }
+      const first = capWords(g("firstName"));
+      const last = capWords(g("lastName"));
+      const currentClub = capWords(g("currentClub"));
 
-      function convertTo200Scale(v) {
-        if (v === "" || isNaN(Number(v))) return "";
-        const num = clamp01(Number(v));
-        const scaled = Math.round((num / 100) * 200);
-        return Math.max(0, Math.min(200, scaled));
-      }
+      if (!first || !last || !currentClub) return "";
 
-      function buildResult() {
-        const g = id => (document.getElementById(id)?.value || "").trim();
+      const newFirst = capWords(g("newFirstName"));
+      const newLast = capWords(g("newLastName"));
+      const shortName = capWords(g("newShortName"));
+      const year = g("yearOfBirth");
+      const ca = convertTo200Scale(g("ca"));
+      const pa = convertTo200Scale(g("pa"));
+      const newClub = capWords(g("newClub"));
 
-        const first = capWords(g("firstName"));
-        const last  = capWords(g("lastName"));
-        const currClub = capWords(g("currentClub"));
-        if (!first || !last || !currClub) return "";
+      return `"PLAYER" "${first}" "${last}" "${currentClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
+    }
 
-        const newFirst  = capWords(g("newFirstName"));
-        const newLast   = capWords(g("newLastName"));
-        const shortName = capWords(g("newShortName"));
-        const year      = g("yearOfBirth");
-        const ca        = convertTo200Scale(g("ca"));
-        const pa        = convertTo200Scale(g("pa"));
-        const newClub   = capWords(g("newClub"));
-
-        return `"PLAYER" "${first}" "${last}" "${currClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
-      }
-
-      function addResult() {
-        const resultsEl = document.getElementById("results");
-        if (!resultsEl) return;
-        const line = buildResult();
-        if (line) {
-          resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
-          resultsEl.scrollTop = resultsEl.scrollHeight; // stay at bottom
-          saveResults();
-          clearAllInputs();
-        } else {
-          alert("Please fill in First Name, Last Name, and Current Club.");
-        }
-      }
-
-      function clearAllInputs() {
-        const ids = [
-          "firstName","lastName","currentClub","newClub",
-          "newFirstName","newLastName","newShortName",
-          "yearOfBirth","ca","pa","caRange","paRange"
-        ];
-        ids.forEach(id => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          if (el.type === 'range' || el.type === 'number' || el.type === 'text') {
-            if (id === 'ca' || id === 'pa' || id === 'caRange' || id === 'paRange') el.value = 0;
-            else el.value = "";
-          }
-        });
-        const yc = document.getElementById('yearOfBirth');
-        const yw = document.getElementById('yearWarn');
-        if (yc) yc.classList.remove('error');
-        if (yw) yw.style.display = 'none';
-
-        const cc = document.getElementById("comboCurrent");
-        const nc = document.getElementById("comboNew");
-        if (cc) cc.classList.remove("has-logo");
-        if (nc) nc.classList.remove("has-logo");
-      }
-
-      function clearResults() {
-        const el = document.getElementById("results");
-        if (el) el.textContent = "";
+    function addResult() {
+      const resultsEl = document.getElementById("results");
+      const line = buildResult();
+      if (line) {
+        resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
+        resultsEl.scrollTop = resultsEl.scrollHeight; // stay at bottom
         saveResults();
-        setCopyStatus("");
+        clearAllInputs();                 // auto-clear after adding
+        // no focus -> no page jump
+      } else {
+        alert("Please fill in First Name, Last Name, and Current Club.");
+      }
+    }
+
+    function clearResults() {
+      document.getElementById("results").textContent = "";
+      saveResults();
+      setCopyStatus("");
+    }
+
+    function copyResults() {
+      const text = document.getElementById("results").textContent.trim();
+      if (text) {
+        navigator.clipboard.writeText(text).then(() => {
+          setCopyStatus("Copied all results ✅");
+        }).catch(err => {
+          alert("Copy failed: " + err);
+        });
+      }
+    }
+
+    function setCopyStatus(msg) {
+      document.getElementById("copyStatus").textContent = msg;
+    }
+
+    function saveResults() {
+      localStorage.setItem(STORAGE_KEY, document.getElementById("results").textContent);
+    }
+
+    function loadResults() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) document.getElementById("results").textContent = saved;
+    }
+
+    /* Clear all input fields + remove logos and their left padding */
+    function clearAllInputs() {
+      const ids = [
+        "firstName","lastName","currentClub","newClub",
+        "newFirstName","newLastName","newShortName",
+        "yearOfBirth","ca","pa"
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+      });
+      // Remove logo & padding state
+      document.getElementById("comboCurrent").classList.remove("has-logo");
+      document.getElementById("comboNew").classList.remove("has-logo");
+    }
+
+    /* ===== Searchable dropdown with square logo inside input ===== */
+    function initCombo(comboId, inputId, logoId) {
+      const combo = document.getElementById(comboId);
+      const input = document.getElementById(inputId);
+      const logo  = document.getElementById(logoId);
+      const panel = combo.querySelector(".combo-panel");
+
+      let visibleItems = [];
+      let activeIndex = -1;
+
+      function open() { combo.classList.add("open"); }
+      function close() { combo.classList.remove("open"); activeIndex = -1; }
+      function isOpen() { return combo.classList.contains("open"); }
+
+      function filter(q) {
+        const query = (q || "").toLowerCase().trim();
+        if (!query) return clubs.slice(0, 50);
+        return clubs.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
       }
 
-      function copyResults() {
-        const text = document.getElementById("results")?.textContent.trim();
-        if (text) {
-          navigator.clipboard.writeText(text)
-            .then(() => setCopyStatus("Copied all results ✅"))
-            .catch(err => alert("Copy failed: " + err));
+      function render(list) {
+        panel.innerHTML = "";
+        visibleItems = list;
+
+        if (list.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "combo-item";
+          empty.style.opacity = "0.7";
+          empty.textContent = "No matches";
+          panel.appendChild(empty);
+          return;
         }
-      }
 
-      function downloadResults(){
-        const txt = document.getElementById('results')?.textContent || "";
-        const blob = new Blob([txt], {type:'text/plain'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'player-results.txt';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      }
+        list.forEach((club, idx) => {
+          const item = document.createElement("div");
+          item.className = "combo-item";
+          item.dataset.index = idx;
 
-      function limitYear(el){
-        if (!el) return;
-        el.value = el.value.replace(/\D+/g, '').slice(0, 4);
-        const warn = document.getElementById('yearWarn');
-        if (el.value && (Number(el.value) < YEAR_MIN || Number(el.value) > YEAR_MAX)) {
-          el.classList.add('error');
-          if (warn) warn.style.display = 'block';
-        } else {
-          el.classList.remove('error');
-          if (warn) warn.style.display = 'none';
-        }
-      }
+          const img = document.createElement("img");
+          img.src = club.logo || FALLBACK_LOGO;
+          img.alt = club.name;
+          img.onerror = () => { img.src = FALLBACK_LOGO; };
 
-      function syncRangeToNumber(rangeId, numId){
-        const r = document.getElementById(rangeId);
-        const n = document.getElementById(numId);
-        if (!r || !n) return;
-        n.value = r.value;
-      }
-      function syncNumberToRange(numId, rangeId){
-        const n = document.getElementById(numId);
-        const r = document.getElementById(rangeId);
-        if (!n || !r) return;
-        let v = parseInt(n.value || 0, 10);
-        if (isNaN(v)) v = 0;
-        v = clamp01(v);
-        n.value = v;
-        r.value = v;
-      }
+          const span = document.createElement("span");
+          span.textContent = club.name;
 
-      /* ===== Searchable dropdown with square logo inside input ===== */
-      function initCombo(comboId, inputId, logoId) {
-        const combo = document.getElementById(comboId);
-        const input = document.getElementById(inputId);
-        const logo  = document.getElementById(logoId);
-        if (!combo || !input || !logo) return;
-        const panel = combo.querySelector(".combo-panel");
+          item.append(img, span);
 
-        let visibleItems = [];
-        let activeIndex = -1;
-
-        function open() { combo.classList.add("open"); }
-        function close() { combo.classList.remove("open"); activeIndex = -1; }
-        function isOpen() { return combo.classList.contains("open"); }
-
-        function filter(q) {
-          const query = (q || "").toLowerCase().trim();
-          if (!query) return clubs.slice(0, 50);
-          return clubs.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
-        }
-
-        function render(list) {
-          if (!panel) return;
-          panel.innerHTML = "";
-          visibleItems = list;
-
-          if (list.length === 0) {
-            const empty = document.createElement("div");
-            empty.className = "combo-item";
-            empty.style.opacity = "0.7";
-            empty.textContent = "No matches";
-            panel.appendChild(empty);
-            return;
-          }
-
-          list.forEach((club, idx) => {
-            const item = document.createElement("div");
-            item.className = "combo-item";
-            item.dataset.index = idx;
-
-            const img = document.createElement("img");
-            img.src = club.logo || FALLBACK_LOGO;
-            img.alt = club.name;
-            img.onerror = () => { img.src = FALLBACK_LOGO; };
-
-            const span = document.createElement("span");
-            span.textContent = club.name;
-
-            item.append(img, span);
-
-            item.addEventListener("mousedown", (e) => {
-              e.preventDefault();  // keep focus on input
-              select(idx);
-            });
-
-            panel.appendChild(item);
+          item.addEventListener("mousedown", (e) => {
+            e.preventDefault();  // keep focus on input
+            select(idx);
           });
-        }
 
-        function select(idx) {
-          const club = visibleItems[idx];
-          if (!club) return;
-          input.value = club.name;              // show text in input
-          logo.src = club.logo || FALLBACK_LOGO;
-          logo.onerror = () => { logo.src = FALLBACK_LOGO; };
-          combo.classList.add("has-logo");      // keep logo visible
-          close();
-        }
-
-        function moveActive(delta) {
-          if (!isOpen()) open();
-          const items = panel.querySelectorAll(".combo-item");
-          if (items.length === 0) return;
-          activeIndex = (activeIndex + delta + items.length) % items.length;
-          items.forEach(el => el.classList.remove("active"));
-          const activeEl = items[activeIndex];
-          activeEl.classList.add("active");
-
-          const panelRect = panel.getBoundingClientRect();
-          const itemRect  = activeEl.getBoundingClientRect();
-          if (itemRect.top < panelRect.top) panel.scrollTop -= (panelRect.top - itemRect.top);
-          if (itemRect.bottom > panelRect.bottom) panel.scrollTop += (itemRect.bottom - panelRect.bottom);
-        }
-
-        input.addEventListener("focus", () => {
-          render(filter(input.value));
-          open();
-        });
-
-        input.addEventListener("input", () => {
-          if (input.value.trim() === "") combo.classList.remove("has-logo");
-          render(filter(input.value));
-          open();
-        });
-
-        input.addEventListener("keydown", (e) => {
-          if (!isOpen() && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-            render(filter(input.value));
-            open();
-          }
-          switch (e.key) {
-            case "ArrowDown": e.preventDefault(); moveActive(1); break;
-            case "ArrowUp":   e.preventDefault(); moveActive(-1); break;
-            case "Enter":
-              if (isOpen()) {
-                e.preventDefault();
-                if (activeIndex >= 0) select(activeIndex);
-                else if (visibleItems.length > 0) select(0);
-              }
-              break;
-            case "Escape": close(); break;
-          }
-        });
-
-        document.addEventListener("click", (e) => {
-          if (!combo.contains(e.target)) close();
+          panel.appendChild(item);
         });
       }
 
-      /* ===== DOM Ready Init ===== */
-      window.addEventListener('DOMContentLoaded', () => {
-        // Load saved results
-        loadResults();
+      function select(idx) {
+        const club = visibleItems[idx];
+        if (!club) return;
+        input.value = club.name;              // show text in input
+        logo.src = club.logo || FALLBACK_LOGO;
+        logo.onerror = () => { logo.src = FALLBACK_LOGO; };
+        combo.classList.add("has-logo");      // keep logo visible
+        close();
+      }
 
-        // Init combos
-        initCombo("comboCur
+      function moveActive(delta) {
+        if (!isOpen()) open();
+        const items = panel.querySelectorAll(".combo-item");
+        if (items.length === 0) return;
+        activeIndex = (activeIndex + delta + items.length) % items.length;
+        items.forEach(el => el.classList.remove("active"));
+        const activeEl = items[activeIndex];
+        activeEl.classList.add("active");
+
+        const panelRect = panel.getBoundingClientRect();
+        const itemRect  = activeEl.getBoundingClientRect();
+        if (itemRect.top < panelRect.top) panel.scrollTop -= (panelRect.top - itemRect.top);
+        if (itemRect.bottom > panelRect.bottom) panel.scrollTop += (itemRect.bottom - panelRect.bottom);
+      }
+
+      input.addEventListener("focus", () => {
+        render(filter(input.value));
+        open();
+      });
+
+      input.addEventListener("input", () => {
+        // KEEP the logo while typing; remove only if cleared
+        if (input.value.trim() === "") {
+          combo.classList.remove("has-logo");
+        }
+        render(filter(input.value));
+        open();
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if (!isOpen() && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+          render(filter(input.value));
+          open();
+        }
+        switch (e.key) {
+          case "ArrowDown": e.preventDefault(); moveActive(1); break;
+          case "ArrowUp":   e.preventDefault(); moveActive(-1); break;
+          case "Enter":
+            if (isOpen()) {
+              e.preventDefault();
+              if (activeIndex >= 0) select(activeIndex);
+              else if (visibleItems.length > 0) select(0);
+            }
+            break;
+          case "Escape": close(); break;
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!combo.contains(e.target)) close();
+      });
+    }
+
+    // Init combos + load saved results
+    window.onload = function() {
+      loadResults();
+      initCombo("comboCurrent", "currentClub", "logoCurrent");
+      initCombo("comboNew",     "newClub",     "logoNew");
+    };
+  </script>
+</body>
+</html>
