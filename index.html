@@ -33,6 +33,11 @@
       --toggle-track:#202233;
       --toggle-thumb:#fff;
       --toggle-shadow: rgba(0,0,0,0.35);
+
+      /* success status */
+      --success:#76d39b;
+      --success-bg: rgba(118,211,155,0.12);
+      --success-border: rgba(118,211,155,0.65);
     }
     /* Light theme */
     [data-theme="light"] {
@@ -51,6 +56,10 @@
       --toggle-track:#e7e8ff;
       --toggle-thumb:#ffffff;
       --toggle-shadow: rgba(50,50,93,0.2);
+
+      --success:#25b36a;
+      --success-bg: rgba(37,179,106,0.1);
+      --success-border: rgba(37,179,106,0.55);
     }
 
     * { box-sizing: border-box; }
@@ -223,7 +232,34 @@
     .full-width { width:100%; margin:6px 0 10px; display:block; }
     .actions-row { display:flex; gap:10px; flex-wrap:wrap; }
     .actions-row .btn { flex:1 1 0; }
-    .copy-status { margin-top:6px; font-size:12px; color:#9ad29a; min-height:16px; }
+
+    /* Minimal, emoji-free status pill */
+    .copy-status {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-height:20px;
+      font-size:13px;
+      color:var(--success);
+      margin-top:6px;
+      border-radius:10px;
+      padding:0;             /* becomes padded only when .show is added */
+      opacity:0;
+      transition: opacity .25s ease, transform .25s ease, padding .15s ease;
+    }
+    .copy-status svg { width:16px; height:16px; stroke:var(--success); }
+    .copy-status.show {
+      background:var(--success-bg);
+      border:1px solid var(--success-border);
+      padding:4px 8px;
+      opacity:1;
+      transform: translateY(0);
+      animation: fadeOut 2.6s forwards;  /* auto fade */
+    }
+    @keyframes fadeOut{
+      0%,80%{ opacity:1 }
+      100%{ opacity:0 }
+    }
 
     /* Combo (dropdown with square logo) */
     .combo { position:relative; }
@@ -255,18 +291,17 @@
       .num-range { grid-template-columns: 1fr; }
     }
 
-    /* ===== Rebuilt slider (thumb perfectly centered) ===== */
+    /* Rebuilt slider (thumb perfectly centered) */
     input[type="range"]{
       --fill: 0%;
       appearance: none;
       -webkit-appearance: none;
       width: 100%;
       height: 28px;             /* control box height (space for thumb) */
-      background: transparent;  /* track handled below */
+      background: transparent;
       border: none;
       padding: 0;
     }
-    /* WebKit track */
     input[type="range"]::-webkit-slider-runnable-track{
       height: 10px;
       border-radius: 999px;
@@ -275,16 +310,14 @@
         #3a3b52;
       border: 1px solid var(--border);
     }
-    /* WebKit thumb (centered: (thumb 18 - track 10)/2 = 4px) */
     input[type="range"]::-webkit-slider-thumb{
       -webkit-appearance: none;
       width: 18px; height: 18px; border-radius: 50%;
       background: #fff; border: 2px solid var(--accent);
       box-shadow: 0 2px 6px rgba(0,0,0,.35);
-      margin-top: -4px; /* centers the thumb vertically */
+      margin-top: -4px; /* (thumb 18 - track 10)/2 */
       cursor: pointer;
     }
-    /* Firefox track & progress */
     input[type="range"]::-moz-range-track{
       height: 10px; border-radius: 999px;
       background: #3a3b52; border: 1px solid var(--border);
@@ -466,7 +499,9 @@
           <button class="btn" id="copyBtn">Copy All</button>
           <button class="btn btn-secondary" id="clearBtn">Clear</button>
         </div>
-        <div id="copyStatus" class="copy-status"></div>
+
+        <!-- Minimal status (SVG, no emoji) -->
+        <div id="copyStatus" class="copy-status" aria-live="polite"></div>
       </section>
     </div>
   </div>
@@ -499,7 +534,19 @@
       function capWords(str){ return String(str||'').trim().replace(/\b([a-zA-Z])/g,(m,p)=>p.toUpperCase()); }
       function clamp01(n){ return Math.max(0, Math.min(100, n)); }
       function convertTo200Scale(v){ if(v===""||isNaN(+v))return ""; const n=clamp01(+v); return Math.round((n/100)*200); }
-      function setCopyStatus(msg){ $('copyStatus').textContent = msg || ''; }
+
+      /* SVG icons for status */
+      const checkSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+      function setCopyStatus(msg){
+        const el = $('copyStatus');
+        el.innerHTML = `${checkSVG}<span>${msg}</span>`;
+        el.classList.add('show');
+        clearTimeout(setCopyStatus._t);
+        setCopyStatus._t = setTimeout(()=>{ el.classList.remove('show'); el.innerHTML=''; }, 2600);
+      }
 
       function updateEmptyState(){
         const hasLines = resultsEl.querySelector('.res-line') !== null;
@@ -508,7 +555,7 @@
       }
 
       function trashSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`; }
-      function copySVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>`; }
+      function copyIconSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>`; }
 
       function copyToClipboard(text){
         if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
@@ -522,10 +569,10 @@
       function makeLineEl(text){
         const line = document.createElement('div'); line.className = 'res-line';
         const span = document.createElement('span'); span.className='res-text'; span.contentEditable='true'; span.textContent=text;
-        const copyBtn = document.createElement('button'); copyBtn.className='icon-btn'; copyBtn.title='Copy line'; copyBtn.setAttribute('aria-label','Copy line'); copyBtn.innerHTML = copySVG();
+        const copyBtn = document.createElement('button'); copyBtn.className='icon-btn'; copyBtn.title='Copy line'; copyBtn.setAttribute('aria-label','Copy line'); copyBtn.innerHTML = copyIconSVG();
         const delBtn  = document.createElement('button'); delBtn.className='icon-btn';  delBtn.title='Delete line'; delBtn.setAttribute('aria-label','Delete line'); delBtn.innerHTML  = trashSVG();
 
-        copyBtn.addEventListener('click', () => { copyToClipboard(span.textContent.trim()).then(()=>setCopyStatus('Copied line ✅')).catch(err=>alert('Copy failed: '+err)); });
+        copyBtn.addEventListener('click', () => { copyToClipboard(span.textContent.trim()).then(()=>setCopyStatus('Copied line')).catch(err=>alert('Copy failed: '+err)); });
         delBtn.addEventListener('click',  () => { line.remove(); saveResults(); updateEmptyState(); });
         span.addEventListener('input', () => saveResults());
 
@@ -580,7 +627,7 @@
       }
       function clampPercent(el){ if (el.value === "") return; let n=parseInt(el.value,10); if(isNaN(n)){el.value=""; return;} el.value=Math.max(0, Math.min(100, n)); }
 
-      /* Range helpers (instant fill via CSS var on the track) */
+      /* Range helpers (instant fill via CSS var) */
       function setRangeFill(slider) {
         const v = Math.max(0, Math.min(100, Number(slider.value)||0));
         slider.style.setProperty('--fill', v + '%');
@@ -717,27 +764,11 @@
         $('caOut').textContent = "→ 0–200: —";
         $('paOut').textContent = "→ 0–200: —";
       }
-      function copyResults(){ const text=getAllLines().join('\n').trim(); if(!text) return; copyToClipboard(text).then(()=>{ setCopyStatus('Copied all results ✅'); }).catch(err=>alert('Copy failed: '+err)); }
-      function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); setCopyStatus(''); updateEmptyState(); }
-
-      /* Results helpers */
-      function getAllLines(){ return Array.from(resultsEl.querySelectorAll('.res-text')).map(el => el.textContent); }
-      function saveResults(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(getAllLines())); }
-      function renderFromLines(lines){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); lines.forEach(t=>{ if(t&&String(t).trim()!=='') resultsEl.appendChild(makeLineEl(t)); }); updateEmptyState(); }
-      function loadResults(){ const raw=localStorage.getItem(STORAGE_KEY); if(!raw){updateEmptyState();return;} let lines=[]; try{const p=JSON.parse(raw); lines=Array.isArray(p)?p:String(raw).split(/\n/);}catch{lines=String(raw).split(/\n/);} renderFromLines(lines); }
-      function makeLineEl(text){
-        const line = document.createElement('div'); line.className = 'res-line';
-        const span = document.createElement('span'); span.className='res-text'; span.contentEditable='true'; span.textContent=text;
-        const copyBtn = document.createElement('button'); copyBtn.className='icon-btn'; copyBtn.title='Copy line'; copyBtn.setAttribute('aria-label','Copy line'); copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>`;
-        const delBtn  = document.createElement('button'); delBtn.className='icon-btn';  delBtn.title='Delete line'; delBtn.setAttribute('aria-label','Delete line'); delBtn.innerHTML  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`;
-
-        copyBtn.addEventListener('click', () => { copyToClipboard(span.textContent.trim()).then(()=>setCopyStatus('Copied line ✅')).catch(err=>alert('Copy failed: '+err)); });
-        delBtn.addEventListener('click',  () => { line.remove(); saveResults(); updateEmptyState(); });
-        span.addEventListener('input', () => saveResults());
-
-        line.append(span, copyBtn, delBtn);
-        return line;
+      function copyResults(){
+        const text=getAllLines().join('\n').trim(); if(!text) return;
+        copyToClipboard(text).then(()=> setCopyStatus('Copied all results')).catch(err=>alert('Copy failed: '+err));
       }
+      function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); setCopyStatus('Cleared'); updateEmptyState(); }
 
       /* Init */
       document.addEventListener('DOMContentLoaded', () => {
@@ -756,7 +787,7 @@
         $('ca').addEventListener('input', e => { clampPercent(e.target); setRangeFill($('caSlider')); });
         $('pa').addEventListener('input', e => { clampPercent(e.target); setRangeFill($('paSlider')); });
 
-        // Bind and sync sliders with numbers (instant fill)
+        // Bind and sync sliders with numbers
         bindNumberAndSlider('ca','caSlider','caOut');
         bindNumberAndSlider('pa','paSlider','paOut');
 
@@ -778,6 +809,27 @@
 
         updateEmptyState();
       });
+
+      /* Range binders */
+      function setRangeFill(slider) {
+        const v = Math.max(0, Math.min(100, Number(slider.value)||0));
+        slider.style.setProperty('--fill', v + '%');
+      }
+      function bindNumberAndSlider(numId, sliderId, outId){
+        const num = $(numId), slider = $(sliderId), out = $(outId);
+        const updateOut = () => { const converted = convertTo200Scale(num.value); out.textContent = "→ 0–200: " + (converted === "" ? "—" : converted); };
+        const syncFromNumber = () => {
+          if (num.value === "") { slider.value = 0; setRangeFill(slider); updateOut(); return; }
+          let n=parseInt(num.value,10); if(isNaN(n)) n=0; n=Math.max(0,Math.min(100,n)); num.value=n;
+          slider.value = n; setRangeFill(slider); updateOut();
+        };
+        const syncFromSlider = () => {
+          num.value = slider.value; setRangeFill(slider); updateOut();
+        };
+        num.addEventListener('input', syncFromNumber);
+        slider.addEventListener('input', syncFromSlider);
+        setRangeFill(slider); updateOut();
+      }
     })();
   </script>
 </body>
