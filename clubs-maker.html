@@ -23,7 +23,6 @@
   label{font-size:13px;color:var(--muted);display:block;margin:4px 0 6px}
   textarea{width:100%;min-height:260px;border-radius:12px;border:1px solid var(--border);background:#242537;color:var(--ink);padding:12px;font-size:14px;resize:vertical;outline:none}
   textarea:focus{box-shadow:0 0 0 2px rgba(255,90,200,.35)}
-  input[type="text"]{width:100%;border-radius:10px;border:1px solid var(--border);background:#242537;color:var(--ink);padding:10px;font-size:14px;outline:none}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .btn{border:none;border-radius:14px;padding:12px 16px;font-weight:600;color:#fff;cursor:pointer;background:linear-gradient(90deg,var(--grad1),var(--grad2))}
   .btn.secondary{background:transparent;border:2px solid var(--accent);color:var(--accent)}
@@ -35,13 +34,12 @@
   .chip{display:inline-flex;align-items:center;gap:6px;background:#242537;border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
   .progress{height:8px;background:#242537;border:1px solid var(--border);border-radius:999px;overflow:hidden}
   .bar{height:100%;width:0;background:linear-gradient(90deg,var(--grad1),var(--grad2))}
-  code{background:#2a2c43;border-radius:6px;padding:2px 6px}
-  .errors{margin-top:10px}
-  .errors li{margin:4px 0;color:var(--warn);font-size:12px}
   .guide{background:#232540;border:1px dashed var(--border);border-radius:12px;padding:10px;margin:8px 0 2px}
   .guide h3{margin:2px 0 8px;font-size:14px}
   .guide ol{margin:0 0 0 18px;padding:0}
   .guide li{margin:6px 0;font-size:13px}
+  .errors{margin-top:10px}
+  .errors li{margin:4px 0;color:var(--warn);font-size:12px}
 </style>
 </head>
 <body>
@@ -52,10 +50,10 @@
     <div class="guide">
       <h3>Quick guide</h3>
       <ol>
-        <li>CSV can be **with or without a header**. If there’s no header, we assume column order is:
+        <li>CSV can be <b>with or without header</b>. If no header, we assume
             <code>common, official, logo, aliases</code>.</li>
-        <li>Click <b>Convert → JSON</b>. (Optional) auto-fetch missing logos from Wikipedia.</li>
-        <li>Click <b>Download clubs.json</b> and put it next to your HTML on GitHub.</li>
+        <li>Click <b>Convert → JSON</b>. (Optional) tick <b>auto-fetch logos</b> to fill <i>empty</i> logo cells.</li>
+        <li>Click <b>Download clubs.json</b> and put it next to your HTML.</li>
       </ol>
     </div>
 
@@ -87,7 +85,7 @@ Barcelona,FC Barcelona,https://…/barca.svg,Barca|Barcelona FC'></textarea>
           </label>
           <div id="wkBox" style="display:none;margin-top:10px">
             <div class="row" style="justify-content:space-between">
-              <div class="note">We’ll search Wikipedia for clubs with empty <em>logo</em> and use the main image.</div>
+              <div class="note">Only rows with empty <code>logo</code> are fetched.</div>
               <div class="chip"><span id="wkCount">0</span> to fetch</div>
             </div>
             <div class="progress" style="margin-top:8px"><div class="bar" id="wkBar"></div></div>
@@ -107,22 +105,12 @@ Barcelona,FC Barcelona,https://…/barca.svg,Barca|Barcelona FC'></textarea>
           </div>
         </div>
         <pre id="out">// JSON will appear here…</pre>
-
-        <div class="guide" style="margin-top:10px">
-          <h3>CSV tips</h3>
-          <ul class="note" style="margin:0 0 0 16px;padding:0;list-style:disc">
-            <li>Without header, use the order: <code>common, official, logo, aliases</code>.</li>
-            <li>Use quotes if a value contains commas: <code>"Manchester United"</code></li>
-            <li>Aliases can be separated by <code>|</code>, <code>;</code>, or <code>,</code></li>
-            <li>Missing fields are OK — they’re omitted in JSON</li>
-          </ul>
-        </div>
       </div>
     </div>
   </div>
 
 <script>
-/* ---------- tiny CSV parser (handles quotes & newlines in quotes) ---------- */
+/* -------- CSV utilities -------- */
 function parseCSV(text){
   const rows=[]; let row=[], field='', inQ=false;
   for(let i=0;i<text.length;i++){
@@ -143,19 +131,13 @@ function parseCSV(text){
   row.push(field); rows.push(row);
   return rows.filter(r=>!(r.length===1 && r[0].trim()===''));
 }
-function splitAliases(s){
-  if(!s) return [];
-  return s.split(/[|;,]/).map(x=>x.trim()).filter(Boolean);
-}
+function splitAliases(s){ if(!s) return []; return s.split(/[|;,]/).map(x=>x.trim()).filter(Boolean); }
 
 const DEFAULT_HEADERS = ['common','official','logo','aliases'];
-
 function looksLikeHeader(row){
-  // If the first row contains any expected header keyword, treat as header
   const lower = row.map(x=>x.trim().toLowerCase());
   return DEFAULT_HEADERS.some(h => lower.includes(h));
 }
-
 function toObj(headers, row, lineNo){
   const h = headers.map(x=>x.trim().toLowerCase());
   const get = (name)=>{ const idx=h.indexOf(name); return idx>=0 ? (row[idx]||'').trim() : ''; };
@@ -173,21 +155,41 @@ function toObj(headers, row, lineNo){
   return {obj:o, errors};
 }
 
-/* ---------- Wikipedia logo fetch ---------- */
+/* -------- Robust Wikipedia logo fetch -------- */
 async function wikiLogo(name){
-  const url = 'https://en.wikipedia.org/w/api.php?origin=*&action=query&format=json'
-            + '&generator=search&gsrsearch=' + encodeURIComponent(name)
-            + '&gsrlimit=1&prop=pageimages&piprop=original';
+  // 1) REST Summary API (fast & often gives originalimage)
   try{
-    const r = await fetch(url);
-    const j = await r.json();
-    if(!j.query || !j.query.pages) return null;
-    const page = Object.values(j.query.pages)[0];
-    return page?.original?.source || null;
-  }catch{ return null; }
+    const r = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' +
+                          encodeURIComponent(name) + '?redirect=true');
+    if(r.ok){
+      const j = await r.json();
+      if(j.originalimage?.source) return j.originalimage.source;
+      if(j.thumbnail?.source)     return j.thumbnail.source;
+    }
+  }catch(e){ /* ignore */ }
+
+  // 2) Action API: search → pageimages (original or thumbnail)
+  try{
+    const s = await fetch('https://en.wikipedia.org/w/api.php?origin=*&action=query&format=json' +
+                          '&list=search&srnamespace=0&srlimit=1&srwhat=text&utf8=1&srsearch=' +
+                          encodeURIComponent(name));
+    const sj = await s.json();
+    const title = sj?.query?.search?.[0]?.title;
+    if(title){
+      const p = await fetch('https://en.wikipedia.org/w/api.php?origin=*&action=query&format=json' +
+                            '&prop=pageimages&piprop=original|thumbnail&pithumbsize=600&titles=' +
+                            encodeURIComponent(title));
+      const pj = await p.json();
+      const page = pj?.query?.pages ? Object.values(pj.query.pages)[0] : null;
+      if(page?.original?.source)  return page.original.source;
+      if(page?.thumbnail?.source) return page.thumbnail.source;
+    }
+  }catch(e){ /* ignore */ }
+
+  return null; // not found
 }
 
-/* ---------- UI wiring ---------- */
+/* -------- UI wiring -------- */
 const $ = id => document.getElementById(id);
 const file = $('file'), csv = $('csv'), out = $('out'), countEl=$('count');
 const convertBtn = $('convertBtn'), downloadBtn=$('downloadBtn'), copyBtn=$('copyBtn');
@@ -200,15 +202,13 @@ file.addEventListener('change', async () => {
   const f = file.files[0]; if(!f) return;
   csv.value = await f.text();
 });
-
 wikiCB.addEventListener('change', () => {
   wkBox.style.display = wikiCB.checked ? 'block' : 'none';
 });
-
 sampleBtn.addEventListener('click', () => {
-  csv.value = `Barcelona,FC Barcelona,https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg,Barca|Barcelona FC
-Real Madrid,Real Madrid CF,https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg,Real
-Man United,"Manchester United",https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg,MUFC;Man Utd`;
+  csv.value = `Barcelona,FC Barcelona,,Barca|Barcelona FC
+Real Madrid,Real Madrid CF,,Real
+Man United,"Manchester United",,MUFC;Man Utd`;
 });
 
 convertBtn.addEventListener('click', async () => {
@@ -230,7 +230,7 @@ convertBtn.addEventListener('click', async () => {
     dataRows = rows.slice(1);
     headerWasPresent = true;
   } else {
-    headers = DEFAULT_HEADERS.slice(); // auto header
+    headers = DEFAULT_HEADERS.slice();
     dataRows = rows;
     headerWasPresent = false;
   }
@@ -243,16 +243,19 @@ convertBtn.addEventListener('click', async () => {
     if(errors.length) rowErrors.push(...errors);
   });
 
+  // Auto-fetch logos for *empty* logo fields
   if(wikiCB.checked){
     const missing = data.filter(d => !d.logo && (d.official || d.common));
     wkCount.textContent = missing.length;
-    wkBar.style.width = '0%';
+    wkBar.style.width = missing.length ? '0%' : '100%';
+    let notFound = 0;
     for(let i=0;i<missing.length;i++){
-      const src = await wikiLogo(missing[i].official || missing[i].common);
-      if(src) missing[i].logo = src;
+      const name = missing[i].official || missing[i].common;
+      const src = await wikiLogo(name);
+      if(src) missing[i].logo = src; else { notFound++; rowErrors.push(`No logo found for “${name}”`); }
       wkBar.style.width = (((i+1)/missing.length)*100).toFixed(1) + '%';
     }
-    if(!missing.length){ wkBar.style.width = '100%'; }
+    if(!missing.length){ rowErrors.push('Nothing to fetch — all rows already have a logo.'); }
   }
 
   jsonData = data;
@@ -278,15 +281,12 @@ downloadBtn.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(a.href);
 });
-
 copyBtn.addEventListener('click', async () => {
   try{
     await navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2));
     copyBtn.textContent = 'Copied!';
     setTimeout(()=>copyBtn.textContent='Copy JSON',1200);
-  }catch(e){
-    alert('Copy failed: ' + e);
-  }
+  }catch(e){ alert('Copy failed: ' + e); }
 });
 </script>
 </body>
