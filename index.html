@@ -127,7 +127,7 @@
 
     .error { border-color:var(--error)!important; box-shadow:0 0 8px rgba(255,77,154,0.6)!important; }
 
-    /* Compact help bubble */
+    /* Compact help bubble (ALWAYS ABOVE) */
     .help {
       position: relative;
       display: inline-flex;
@@ -142,8 +142,11 @@
       transition: background .2s, color .2s, transform .1s;
     }
     .help:active { transform: scale(0.96); }
+
     .help .tip {
       position: absolute;
+      bottom: calc(100% + 10px);     /* always above */
+      left: 0;
       min-width: 220px;
       max-width: 320px;
       background: var(--input-bg);
@@ -154,20 +157,20 @@
       font-size: 12px;
       line-height: 1.35;
       box-shadow: 0 10px 24px rgba(0,0,0,0.35);
-      z-index: 4000;               /* above inputs & dropdown */
-      visibility: hidden;          /* enable transitions */
+      z-index: 4000;                 /* above inputs & dropdown */
+      visibility: hidden;
       opacity: 0;
       pointer-events: none;
-      transform: translateY(0) scale(.98);
+      transform: translateY(-6px) scale(.98);
       transition:
         opacity .18s ease,
         transform .18s cubic-bezier(.2,.8,.2,1),
-        visibility 0s linear .18s; /* hide after fade-out */
+        visibility 0s linear .18s;   /* hide after fade-out */
     }
-    /* Direction presets; JS toggles above/below */
-    .help .tip.above { bottom: calc(100% + 10px); left: 0; transform: translateY(-6px) scale(.98); }
-    .help .tip.below { top: calc(100% + 10px);    left: 0; transform: translateY( 6px) scale(.98); }
-    /* Visible state */
+    .help .tip::before{
+      content:""; position:absolute; left:12px; bottom:-6px;
+      border-left:6px solid transparent; border-right:6px solid transparent; border-top:6px solid var(--border);
+    }
     .help.open .tip {
       visibility: visible;
       opacity: 1;
@@ -177,15 +180,6 @@
         transform .22s cubic-bezier(.2,.8,.2,1),
         visibility 0s;
       pointer-events: auto;
-    }
-    /* Arrow tips */
-    .help .tip.above::before{
-      content:""; position:absolute; left:12px; bottom:-6px;
-      border-left:6px solid transparent; border-right:6px solid transparent; border-top:6px solid var(--border);
-    }
-    .help .tip.below::before{
-      content:""; position:absolute; left:12px; top:-6px;
-      border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:6px solid var(--border);
     }
 
     /* Required-field feedback */
@@ -579,7 +573,7 @@
         document.addEventListener("click", (e) => { if (!combo.contains(e.target)) close(); });
       }
 
-      /* Help bubbles: smart position + variable duration + smooth anim */
+      /* Help bubbles: fixed ABOVE + variable duration + smooth anim */
       function initHelpBubbles(){
         const helps = document.querySelectorAll('.help');
         const timers = new WeakMap();
@@ -590,23 +584,6 @@
           h.setAttribute('aria-expanded','false');
           if (timers.get(h)) clearTimeout(timers.get(h));
         }
-        function placeTip(h){
-          const tip = h.querySelector('.tip');
-          tip.classList.remove('above','below');
-          const rect = h.getBoundingClientRect();
-          // Decide based on available space above vs below
-          const viewportH = window.innerHeight || document.documentElement.clientHeight;
-          // Temporarily make visible to measure height
-          const prevVis = tip.style.visibility; const prevOp = tip.style.opacity;
-          tip.style.visibility='hidden'; tip.style.opacity='0'; tip.classList.add('below');
-          const tipH = tip.offsetHeight || 80;
-          tip.classList.remove('below');
-          tip.style.visibility=prevVis; tip.style.opacity=prevOp;
-
-          const spaceBelow = viewportH - rect.bottom;
-          if (spaceBelow < tipH + 16 && rect.top > tipH + 16) tip.classList.add('above');
-          else tip.classList.add('below');
-        }
         function tipDuration(tipEl){
           const len = (tipEl.textContent || '').trim().length;
           // ~25ms per char, min 1400ms, max 5200ms
@@ -614,7 +591,6 @@
         }
         function openTip(h){
           const tip = h.querySelector('.tip');
-          placeTip(h);
           h.classList.add('open'); h.setAttribute('aria-expanded','true');
           if (timers.get(h)) clearTimeout(timers.get(h));
           timers.set(h, setTimeout(() => close(h), tipDuration(tip)));
@@ -628,7 +604,6 @@
         });
 
         document.addEventListener('click', () => { helps.forEach(close); }, { capture:true });
-        window.addEventListener('resize', () => { document.querySelectorAll('.help.open').forEach(placeTip); });
       }
 
       /* Actions */
