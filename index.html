@@ -10,10 +10,10 @@
 
   <style>
     :root{
-      /* Pink gradient theme */
       --grad-start:#FF7AD9;
       --grad-end:#FF3D7F;
-      --accent:#FF5AC8;        /* solid accent for borders/glow */
+      --accent:#FF5AC8;
+      --error:#FF4D9A;
     }
 
     * { box-sizing: border-box; }
@@ -33,7 +33,6 @@
     }
 
     .container {
-      /* Rounded container with gradient border */
       border-radius: 22px;
       background:
         linear-gradient(#18192B, #18192B) padding-box,
@@ -42,7 +41,7 @@
 
       padding: 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      max-width: 520px;
+      max-width: 560px;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -57,7 +56,7 @@
       text-align: center;
     }
 
-    .field { margin-bottom: 10px; }
+    .field { margin-bottom: 12px; }
     .field label {
       display: block;
       margin-bottom: 6px;
@@ -67,7 +66,6 @@
     }
     .field label .required { color: var(--accent); font-weight: 700; }
 
-    /* Inputs + results */
     .field input,
     #results {
       width: 100%;
@@ -80,7 +78,6 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, padding-left 0.2s;
     }
-    /* Visual capitalization while typing */
     .field input[type="text"] { text-transform: capitalize; }
 
     .field input:focus,
@@ -90,8 +87,16 @@
       box-shadow: 0 0 8px rgba(255, 90, 200, 0.55);
     }
 
+    .error {
+      border-color: var(--error) !important;
+      box-shadow: 0 0 8px rgba(255, 77, 154, 0.6) !important;
+    }
+
+    .hint { font-size:12px; color:#bdbdbd; margin-top:4px; }
+    .warn { color: var(--error); display:none; }
+
     .result-label {
-      margin-top: 10px;
+      margin-top: 8px;
       margin-bottom: 6px;
       font-size: 15px;
       font-weight: 600;
@@ -108,11 +113,10 @@
       max-height: 300px;
       overflow-y: auto;
       line-height: 1.6;
-      margin-bottom: 14px; /* space above buttons */
+      margin-bottom: 14px;
       border-radius: 12px;
     }
 
-    /* Buttons */
     .btn {
       border: none;
       color: white;
@@ -135,12 +139,13 @@
 
     .full-width { width: 100%; margin: 6px 0 10px; display: block; }
 
-    .actions-row {
+    .actions-row, .file-row {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      margin-top: 2px;
     }
-    .actions-row .btn { flex: 1 1 0; }
+    .actions-row .btn, .file-row .btn { flex: 1 1 0; }
 
     .copy-status {
       margin-top: 6px;
@@ -149,36 +154,23 @@
       min-height: 16px;
     }
 
-    /* ===== Searchable dropdown with SQUARE logo icon inside input ===== */
+    /* Combo (searchable dropdown with logo inside) */
     .combo { position: relative; }
-
-    /* Default: NO reserved space for logo */
-    .combo input {
-      width: 100%;
-      padding: 10px; /* normal padding */
-      border: 1px solid #444;
-      border-radius: 12px;
-      background: #242537;
-      color: #f5f5f5;
-    }
-
-    /* Only when a logo is present, add left padding */
+    .combo input { padding: 10px; }
     .combo.has-logo input { padding-left: 42px; }
 
     .combo-logo {
       position: absolute;
-      top: 50%;
-      left: 10px;
+      top: 50%; left: 10px;
       transform: translateY(-50%);
       width: 20px; height: 20px;
-      border-radius: 6px;       /* square-ish */
+      border-radius: 6px;
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
       pointer-events: none;
-      display: none; /* default hidden */
+      display: none;
     }
-    /* Show logo only when selected */
     .combo.has-logo .combo-logo { display: block; }
 
     .combo-panel {
@@ -200,19 +192,29 @@
       display: flex; align-items: center; gap: 10px;
       padding: 8px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; color: #f5f5f5;
     }
-    .combo-item:hover,
-    .combo-item.active {
+    .combo-item:hover, .combo-item.active {
       background: #2b2c3f;
       outline: 1px solid var(--accent);
     }
     .combo-item img {
       width: 22px; height: 22px;
-      border-radius: 6px;       /* square-ish in list */
+      border-radius: 6px;
       object-fit: contain;
       background: #18192B;
       border: 1px solid #3a3b4f;
     }
-    .hint { font-size:12px; color:#bdbdbd; margin-top:4px; }
+
+    /* Sliders */
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 70px;
+      gap: 10px;
+      align-items: center;
+    }
+    input[type="range"]{
+      accent-color: #ff5ac8;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -222,12 +224,12 @@
     <!-- Basic fields -->
     <div class="field">
       <label for="firstName">First Name <span class="required">*</span></label>
-      <input id="firstName" type="text" autocomplete="off" />
+      <input id="firstName" type="text" autocomplete="off" enterkeyhint="done" />
     </div>
 
     <div class="field">
       <label for="lastName">Last Name <span class="required">*</span></label>
-      <input id="lastName" type="text" autocomplete="off" />
+      <input id="lastName" type="text" autocomplete="off" enterkeyhint="done" />
     </div>
 
     <!-- Current Club -->
@@ -235,7 +237,7 @@
       <label for="currentClub">Current Club <span class="required">*</span></label>
       <div class="combo" id="comboCurrent">
         <img id="logoCurrent" class="combo-logo" alt="">
-        <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
+        <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" enterkeyhint="done" />
         <div class="combo-panel"></div>
       </div>
       <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
@@ -246,31 +248,41 @@
       <label for="newClub">New Club</label>
       <div class="combo" id="comboNew">
         <img id="logoNew" class="combo-logo" alt="">
-        <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" />
+        <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" enterkeyhint="done" />
         <div class="combo-panel"></div>
       </div>
       <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
     </div>
 
     <!-- Other fields -->
-    <div class="field"><label for="newFirstName">New First Name</label><input id="newFirstName" type="text" autocomplete="off" /></div>
-    <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" /></div>
-    <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" /></div>
+    <div class="field"><label for="newFirstName">New First Name</label><input id="newFirstName" type="text" autocomplete="off" enterkeyhint="done" /></div>
+    <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" enterkeyhint="done" /></div>
+    <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" enterkeyhint="done" /></div>
 
+    <!-- Year with guardrails -->
     <div class="field">
       <label for="yearOfBirth">Year of Birth (4 digits)</label>
-      <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" oninput="limitYear(this)" />
+      <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" oninput="limitYear(this)" enterkeyhint="done" />
+      <div id="yearWarn" class="hint warn">Year should be between 1900 and 2025.</div>
     </div>
 
+    <!-- CA slider + number -->
     <div class="field">
       <label for="ca">CA (0–100)</label>
-      <input id="ca" type="number" min="0" max="100" inputmode="numeric" oninput="validatePercent(this)" />
+      <div class="range-row">
+        <input id="caRange" type="range" min="0" max="100" value="0" oninput="syncRangeToNumber('caRange','ca')" />
+        <input id="ca" type="number" min="0" max="100" inputmode="numeric" value="0" oninput="syncNumberToRange('ca','caRange')" />
+      </div>
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
 
+    <!-- PA slider + number -->
     <div class="field">
       <label for="pa">PA (0–100)</label>
-      <input id="pa" type="number" min="0" max="100" inputmode="numeric" oninput="validatePercent(this)" />
+      <div class="range-row">
+        <input id="paRange" type="range" min="0" max="100" value="0" oninput="syncRangeToNumber('paRange','pa')" />
+        <input id="pa" type="number" min="0" max="100" inputmode="numeric" value="0" oninput="syncNumberToRange('pa','paRange')" />
+      </div>
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
 
@@ -284,13 +296,19 @@
       <button class="btn" onclick="copyResults()">Copy All</button>
       <button class="btn btn-secondary" onclick="clearResults()">Clear</button>
     </div>
+    <div class="file-row">
+      <button class="btn btn-secondary" onclick="downloadResults()">Download .txt</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Upload .txt</button>
+      <input id="fileInput" type="file" accept=".txt,text/plain" style="display:none" />
+    </div>
     <div id="copyStatus" class="copy-status"></div>
   </div>
 
   <script>
     const STORAGE_KEY = "playerEditorResults";
+    const YEAR_MIN = 1900;
+    const YEAR_MAX = 2025;
 
-    /* Square fallback logo (data URI) using pink accent */
     const FALLBACK_LOGO =
       'data:image/svg+xml;utf8,' +
       encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
@@ -298,7 +316,6 @@
         <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
       </svg>`);
 
-    /* Clubs: mix local and web URLs */
     const clubs = [
       { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
       { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
@@ -314,24 +331,38 @@
     }
 
     function limitYear(el){
-      // keep digits only and at most 4 chars
       el.value = el.value.replace(/\D+/g, '').slice(0, 4);
+      const warn = document.getElementById('yearWarn');
+      if (el.value && (Number(el.value) < YEAR_MIN || Number(el.value) > YEAR_MAX)) {
+        el.classList.add('error');
+        warn.style.display = 'block';
+      } else {
+        el.classList.remove('error');
+        warn.style.display = 'none';
+      }
     }
 
-    function validatePercent(el) {
-      if (el.value === "") return;
-      let n = parseInt(el.value, 10);
-      if (isNaN(n)) { el.value = ""; return; }
-      if (n < 0) n = 0;
-      if (n > 100) n = 100;     // clamp to 0–100
-      el.value = n;
+    function clamp01(n){ return Math.max(0, Math.min(100, n)); }
+
+    function syncRangeToNumber(rangeId, numId){
+      const r = document.getElementById(rangeId);
+      const n = document.getElementById(numId);
+      n.value = r.value;
+    }
+    function syncNumberToRange(numId, rangeId){
+      const n = document.getElementById(numId);
+      let v = parseInt(n.value || 0, 10);
+      if (isNaN(v)) v = 0;
+      v = clamp01(v);
+      n.value = v;
+      document.getElementById(rangeId).value = v;
     }
 
     function convertTo200Scale(v) {
       if (v === "" || isNaN(Number(v))) return "";
-      const num = Math.max(0, Math.min(100, Number(v)));
+      const num = clamp01(Number(v));
       const scaled = Math.round((num / 100) * 200);
-      return Math.max(0, Math.min(200, scaled)); // final clamp 0–200
+      return Math.max(0, Math.min(200, scaled));
     }
 
     function buildResult() {
@@ -360,8 +391,7 @@
         resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
         resultsEl.scrollTop = resultsEl.scrollHeight; // scroll inside results only
         saveResults();
-        clearAllInputs(); // auto-clear inputs
-        // (No focusing anything here, so the page doesn't jump to the top)
+        clearAllInputs();
       } else {
         alert("Please fill in First Name, Last Name, and Current Club.");
       }
@@ -382,33 +412,62 @@
       }
     }
 
-    function setCopyStatus(msg) {
-      document.getElementById("copyStatus").textContent = msg;
+    function downloadResults(){
+      const txt = document.getElementById('results').textContent || "";
+      const blob = new Blob([txt], {type:'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'player-results.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     }
 
-    function saveResults() {
-      localStorage.setItem(STORAGE_KEY, document.getElementById("results").textContent);
-    }
+    document.getElementById('fileInput').addEventListener('change', (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const incoming = String(reader.result || "").replace(/\r\n/g,"\n").trim();
+        if (!incoming) return;
+        const replace = confirm("Replace current results with file content?\nPress OK to REPLACE, Cancel to APPEND.");
+        const el = document.getElementById('results');
+        if (replace) el.textContent = incoming;
+        else el.textContent += (el.textContent ? "\n" : "") + incoming;
+        saveResults();
+        setCopyStatus(replace ? "Results replaced from file." : "Results appended from file.");
+        e.target.value = ""; // reset
+      };
+      reader.readAsText(file);
+    });
 
+    function setCopyStatus(msg) { document.getElementById("copyStatus").textContent = msg; }
+    function saveResults() { localStorage.setItem(STORAGE_KEY, document.getElementById("results").textContent); }
     function loadResults() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) document.getElementById("results").textContent = saved;
     }
 
-    /* Clear all input fields + remove logos and their left padding */
     function clearAllInputs() {
       const ids = [
         "firstName","lastName","currentClub","newClub",
         "newFirstName","newLastName","newShortName",
-        "yearOfBirth","ca","pa"
+        "yearOfBirth","ca","pa","caRange","paRange"
       ];
       ids.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.value = "";
+        if (!el) return;
+        if (el.type === 'range' || el.type === 'number' || el.type === 'text') {
+          if (id === 'ca' || id === 'pa' || id === 'caRange' || id === 'paRange') el.value = 0;
+          else el.value = "";
+        }
       });
-      // Remove logo & padding state
       document.getElementById("comboCurrent").classList.remove("has-logo");
       document.getElementById("comboNew").classList.remove("has-logo");
+      document.getElementById('yearWarn').style.display = 'none';
+      document.getElementById('yearOfBirth').classList.remove('error');
     }
 
     /* ===== Searchable dropdown with square logo inside input ===== */
@@ -417,6 +476,13 @@
       const input = document.getElementById(inputId);
       const logo  = document.getElementById(logoId);
       const panel = combo.querySelector(".combo-panel");
+
+      const FALLBACK_LOGO =
+        'data:image/svg+xml;utf8,' +
+        encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+          <rect width="100%" height="100%" fill="#18192B"/>
+          <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
+        </svg>`);
 
       let visibleItems = [];
       let activeIndex = -1;
@@ -460,7 +526,7 @@
           item.append(img, span);
 
           item.addEventListener("mousedown", (e) => {
-            e.preventDefault();  // keep focus on input
+            e.preventDefault();
             select(idx);
           });
 
@@ -471,10 +537,10 @@
       function select(idx) {
         const club = visibleItems[idx];
         if (!club) return;
-        input.value = club.name;              // show text in input
+        input.value = club.name;
         logo.src = club.logo || FALLBACK_LOGO;
         logo.onerror = () => { logo.src = FALLBACK_LOGO; };
-        combo.classList.add("has-logo");      // keep logo visible
+        combo.classList.add("has-logo");
         close();
       }
 
@@ -499,10 +565,7 @@
       });
 
       input.addEventListener("input", () => {
-        // KEEP the logo while typing; remove only if cleared
-        if (input.value.trim() === "") {
-          combo.classList.remove("has-logo");
-        }
+        if (input.value.trim() === "") combo.classList.remove("has-logo");
         render(filter(input.value));
         open();
       });
@@ -527,16 +590,4 @@
       });
 
       document.addEventListener("click", (e) => {
-        if (!combo.contains(e.target)) close();
-      });
-    }
-
-    // Init combos
-    initCombo("comboCurrent", "currentClub", "logoCurrent");
-    initCombo("comboNew",     "newClub",     "logoNew");
-
-    // Load saved results on start
-    window.onload = loadResults;
-  </script>
-</body>
-</html>
+        if (!com
