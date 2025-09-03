@@ -66,6 +66,19 @@
     .hint { font-size:12px; color:#bdbdbd; margin-top:4px; }
     .warn { color: var(--error); display:none; }
 
+    /* Required-field visual feedback */
+    .field.req .req-msg { display:block; }
+    .field.req input { border-color: var(--error); box-shadow: 0 0 10px rgba(255,77,154,0.55); }
+    .field.req .combo input { border-color: var(--error); box-shadow: 0 0 10px rgba(255,77,154,0.55); }
+    .req-msg { display:none; font-size:12px; color: var(--error); margin-top:6px; }
+    .shake { animation: shake 240ms ease-in-out 0s 1; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-3px); }
+    }
+
     .result-label { margin-top: 10px; margin-bottom: 6px; font-size: 15px; font-weight: 600; color: var(--accent); }
 
     /* Results container + empty state */
@@ -170,23 +183,27 @@
     <h2>Player Data Input</h2>
 
     <!-- Basic fields -->
-    <div class="field">
+    <div class="field" id="field-first">
       <label for="firstName">First Name <span class="required">*</span></label>
       <input id="firstName" type="text" autocomplete="off" />
+      <div class="req-msg" id="msg-first">This field is required.</div>
     </div>
-    <div class="field">
+
+    <div class="field" id="field-last">
       <label for="lastName">Last Name <span class="required">*</span></label>
       <input id="lastName" type="text" autocomplete="off" />
+      <div class="req-msg" id="msg-last">This field is required.</div>
     </div>
 
     <!-- Current Club -->
-    <div class="field">
+    <div class="field" id="field-current">
       <label for="currentClub">Current Club <span class="required">*</span></label>
       <div class="combo" id="comboCurrent">
         <img id="logoCurrent" class="combo-logo" alt="">
         <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
         <div class="combo-panel"></div>
       </div>
+      <div class="req-msg" id="msg-current">This field is required.</div>
       <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
     </div>
 
@@ -313,8 +330,7 @@
             ta.style.position = 'fixed';
             ta.style.opacity = '0';
             document.body.appendChild(ta);
-            ta.focus();
-            ta.select();
+            ta.focus(); ta.select();
             document.execCommand('copy');
             document.body.removeChild(ta);
             resolve();
@@ -437,7 +453,7 @@
       }
       function clampPercent(el){
         if (el.value === "") return;
-        let n = parseInt(el.value,10); if (isNaN(n)) { el.value=""; return; } el.value = clamp01(n);
+        let n = parseInt(el.value,10); if (isNaN(n)) { el.value=""; return; } el.value = Math.max(0, Math.min(100, n));
       }
 
       /* ===== Combo (searchable dropdown with logo) ===== */
@@ -469,6 +485,7 @@
           const club = visible[idx]; if (!club) return;
           input.value = club.name; logo.src = club.logo || FALLBACK_LOGO; logo.onerror=()=>{logo.src=FALLBACK_LOGO;};
           combo.classList.add("has-logo"); close();
+          clearReqFor(input); // clear required state when a club is chosen
         }
         function moveActive(delta){
           if (!isOpen()) open();
@@ -481,7 +498,7 @@
         }
 
         input.addEventListener("focus", () => { render(filter(input.value)); open(); });
-        input.addEventListener("input", () => { if (input.value.trim()==="") combo.classList.remove("has-logo"); render(filter(input.value)); open(); });
+        input.addEventListener("input", () => { if (input.value.trim()==="") combo.classList.remove("has-logo"); render(filter(input.value)); open(); clearReqFor(input); });
         input.addEventListener("keydown", (e) => {
           if (!isOpen() && (e.key==="ArrowDown"||e.key==="ArrowUp")) { render(filter(input.value)); open(); }
           switch (e.key) {
@@ -494,17 +511,59 @@
         document.addEventListener("click", (e) => { if (!combo.contains(e.target)) close(); });
       }
 
+      /* ===== Required fields UX ===== */
+      const requiredInputs = [
+        { id: 'firstName', field: 'field-first', msg: 'msg-first' },
+        { id: 'lastName',  field: 'field-last',  msg: 'msg-last' },
+        { id: 'currentClub', field: 'field-current', msg: 'msg-current' }
+      ];
+
+      function markReqFor(inputEl){
+        const fieldEl = inputEl.closest('.field');
+        if (!fieldEl) return;
+        fieldEl.classList.add('req', 'shake');
+        setTimeout(() => fieldEl.classList.remove('shake'), 260);
+      }
+      function clearReqFor(inputEl){
+        const fieldEl = inputEl.closest('.field');
+        if (!fieldEl) return;
+        fieldEl.classList.remove('req');
+      }
+
+      function validateRequired(showFeedback = false){
+        const missing = [];
+        requiredInputs.forEach(({id}) => {
+          const el = $(id);
+          if (!el || !el.value.trim()) missing.push(el);
+        });
+
+        if (showFeedback && missing.length) {
+          // show & focus the first missing
+          missing.forEach(el => markReqFor(el));
+          const first = missing[0];
+          first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => first.focus(), 220);
+        }
+        return missing.length === 0;
+      }
+
       /* ===== Actions ===== */
       function addResult(){
-        if (!isYearValidOrEmpty()) { $('yearOfBirth').classList.add('error'); $('yearWarn').style.display='block'; alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).'); return; }
+        if (!validateRequired(true)) return;
+
+        if (!isYearValidOrEmpty()) {
+          $('yearOfBirth').classList.add('error'); $('yearWarn').style.display='block';
+          alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).');
+          return;
+        }
         const line = buildResult();
-        if (!line) { alert("Please fill in First Name, Last Name, and Current Club."); return; }
+        if (!line) return;
         appendResultLine(line);
         clearAllInputs();
       }
       function copyResults(){
         const text = getAllLines().join('\n').trim(); if (!text) return;
-        navigator.clipboard.writeText(text).then(()=>{ setCopyStatus('Copied all results ✅'); }).catch(err=>alert('Copy failed: '+err));
+        copyToClipboard(text).then(()=>{ setCopyStatus('Copied all results ✅'); }).catch(err=>alert('Copy failed: '+err));
       }
       function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); setCopyStatus(''); updateEmptyState(); }
 
@@ -514,10 +573,19 @@
         initCombo("comboCurrent", "currentClub", "logoCurrent");
         initCombo("comboNew",     "newClub",     "logoNew");
 
+        // Validation wiring
         $('yearOfBirth').addEventListener('input', e => limitYear(e.target));
         $('ca').addEventListener('input', e => clampPercent(e.target));
         $('pa').addEventListener('input', e => clampPercent(e.target));
 
+        // Clear req highlighting as user types
+        ['firstName','lastName','currentClub'].forEach(id => {
+          $(id).addEventListener('input', (e) => {
+            if (e.target.value.trim()) clearReqFor(e.target);
+          });
+        });
+
+        // Buttons
         $('addBtn').addEventListener('click', addResult);
         $('copyBtn').addEventListener('click', copyResults);
         $('clearBtn').addEventListener('click', clearResults);
