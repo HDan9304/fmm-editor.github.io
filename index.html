@@ -36,7 +36,7 @@
     }
     /* Light theme */
     [data-theme="light"] {
-      --bg: #E5E6FA;                     /* requested */
+      --bg: #E5E6FA;
       --bg-pattern: rgba(26,27,46,0.08);
       --panel-bg: #ffffff;
       --input-bg: #F4F5FF;
@@ -78,7 +78,7 @@
       border: 2px solid transparent;
       padding: 16px 16px 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      max-width: 520px;            /* mobile default */
+      max-width: 520px; /* mobile default */
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -86,156 +86,115 @@
       transition: background .25s ease, box-shadow .25s ease, max-width .25s ease;
     }
 
-    /* ===== Header / theme toggle ===== */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 2px 2px 8px;
-    }
-    h2 { margin: 0; font-size: 22px; font-weight: 600; color: var(--text); }
+    /* Header / theme toggle */
+    .header { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:2px 2px 8px; }
+    h2 { margin:0; font-size:22px; font-weight:600; color:var(--text); }
 
-    .theme-toggle { border: 0; background: transparent; padding: 0; cursor: pointer; }
+    .theme-toggle { border:0; background:transparent; padding:0; cursor:pointer; }
     .toggle-track {
-      position: relative; width: 56px; height: 28px; border-radius: 999px;
-      background: var(--toggle-track);
-      box-shadow: 0 2px 8px var(--toggle-shadow) inset, 0 2px 6px var(--toggle-shadow);
-      padding: 2px; display: inline-block;
-      transition: background .25s ease, box-shadow .25s ease, transform .25s ease;
+      position: relative; width:56px; height:28px; border-radius:999px;
+      background:var(--toggle-track);
+      box-shadow:0 2px 8px var(--toggle-shadow) inset, 0 2px 6px var(--toggle-shadow);
+      padding:2px; display:inline-block;
+      transition: background .25s ease, box-shadow .25s ease;
     }
     .toggle-thumb {
-      position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 999px;
-      background: var(--toggle-thumb); box-shadow: 0 2px 6px rgba(0,0,0,.25);
-      transition: transform .28s cubic-bezier(.2,.8,.2,1), background .25s ease;
-      display: grid; place-items: center; overflow: hidden;
+      position:absolute; top:2px; left:2px; width:24px; height:24px; border-radius:999px;
+      background:var(--toggle-thumb); box-shadow:0 2px 6px rgba(0,0,0,.25);
+      transition: transform .28s cubic-bezier(.2,.8,.2,1);
     }
-    .toggle-icon { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; opacity: .9; }
-    .toggle-icon.moon { right: 8px; color: #8ea0ff; }
-    .toggle-icon.sun  { left: 8px; color: #ffb84d; }
-    .toggle-icon svg { width: 14px; height: 14px; display:block; }
+    .toggle-icon { position:absolute; top:50%; transform:translateY(-50%); width:14px; height:14px; opacity:.9; }
+    .toggle-icon.moon { right:8px; color:#8ea0ff; }
+    .toggle-icon.sun  { left:8px;  color:#ffb84d; }
+    .toggle-icon svg { width:14px; height:14px; display:block; }
     [data-theme="light"] .toggle-thumb { transform: translateX(28px); }
-    [data-theme="light"] .toggle-icon.sun  { opacity: 1; }
-    [data-theme="light"] .toggle-icon.moon { opacity: .4; }
-    [data-theme="dark"]  .toggle-icon.sun  { opacity: .4; }
-    [data-theme="dark"]  .toggle-icon.moon { opacity: 1; }
 
-    /* ===== Inputs ===== */
-    .field { margin-bottom: 10px; }
-    .field label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text); font-size: 14px; opacity: .9; }
-    .field label .required { color: var(--accent); font-weight: 700; }
+    /* Inputs */
+    .field { margin-bottom:10px; }
+    .field label { display:block; margin-bottom:6px; font-weight:500; color:var(--text); font-size:14px; opacity:.9; }
+    .field label .required { color:var(--accent); font-weight:700; }
 
     .field input {
-      width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 12px;
-      font-size: 16px; background: var(--input-bg); color: var(--text); outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, padding-left 0.2s, color .25s ease;
+      width:100%; padding:10px; border:1px solid var(--border); border-radius:12px;
+      font-size:16px; background:var(--input-bg); color:var(--text); outline:none;
+      transition: border-color .2s, box-shadow .2s, background .2s, padding-left .2s;
     }
     .field input[type="text"] { text-transform: capitalize; }
-    .field input:focus { border-color: var(--accent); background: rgba(43,44,63,.12); box-shadow: 0 0 8px var(--focus-glow); }
+    .field input:focus { border-color:var(--accent); background:rgba(43,44,63,.12); box-shadow:0 0 8px var(--focus-glow); }
 
-    .error { border-color: var(--error) !important; box-shadow: 0 0 8px rgba(255,77,154,0.6) !important; }
-    .hint { font-size:12px; color: var(--muted); margin-top:4px; }
-    .warn { color: var(--error); display:none; }
+    .error { border-color:var(--error)!important; box-shadow:0 0 8px rgba(255,77,154,0.6)!important; }
+    .hint { font-size:12px; color:var(--muted); margin-top:4px; }
+    .warn { color:var(--error); display:none; }
 
     /* Required-field feedback */
     .field.req .req-msg { display:block; }
     .field.req input,
-    .field.req .combo input { border-color: var(--error); box-shadow: 0 0 10px rgba(255,77,154,0.55); }
-    .req-msg { display:none; font-size:12px; color: var(--error); margin-top:6px; }
+    .field.req .combo input { border-color:var(--error); box-shadow:0 0 10px rgba(255,77,154,0.55); }
+    .req-msg { display:none; font-size:12px; color:var(--error); margin-top:6px; }
     .shake { animation: shake 240ms ease-in-out 0s 1; }
     @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 50%{transform:translateX(5px);} 75%{transform:translateX(-3px);} }
 
-    .result-label { margin-top: 10px; margin-bottom: 6px; font-size: 15px; font-weight: 600; color: var(--accent); }
-
     /* Results */
+    .result-label { margin-top:0; margin-bottom:6px; font-size:15px; font-weight:600; color:var(--accent); } /* << aligned */
+
     #results {
-      padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--input-bg);
-      min-height: 160px; max-height: 300px; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 12px; position: relative; margin-bottom: 14px;
+      padding:16px; border:1px solid var(--border); border-radius:16px; background:var(--input-bg);
+      min-height:160px; max-height:300px; overflow-y:auto;
+      display:flex; flex-direction:column; gap:12px; position:relative; margin-bottom:14px;
       transition: background .25s ease, border-color .25s ease;
     }
-    #results.empty { justify-content: center; }
+    #results.empty { justify-content:center; }
     .empty-state {
-      display: none; border: 1px solid var(--border); background: var(--empty-bg); color: var(--muted);
-      border-radius: 16px; height: 72px; padding: 0 16px; align-items: center; justify-content: center; text-align: center;
+      display:none; border:1px solid var(--border); background:var(--empty-bg); color:var(--muted);
+      border-radius:16px; height:72px; padding:0 16px; align-items:center; justify-content:center; text-align:center;
     }
-    #results.empty .empty-state { display: flex; }
+    #results.empty .empty-state { display:flex; }
 
-    .res-line {
-      display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border-radius: 14px;
-      background: var(--input-bg); outline: 1px solid var(--outline-soft);
-    }
-    .res-text { flex: 1 1 auto; min-height: 18px; line-height: 1.6; font-family: 'Poppins', monospace; font-size: 14px; color: var(--text); outline: none; }
-    .res-text[contenteditable="true"]:focus {
-      background: rgba(43,44,63,.12);
-      box-shadow: inset 0 0 0 1px var(--accent), 0 0 8px rgba(255,90,200,0.35);
-      border-radius: 8px; padding: 2px 4px;
-    }
+    .res-line { display:flex; align-items:flex-start; gap:8px; padding:10px 12px; border-radius:14px; background:var(--input-bg); outline:1px solid var(--outline-soft); }
+    .res-text { flex:1 1 auto; min-height:18px; line-height:1.6; font-family:'Poppins', monospace; font-size:14px; color:var(--text); outline:none; }
+    .res-text[contenteditable="true"]:focus { background:rgba(43,44,63,.12); box-shadow: inset 0 0 0 1px var(--accent), 0 0 8px rgba(255,90,200,0.35); border-radius:8px; padding:2px 4px; }
 
-    .icon-btn { border: none; background: transparent; color: var(--icon); padding: 6px 8px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-    .icon-btn:hover { background: rgba(255,90,200,0.1); }
-    .icon-btn svg { width: 18px; height: 18px; display: block; }
+    .icon-btn { border:none; background:transparent; color:var(--icon); padding:6px 8px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+    .icon-btn:hover { background:rgba(255,90,200,0.1); }
+    .icon-btn svg { width:18px; height:18px; display:block; }
 
-    .btn {
-      border: none; color: white; padding: 12px; border-radius: 14px; font-size: 14px; font-weight: 600;
-      cursor: pointer; text-align: center; background: linear-gradient(90deg,var(--grad-start),var(--grad-end));
-    }
-    .btn:hover { filter: brightness(1.06); }
-    .btn.cta { padding: 16px; font-size: 16px; border-radius: 16px; }
-    .btn-secondary { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
-    .btn-secondary:hover { background: rgba(255,90,200,0.08); }
-    .full-width { width: 100%; margin: 6px 0 10px; display: block; }
-    .actions-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .actions-row .btn { flex: 1 1 0; }
-    .copy-status { margin-top: 6px; font-size: 12px; color: #9ad29a; min-height: 16px; }
+    .btn { border:none; color:white; padding:12px; border-radius:14px; font-size:14px; font-weight:600; cursor:pointer; text-align:center; background:linear-gradient(90deg,var(--grad-start),var(--grad-end)); }
+    .btn:hover { filter:brightness(1.06); }
+    .btn.cta { padding:16px; font-size:16px; border-radius:16px; }
+    .btn-secondary { background:transparent; border:2px solid var(--accent); color:var(--accent); }
+    .btn-secondary:hover { background:rgba(255,90,200,0.08); }
+    .full-width { width:100%; margin:6px 0 10px; display:block; }
+    .actions-row { display:flex; gap:10px; flex-wrap:wrap; }
+    .actions-row .btn { flex:1 1 0; }
+    .copy-status { margin-top:6px; font-size:12px; color:#9ad29a; min-height:16px; }
 
-    /* Combo (searchable dropdown with *just* logo) */
-    .combo { position: relative; }
-    .combo input { padding: 10px; }
-    .combo.has-logo input { padding-left: 42px; }
+    /* Combo (searchable dropdown with just logo) */
+    .combo { position:relative; }
+    .combo input { padding:10px; }
+    .combo.has-logo input { padding-left:42px; }
     .combo-logo {
-      position: absolute; top: 50%; left: 10px; transform: translateY(-50%);
-      width: 22px; height: 22px; border-radius: 4px; object-fit: contain;
-      background: transparent; border: 0; box-shadow: none; display: none; pointer-events: none;
+      position:absolute; top:50%; left:10px; transform:translateY(-50%);
+      width:22px; height:22px; border-radius:4px; object-fit:contain; background:transparent; border:0; box-shadow:none; display:none; pointer-events:none;
     }
-    .combo.has-logo .combo-logo { display: block; }
+    .combo.has-logo .combo-logo { display:block; }
     .combo-panel {
-      position: absolute; left: 0; right: 0; top: calc(100% + 6px);
-      background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-      max-height: 260px; overflow-y: auto; padding: 6px; display: none; z-index: 999;
-      transition: background .25s ease, border-color .25s ease;
+      position:absolute; left:0; right:0; top:calc(100% + 6px);
+      background:var(--input-bg); border:1px solid var(--border); border-radius:12px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.35); max-height:260px; overflow-y:auto; padding:6px; display:none; z-index:999;
     }
-    .combo.open .combo-panel { display: block; }
-    .combo-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-size: 16px; color: var(--text); }
-    .combo-item:hover, .combo-item.active { background: rgba(43,44,63,.12); outline: 1px solid var(--accent); }
-    .combo-item img { width: 28px; height: 28px; border-radius: 4px; object-fit: contain; background: transparent; border: 0; box-shadow: none; }
+    .combo.open .combo-panel { display:block; }
+    .combo-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:16px; color:var(--text); }
+    .combo-item:hover, .combo-item.active { background:rgba(43,44,63,.12); outline:1px solid var(--accent); }
+    .combo-item img { width:28px; height:28px; border-radius:4px; object-fit:contain; background:transparent; border:0; box-shadow:none; }
 
-    /* ========= DESKTOP LAYOUT (two columns, sticky results) ========= */
+    /* Desktop layout: two columns, sticky results */
     @media (min-width: 960px) {
-      .container {
-        max-width: 1120px; /* widen on desktop */
-        padding: 20px 22px 24px;
-      }
+      .container { max-width:1120px; padding:20px 22px 24px; }
       .content-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 420px; /* form grows, results fixed */
-        gap: 22px;
-        align-items: start;
+        display:grid; grid-template-columns:minmax(0,1fr) 420px; gap:22px; align-items:start;
       }
-      .results-col {
-        position: sticky;
-        top: 12px;                 /* keep in view while scrolling the form */
-        height: calc(100vh - 120px);
-        display: flex;
-        flex-direction: column;
-      }
-      /* let results list fill the column; buttons stay visible at bottom */
-      .results-col #results {
-        flex: 1 1 auto;
-        min-height: 0;
-        max-height: none;
-      }
+      .results-col { position:sticky; top:12px; height:calc(100vh - 120px); display:flex; flex-direction:column; }
+      .results-col #results { flex:1 1 auto; min-height:0; max-height:none; }
     }
   </style>
 </head>
@@ -263,7 +222,7 @@
       </button>
     </div>
 
-    <!-- CONTENT GRID: form (left) + results (right on desktop) -->
+    <!-- Grid: form (left) + results (right) -->
     <div class="content-grid">
       <section class="form-col">
         <div class="field" id="field-first">
@@ -353,18 +312,12 @@
         { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
       ];
 
-      /* ===== Theme ===== */
+      /* Theme */
       const root = document.documentElement;
-      function applyTheme(theme){
-        root.setAttribute('data-theme', theme);
-        localStorage.setItem(THEME_KEY, theme);
-      }
-      function initTheme(){
-        const saved = localStorage.getItem(THEME_KEY);
-        applyTheme(saved === 'light' || saved === 'dark' ? saved : 'dark');
-      }
+      function applyTheme(theme){ root.setAttribute('data-theme', theme); localStorage.setItem(THEME_KEY, theme); }
+      function initTheme(){ const saved = localStorage.getItem(THEME_KEY); applyTheme(saved==='light'||saved==='dark'?saved:'dark'); }
 
-      /* ===== Helpers ===== */
+      /* Helpers */
       const $ = (id) => document.getElementById(id);
       const resultsEl = $('results');
       const addBtn = $('addBtn');
@@ -380,116 +333,38 @@
         addBtn.classList.toggle('cta', !hasLines);
       }
 
-      function trashSVG(){
-        return `
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-     aria-hidden="true" focusable="false">
-  <polyline points="3 6 5 6 21 6"></polyline>
-  <path d="M19 6l-1 14H6L5 6"></path>
-  <path d="M10 11v6"></path>
-  <path d="M14 11v6"></path>
-  <path d="M9 6V4h6v2"></path>
-</svg>`;
-      }
-      function copySVG(){
-        return `
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-     aria-hidden="true" focusable="false">
-  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-  <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
-</svg>`;
-      }
+      function trashSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`; }
+      function copySVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>`; }
 
       function copyToClipboard(text){
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          return navigator.clipboard.writeText(text);
-        }
+        if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
         return new Promise((resolve, reject) => {
-          try {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.focus(); ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            resolve();
-          } catch (e) { reject(e); }
+          try { const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); resolve(); }
+          catch(e){ reject(e); }
         });
       }
 
-      /* ===== Results list ===== */
+      /* Results */
       function makeLineEl(text){
-        const line = document.createElement('div');
-        line.className = 'res-line';
+        const line = document.createElement('div'); line.className = 'res-line';
+        const span = document.createElement('span'); span.className='res-text'; span.contentEditable='true'; span.textContent=text;
+        const copyBtn = document.createElement('button'); copyBtn.className='icon-btn'; copyBtn.title='Copy line'; copyBtn.setAttribute('aria-label','Copy line'); copyBtn.innerHTML = copySVG();
+        const delBtn  = document.createElement('button'); delBtn.className='icon-btn';  delBtn.title='Delete line'; delBtn.setAttribute('aria-label','Delete line'); delBtn.innerHTML  = trashSVG();
 
-        const span = document.createElement('span');
-        span.className = 'res-text';
-        span.contentEditable = 'true';
-        span.textContent = text;
-
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'icon-btn';
-        copyBtn.title = 'Copy line';
-        copyBtn.setAttribute('aria-label','Copy line');
-        copyBtn.innerHTML = copySVG();
-
-        const delBtn = document.createElement('button');
-        delBtn.className = 'icon-btn';
-        delBtn.title = 'Delete line';
-        delBtn.setAttribute('aria-label','Delete line');
-        delBtn.innerHTML = trashSVG();
-
-        copyBtn.addEventListener('click', () => {
-          copyToClipboard(span.textContent.trim())
-            .then(() => setCopyStatus('Copied line ✅'))
-            .catch(err => alert('Copy failed: ' + err));
-        });
-        copyBtn.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyBtn.click(); }
-        });
-
-        delBtn.addEventListener('click', () => {
-          line.remove(); saveResults(); updateEmptyState();
-        });
-        delBtn.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); delBtn.click(); }
-        });
-
+        copyBtn.addEventListener('click', () => { copyToClipboard(span.textContent.trim()).then(()=>setCopyStatus('Copied line ✅')).catch(err=>alert('Copy failed: '+err)); });
+        delBtn.addEventListener('click',  () => { line.remove(); saveResults(); updateEmptyState(); });
         span.addEventListener('input', () => saveResults());
 
         line.append(span, copyBtn, delBtn);
         return line;
       }
-
-      function appendResultLine(text){
-        resultsEl.appendChild(makeLineEl(text));
-        resultsEl.scrollTop = resultsEl.scrollHeight;
-        saveResults();
-        updateEmptyState();
-      }
-      function getAllLines(){
-        return Array.from(resultsEl.querySelectorAll('.res-text')).map(el => el.textContent);
-      }
-      function renderFromLines(lines){
-        resultsEl.querySelectorAll('.res-line').forEach(el => el.remove());
-        lines.forEach(t => { if (t && String(t).trim()!=='') resultsEl.appendChild(makeLineEl(t)); });
-        updateEmptyState();
-      }
+      function appendResultLine(text){ resultsEl.appendChild(makeLineEl(text)); resultsEl.scrollTop = resultsEl.scrollHeight; saveResults(); updateEmptyState(); }
+      function getAllLines(){ return Array.from(resultsEl.querySelectorAll('.res-text')).map(el => el.textContent); }
+      function renderFromLines(lines){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); lines.forEach(t=>{ if(t&&String(t).trim()!=='') resultsEl.appendChild(makeLineEl(t)); }); updateEmptyState(); }
       function saveResults(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(getAllLines())); }
-      function loadResults(){
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) { updateEmptyState(); return; }
-        let lines = [];
-        try { const p = JSON.parse(raw); lines = Array.isArray(p)?p:String(raw).split(/\n/); }
-        catch { lines = String(raw).split(/\n/); }
-        renderFromLines(lines);
-      }
+      function loadResults(){ const raw=localStorage.getItem(STORAGE_KEY); if(!raw){updateEmptyState();return;} let lines=[]; try{const p=JSON.parse(raw); lines=Array.isArray(p)?p:String(raw).split(/\n/);}catch{lines=String(raw).split(/\n/);} renderFromLines(lines); }
 
-      /* ===== Build result ===== */
+      /* Build result */
       function buildResult() {
         const g = id => ($(id)?.value || "").trim();
         const first = capWords(g("firstName"));
@@ -506,24 +381,17 @@
         return `"PLAYER" "${first}" "${last}" "${curr}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
       }
 
-      /* ===== Required fields ===== */
+      /* Required fields */
       const requiredInputs = ['firstName','lastName','currentClub'];
-      function markReqFor(inputEl){
-        const fieldEl = inputEl.closest('.field'); if (!fieldEl) return;
-        fieldEl.classList.add('req','shake'); setTimeout(()=>fieldEl.classList.remove('shake'),260);
-      }
-      function clearReqFor(inputEl){
-        const fieldEl = inputEl.closest('.field'); if (!fieldEl) return;
-        fieldEl.classList.remove('req');
-      }
+      function markReqFor(inputEl){ const fieldEl=inputEl.closest('.field'); if(!fieldEl) return; fieldEl.classList.add('req','shake'); setTimeout(()=>fieldEl.classList.remove('shake'),260); }
+      function clearReqFor(inputEl){ const fieldEl=inputEl.closest('.field'); if(!fieldEl) return; fieldEl.classList.remove('req'); }
       function validateRequired(show=false){
-        const miss=[];
-        requiredInputs.forEach(id=>{ const el=$(id); if(!el.value.trim()) miss.push(el); });
+        const miss=[]; requiredInputs.forEach(id=>{ const el=$(id); if(!el.value.trim()) miss.push(el); });
         if(show && miss.length){ miss.forEach(el=>markReqFor(el)); const f=miss[0]; f.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>f.focus(),220); }
         return miss.length===0;
       }
 
-      /* ===== Year & numbers ===== */
+      /* Year & numbers */
       function limitYear(el){
         el.value = el.value.replace(/\D+/g, '').slice(0, 4);
         const warn = $('yearWarn'); const val = el.value;
@@ -536,12 +404,9 @@
         if (val.length !== 4) return false;
         const n = +val; return !(isNaN(n) || n < YEAR_MIN || n > YEAR_MAX);
       }
-      function clampPercent(el){
-        if (el.value === "") return;
-        let n = parseInt(el.value,10); if (isNaN(n)) { el.value=""; return; } el.value = Math.max(0, Math.min(100, n));
-      }
+      function clampPercent(el){ if (el.value === "") return; let n=parseInt(el.value,10); if(isNaN(n)){el.value=""; return;} el.value=Math.max(0, Math.min(100, n)); }
 
-      /* ===== Combo (searchable dropdown with just logo) ===== */
+      /* Combo (searchable dropdown with just logo) */
       function initCombo(comboId, inputId, logoId) {
         const combo = $(comboId), input = $(inputId), logo = $(logoId), panel = combo.querySelector(".combo-panel");
         let visible = [], activeIndex = -1;
@@ -603,35 +468,23 @@
         document.addEventListener("click", (e) => { if (!combo.contains(e.target)) close(); });
       }
 
-      /* ===== Actions ===== */
+      /* Actions */
       function addResult(){
         if (!validateRequired(true)) return;
-        if (!isYearValidOrEmpty()) {
-          $('yearOfBirth').classList.add('error'); $('yearWarn').style.display='block';
-          alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).');
-          return;
-        }
-        const line = buildResult();
-        if (!line) return;
+        if (!isYearValidOrEmpty()) { $('yearOfBirth').classList.add('error'); $('yearWarn').style.display='block'; alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).'); return; }
+        const line = buildResult(); if (!line) return;
         appendResultLine(line);
-        ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"]
-          .forEach(id => { const el=$(id); if(el) el.value=""; });
-        ["comboCurrent","comboNew"].forEach(id => { const c=$(id); if(c){ c.classList.remove("has-logo"); const img=c.querySelector(".combo-logo"); if(img) img.style.display="none"; }});
+        ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"].forEach(id=>{ const el=$(id); if(el) el.value=""; });
+        ["comboCurrent","comboNew"].forEach(id=>{ const c=$(id); if(c){ c.classList.remove("has-logo"); const img=c.querySelector(".combo-logo"); if(img) img.style.display="none"; }});
         $('yearWarn').style.display='none'; $('yearOfBirth').classList.remove('error');
       }
-      function copyResults(){
-        const text = getAllLines().join('\n').trim(); if (!text) return;
-        copyToClipboard(text).then(()=>{ setCopyStatus('Copied all results ✅'); }).catch(err=>alert('Copy failed: '+err));
-      }
+      function copyResults(){ const text=getAllLines().join('\n').trim(); if(!text) return; copyToClipboard(text).then(()=>{ setCopyStatus('Copied all results ✅'); }).catch(err=>alert('Copy failed: '+err)); }
       function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); setCopyStatus(''); updateEmptyState(); }
 
-      /* ===== Init ===== */
+      /* Init */
       document.addEventListener('DOMContentLoaded', () => {
         initTheme();
-        $('themeToggle').addEventListener('click', () => {
-          const next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
-          applyTheme(next);
-        });
+        $('themeToggle').addEventListener('click', () => { const next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light'; applyTheme(next); });
 
         loadResults();
         initCombo("comboCurrent", "currentClub", "logoCurrent");
@@ -641,9 +494,7 @@
         $('ca').addEventListener('input', e => clampPercent(e.target));
         $('pa').addEventListener('input', e => clampPercent(e.target));
 
-        ['firstName','lastName','currentClub'].forEach(id => {
-          $(id).addEventListener('input', (e) => { if (e.target.value.trim()) clearReqFor(e.target); });
-        });
+        ['firstName','lastName','currentClub'].forEach(id => { $(id).addEventListener('input', e => { if (e.target.value.trim()) clearReqFor(e.target); }); });
 
         $('addBtn').addEventListener('click', addResult);
         $('copyBtn').addEventListener('click', copyResults);
