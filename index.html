@@ -157,7 +157,7 @@
       font-size: 12px;
       line-height: 1.35;
       box-shadow: 0 10px 24px rgba(0,0,0,0.35);
-      z-index: 4000;                 /* above inputs & dropdown */
+      z-index: 4000;
       visibility: hidden;
       opacity: 0;
       pointer-events: none;
@@ -165,7 +165,7 @@
       transition:
         opacity .18s ease,
         transform .18s cubic-bezier(.2,.8,.2,1),
-        visibility 0s linear .18s;   /* hide after fade-out */
+        visibility 0s linear .18s;
     }
     .help .tip::before{
       content:""; position:absolute; left:12px; bottom:-6px;
@@ -181,6 +181,9 @@
         visibility 0s;
       pointer-events: auto;
     }
+
+    /* small note next to labels for converted value */
+    .mini-note { margin-left: auto; font-size:12px; color:var(--muted); }
 
     /* Required-field feedback */
     .field.req .req-msg { display:block; }
@@ -240,6 +243,33 @@
     .combo-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:16px; color:var(--text); }
     .combo-item:hover, .combo-item.active { background:rgba(43,44,63,.12); outline:1px solid var(--accent); }
     .combo-item img { width:22px; height:22px; border-radius:4px; object-fit:contain; background:transparent; border:0; box-shadow:none; }
+
+    /* Range (slider) styles */
+    .range-wrap { margin-top:6px; }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg,var(--grad-start),var(--grad-end)) 0/0% 100% no-repeat, #3a3b52;
+      outline: none;
+      border: 1px solid var(--border);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,.35);
+      cursor: pointer;
+      border: 2px solid var(--accent);
+      margin-top: -6px;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--accent); cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,.35);
+    }
 
     /* Desktop layout: two columns, sticky results */
     @media (min-width: 960px) {
@@ -363,6 +393,7 @@
           <div id="yearWarn" class="req-msg">Year should be between 1900 and 2025.</div>
         </div>
 
+        <!-- CA with slider -->
         <div class="field">
           <div class="field-label">
             <label for="ca">CA</label>
@@ -370,10 +401,15 @@
               i
               <span class="tip">Current Ability. Enter 0–100 here; we convert to 0–200 (max 200).</span>
             </span>
+            <span class="mini-note" id="caOut">→ 0–200: —</span>
           </div>
           <input id="ca" type="number" min="0" max="100" inputmode="numeric" />
+          <div class="range-wrap">
+            <input id="caSlider" type="range" min="0" max="100" step="1" />
+          </div>
         </div>
 
+        <!-- PA with slider -->
         <div class="field">
           <div class="field-label">
             <label for="pa">PA</label>
@@ -381,8 +417,12 @@
               i
               <span class="tip">Potential Ability (past or future). Enter 0–100 here; we convert to 0–200 (max 200).</span>
             </span>
+            <span class="mini-note" id="paOut">→ 0–200: —</span>
           </div>
           <input id="pa" type="number" min="0" max="100" inputmode="numeric" />
+          <div class="range-wrap">
+            <input id="paSlider" type="range" min="0" max="100" step="1" />
+          </div>
         </div>
       </section>
 
@@ -511,6 +551,36 @@
       }
       function clampPercent(el){ if (el.value === "") return; let n=parseInt(el.value,10); if(isNaN(n)){el.value=""; return;} el.value=Math.max(0, Math.min(100, n)); }
 
+      /* Range helpers */
+      function setRangeFill(slider) {
+        const v = Number(slider.value)||0;
+        slider.style.backgroundSize = v + "% 100%";
+      }
+      function bindNumberAndSlider(numId, sliderId, outId){
+        const num = $(numId), slider = $(sliderId), out = $(outId);
+        const updateOut = () => { const converted = convertTo200Scale(num.value); out.textContent = "→ 0–200: " + (converted === "" ? "—" : converted); };
+
+        // number -> slider
+        num.addEventListener('input', () => {
+          if (num.value === "") { slider.value = 0; setRangeFill(slider); updateOut(); return; }
+          clampPercent(num);
+          slider.value = num.value;
+          setRangeFill(slider);
+          updateOut();
+        });
+
+        // slider -> number
+        slider.addEventListener('input', () => {
+          num.value = slider.value;
+          setRangeFill(slider);
+          updateOut();
+        });
+
+        // init
+        setRangeFill(slider);
+        updateOut();
+      }
+
       /* Combo (searchable dropdown) */
       function initCombo(comboId, inputId, logoId) {
         const combo = $(comboId), input = $(inputId), logo = $(logoId), panel = combo.querySelector(".combo-panel");
@@ -612,9 +682,14 @@
         if (!isYearValidOrEmpty()) { $('yearOfBirth').classList.add('error'); $('yearWarn').style.display='block'; alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).'); return; }
         const line = buildResult(); if (!line) return;
         appendResultLine(line);
-        ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"].forEach(id=>{ const el=$(id); if(el) el.value=""; });
+        ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa","caSlider","paSlider"].forEach(id=>{ const el=$(id); if(el) el.value=""; });
+        // Reset sliders to 0
+        setRangeFill($('caSlider')); setRangeFill($('paSlider'));
         ["comboCurrent","comboNew"].forEach(id=>{ const c=$(id); if(c){ c.classList.remove("has-logo"); const img=c.querySelector(".combo-logo"); if(img) img.style.display="none"; }});
         $('yearWarn').style.display='none'; $('yearOfBirth').classList.remove('error');
+        // update mini-notes
+        $('caOut').textContent = "→ 0–200: —";
+        $('paOut').textContent = "→ 0–200: —";
       }
       function copyResults(){ const text=getAllLines().join('\n').trim(); if(!text) return; copyToClipboard(text).then(()=>{ setCopyStatus('Copied all results ✅'); }).catch(err=>alert('Copy failed: '+err)); }
       function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); setCopyStatus(''); updateEmptyState(); }
@@ -635,6 +710,10 @@
         $('yearOfBirth').addEventListener('input', e => limitYear(e.target));
         $('ca').addEventListener('input', e => clampPercent(e.target));
         $('pa').addEventListener('input', e => clampPercent(e.target));
+
+        // Bind sliders
+        bindNumberAndSlider('ca','caSlider','caOut');
+        bindNumberAndSlider('pa','paSlider','paOut');
 
         ['firstName','lastName','currentClub'].forEach(id => {
           $(id).addEventListener('input', e => { if (e.target.value.trim()) clearReqFor(e.target); });
