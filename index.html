@@ -74,6 +74,7 @@
       position:relative;display:inline-flex;align-items:center;justify-content:center;
       width:18px;height:18px;border-radius:50%;border:1px solid var(--accent);
       color:var(--accent);font-size:12px;line-height:18px;cursor:pointer;user-select:none;
+      touch-action:manipulation; /* helps mobile taps */
     }
     .help .tip{
       position:absolute;bottom:calc(100% + 10px);left:0;
@@ -82,7 +83,7 @@
       box-shadow:0 10px 24px rgba(0,0,0,.35);z-index:4000;
       visibility:hidden;opacity:0;transform:translateY(-6px) scale(.98);
       transition:opacity .18s,transform .18s,visibility 0s .18s;
-      pointer-events:none; /* avoid weird focus/tap behavior */
+      pointer-events:none;
     }
     .help.open .tip{
       visibility:visible;opacity:1;transform:translateY(0) scale(1);
@@ -438,7 +439,7 @@
     function copyResults(){const text=getAllLines().join("\n").trim();if(!text)return;copyToClipboard(text).then(()=>status("Copied all results")).catch(err=>alert("Copy failed: "+err))}
     function clearResults(){if(!resultsEl.querySelector(".res-line"))return;beginHistory();resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());saveResults();updateEmptyState();updateUndoRedoButtons();status("Cleared")}
 
-    /* -------- Helper tooltips (robust for mobile) -------- */
+    /* -------- Helper tooltips: single-tap click with pointerdown -------- */
     function initHelpTips(){
       const helps=[...document.querySelectorAll('.help')];
       const timers=new WeakMap();
@@ -448,7 +449,7 @@
         clearTimeout(timers.get(h));
         if(autohide){
           const len=(h.querySelector('.tip')?.textContent||'').trim().length;
-          const dur=Math.min(7000, Math.max(1600, 40*len)); // length-based
+          const dur=Math.min(7000, Math.max(1600, 40*len));
           timers.set(h, setTimeout(()=>close(h), dur));
         }
       };
@@ -456,28 +457,25 @@
         h.classList.remove('open'); h.setAttribute('aria-expanded','false');
         clearTimeout(timers.get(h)); timers.delete(h);
       };
-      const closeAll=(except=null)=>{
-        helps.forEach(h=>{ if(h!==except) close(h); });
-      };
+      const closeAll=(except=null)=>{ helps.forEach(h=>{ if(h!==except) close(h); }); };
 
       helps.forEach(h=>{
-        h.addEventListener('click',e=>{
-          e.stopPropagation();
+        h.addEventListener('pointerdown', e=>{
+          e.preventDefault(); e.stopPropagation(); // avoid focus+click double toggle on mobile
           h.classList.contains('open') ? close(h) : (closeAll(h), open(h,true));
-        });
-        h.addEventListener('keydown',e=>{
+        }, {passive:false});
+
+        h.addEventListener('keydown', e=>{
           if(e.key==='Enter'||e.key===' '){
             e.preventDefault();
             h.classList.contains('open') ? close(h) : (closeAll(h), open(h,true));
           }
         });
-        h.addEventListener('focusin',()=>{ closeAll(h); open(h,false); });
-        h.addEventListener('focusout',()=>close(h));
       });
 
-      document.addEventListener('click',e=>{
+      document.addEventListener('pointerdown', e=>{
         if(!e.target.closest('.help')) closeAll();
-      });
+      }, {passive:true});
     }
 
     /* -------- Init -------- */
