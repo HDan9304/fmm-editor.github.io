@@ -137,19 +137,23 @@
       border-radius: 6px;
       padding: 2px 4px;
     }
+
+    /* Minimal icon button */
     .icon-btn {
       border: none;
       background: transparent;
-      color: #ff9bd9;
-      font-size: 16px;
-      line-height: 1;
+      color: #ff9bd9;               /* uses currentColor for SVG stroke */
       padding: 6px 8px;
       border-radius: 8px;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     .icon-btn:hover { background: rgba(255,90,200,0.1); }
+    .icon-btn svg { width: 18px; height: 18px; display: block; }
 
-    /* Buttons */
+    /* Primary/secondary buttons */
     .btn {
       border: none;
       color: white;
@@ -335,21 +339,31 @@
         const s = String(str || "").trim();
         return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
       }
-
       function clamp01(n){ return Math.max(0, Math.min(100, n)); }
-
       function convertTo200Scale(value) {
         if (value === "" || isNaN(Number(value))) return "";
         const num = clamp01(Number(value));
         return Math.round((num / 100) * 200);
       }
-
       function setCopyStatus(msg){
         const el = document.getElementById('copyStatus');
         if (el) el.textContent = msg || '';
       }
 
       /* ===== Results list (per-line) ===== */
+      function trashSVG(){
+        return `
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" focusable="false">
+  <polyline points="3 6 5 6 21 6"></polyline>
+  <path d="M19 6l-1 14H6L5 6"></path>
+  <path d="M10 11v6"></path>
+  <path d="M14 11v6"></path>
+  <path d="M9 6V4h6v2"></path>
+</svg>`;
+      }
+
       function makeLineEl(text){
         const line = document.createElement('div');
         line.className = 'res-line';
@@ -362,11 +376,20 @@
         const del = document.createElement('button');
         del.className = 'icon-btn';
         del.title = 'Delete line';
-        del.textContent = '🗑';
+        del.setAttribute('aria-label','Delete line');
+        del.innerHTML = trashSVG();
 
         del.addEventListener('click', () => {
           line.remove();
           saveResults();
+        });
+
+        // Keyboard accessibility: Enter/Space deletes
+        del.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            del.click();
+          }
         });
 
         span.addEventListener('input', () => saveResults());
@@ -449,7 +472,7 @@
         document.getElementById('yearOfBirth').classList.remove('error');
       }
 
-      /* ===== Year & number validation (no inline attrs) ===== */
+      /* ===== Year & number validation ===== */
       function limitYear(el){
         el.value = el.value.replace(/\D+/g, '').slice(0, 4);
         const warn = document.getElementById('yearWarn');
@@ -568,7 +591,7 @@
       }
 
       /* ===== Add/Copy/Clear ===== */
-      function addResult(){
+      function buildLineAndMaybeAdd(){
         if (!isYearValidOrEmpty()) {
           const y = document.getElementById('yearOfBirth');
           y.classList.add('error');
@@ -581,14 +604,14 @@
         appendResultLine(line);
         clearAllInputs();
       }
-      function copyResults(){
+      function copyAll(){
         const text = getAllLines().join('\n').trim();
         if (!text) return;
         navigator.clipboard.writeText(text)
           .then(() => setCopyStatus('Copied all results ✅'))
           .catch(err => alert('Copy failed: ' + err));
       }
-      function clearResults(){
+      function clearAllLines(){
         document.getElementById('results').innerHTML = '';
         saveResults(); setCopyStatus('');
       }
@@ -611,9 +634,9 @@
         paEl.addEventListener('input', () => clampPercent(paEl));
 
         // Buttons
-        document.getElementById('addBtn').addEventListener('click', addResult);
-        document.getElementById('copyBtn').addEventListener('click', copyResults);
-        document.getElementById('clearBtn').addEventListener('click', clearResults);
+        document.getElementById('addBtn').addEventListener('click', buildLineAndMaybeAdd);
+        document.getElementById('copyBtn').addEventListener('click', copyAll);
+        document.getElementById('clearBtn').addEventListener('click', clearAllLines);
 
         // Global Enter-to-Add (ignore if a combo is open or editing a result line)
         document.addEventListener('keydown', (e) => {
@@ -621,7 +644,7 @@
           const active = document.activeElement;
           const editingResult = active && active.classList && active.classList.contains('res-text') && active.isContentEditable;
           const comboOpen = document.querySelector('.combo.open');
-          if (!editingResult && !comboOpen) { e.preventDefault(); addResult(); }
+          if (!editingResult && !comboOpen) { e.preventDefault(); buildLineAndMaybeAdd(); }
         });
       });
     })();
