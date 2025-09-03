@@ -34,11 +34,10 @@
       --toggle-thumb:#fff;
       --toggle-shadow: rgba(0,0,0,0.35);
     }
-
-    /* Light theme overrides */
+    /* Light theme */
     [data-theme="light"] {
       --bg: #E5E6FA;                     /* requested */
-      --bg-pattern: rgba(26,27,46,0.08); /* subtle dots */
+      --bg-pattern: rgba(26,27,46,0.08);
       --panel-bg: #ffffff;
       --input-bg: #F4F5FF;
       --border: #cfd1f4;
@@ -79,14 +78,15 @@
       border: 2px solid transparent;
       padding: 16px 16px 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      max-width: 520px;
+      max-width: 520px;            /* mobile default */
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      transition: background .25s ease, box-shadow .25s ease;
+      gap: 8px;
+      transition: background .25s ease, box-shadow .25s ease, max-width .25s ease;
     }
 
+    /* ===== Header / theme toggle ===== */
     .header {
       display: flex;
       align-items: center;
@@ -94,15 +94,8 @@
       gap: 10px;
       padding: 2px 2px 8px;
     }
+    h2 { margin: 0; font-size: 22px; font-weight: 600; color: var(--text); }
 
-    h2 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    /* THEME TOGGLE (animated pill) */
     .theme-toggle { border: 0; background: transparent; padding: 0; cursor: pointer; }
     .toggle-track {
       position: relative; width: 56px; height: 28px; border-radius: 999px;
@@ -119,7 +112,7 @@
     }
     .toggle-icon { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; opacity: .9; }
     .toggle-icon.moon { right: 8px; color: #8ea0ff; }
-    .toggle-icon.sun { left: 8px; color: #ffb84d; }
+    .toggle-icon.sun  { left: 8px; color: #ffb84d; }
     .toggle-icon svg { width: 14px; height: 14px; display:block; }
     [data-theme="light"] .toggle-thumb { transform: translateX(28px); }
     [data-theme="light"] .toggle-icon.sun  { opacity: 1; }
@@ -127,6 +120,7 @@
     [data-theme="dark"]  .toggle-icon.sun  { opacity: .4; }
     [data-theme="dark"]  .toggle-icon.moon { opacity: 1; }
 
+    /* ===== Inputs ===== */
     .field { margin-bottom: 10px; }
     .field label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text); font-size: 14px; opacity: .9; }
     .field label .required { color: var(--accent); font-weight: 700; }
@@ -143,7 +137,7 @@
     .hint { font-size:12px; color: var(--muted); margin-top:4px; }
     .warn { color: var(--error); display:none; }
 
-    /* Required-field visual feedback */
+    /* Required-field feedback */
     .field.req .req-msg { display:block; }
     .field.req input,
     .field.req .combo input { border-color: var(--error); box-shadow: 0 0 10px rgba(255,77,154,0.55); }
@@ -161,7 +155,6 @@
       transition: background .25s ease, border-color .25s ease;
     }
     #results.empty { justify-content: center; }
-
     .empty-state {
       display: none; border: 1px solid var(--border); background: var(--empty-bg); color: var(--muted);
       border-radius: 16px; height: 72px; padding: 0 16px; align-items: center; justify-content: center; text-align: center;
@@ -196,19 +189,16 @@
     .actions-row .btn { flex: 1 1 0; }
     .copy-status { margin-top: 6px; font-size: 12px; color: #9ad29a; min-height: 16px; }
 
-    /* Combo (searchable dropdown with *just* logo inside input) */
+    /* Combo (searchable dropdown with *just* logo) */
     .combo { position: relative; }
     .combo input { padding: 10px; }
     .combo.has-logo input { padding-left: 42px; }
-
-    /* CLEANER: no placeholder box — only the logo if present */
     .combo-logo {
       position: absolute; top: 50%; left: 10px; transform: translateY(-50%);
       width: 22px; height: 22px; border-radius: 4px; object-fit: contain;
       background: transparent; border: 0; box-shadow: none; display: none; pointer-events: none;
     }
     .combo.has-logo .combo-logo { display: block; }
-
     .combo-panel {
       position: absolute; left: 0; right: 0; top: calc(100% + 6px);
       background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
@@ -219,9 +209,34 @@
     .combo.open .combo-panel { display: block; }
     .combo-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-size: 16px; color: var(--text); }
     .combo-item:hover, .combo-item.active { background: rgba(43,44,63,.12); outline: 1px solid var(--accent); }
-
-    /* CLEANER: dropdown logo — just the image, no bg/border */
     .combo-item img { width: 28px; height: 28px; border-radius: 4px; object-fit: contain; background: transparent; border: 0; box-shadow: none; }
+
+    /* ========= DESKTOP LAYOUT (two columns, sticky results) ========= */
+    @media (min-width: 960px) {
+      .container {
+        max-width: 1120px; /* widen on desktop */
+        padding: 20px 22px 24px;
+      }
+      .content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 420px; /* form grows, results fixed */
+        gap: 22px;
+        align-items: start;
+      }
+      .results-col {
+        position: sticky;
+        top: 12px;                 /* keep in view while scrolling the form */
+        height: calc(100vh - 120px);
+        display: flex;
+        flex-direction: column;
+      }
+      /* let results list fill the column; buttons stay visible at bottom */
+      .results-col #results {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -248,79 +263,79 @@
       </button>
     </div>
 
-    <!-- Basic fields -->
-    <div class="field" id="field-first">
-      <label for="firstName">First Name <span class="required">*</span></label>
-      <input id="firstName" type="text" autocomplete="off" />
-      <div class="req-msg" id="msg-first">This field is required.</div>
-    </div>
+    <!-- CONTENT GRID: form (left) + results (right on desktop) -->
+    <div class="content-grid">
+      <section class="form-col">
+        <div class="field" id="field-first">
+          <label for="firstName">First Name <span class="required">*</span></label>
+          <input id="firstName" type="text" autocomplete="off" />
+          <div class="req-msg" id="msg-first">This field is required.</div>
+        </div>
 
-    <div class="field" id="field-last">
-      <label for="lastName">Last Name <span class="required">*</span></label>
-      <input id="lastName" type="text" autocomplete="off" />
-      <div class="req-msg" id="msg-last">This field is required.</div>
-    </div>
+        <div class="field" id="field-last">
+          <label for="lastName">Last Name <span class="required">*</span></label>
+          <input id="lastName" type="text" autocomplete="off" />
+          <div class="req-msg" id="msg-last">This field is required.</div>
+        </div>
 
-    <!-- Current Club -->
-    <div class="field" id="field-current">
-      <label for="currentClub">Current Club <span class="required">*</span></label>
-      <div class="combo" id="comboCurrent">
-        <img id="logoCurrent" class="combo-logo" alt="">
-        <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
-        <div class="combo-panel"></div>
-      </div>
-      <div class="req-msg" id="msg-current">This field is required.</div>
-      <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
-    </div>
+        <div class="field" id="field-current">
+          <label for="currentClub">Current Club <span class="required">*</span></label>
+          <div class="combo" id="comboCurrent">
+            <img id="logoCurrent" class="combo-logo" alt="">
+            <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
+            <div class="combo-panel"></div>
+          </div>
+          <div class="req-msg" id="msg-current">This field is required.</div>
+          <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
+        </div>
 
-    <!-- New Club -->
-    <div class="field">
-      <label for="newClub">New Club</label>
-      <div class="combo" id="comboNew">
-        <img id="logoNew" class="combo-logo" alt="">
-        <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" />
-        <div class="combo-panel"></div>
-      </div>
-      <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
-    </div>
+        <div class="field">
+          <label for="newClub">New Club</label>
+          <div class="combo" id="comboNew">
+            <img id="logoNew" class="combo-logo" alt="">
+            <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" />
+            <div class="combo-panel"></div>
+          </div>
+          <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
+        </div>
 
-    <!-- Other fields -->
-    <div class="field"><label for="newFirstName">New First Name</label><input id="newFirstName" type="text" autocomplete="off" /></div>
-    <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" /></div>
-    <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" /></div>
+        <div class="field"><label for="newFirstName">New First Name</label><input id="newFirstName" type="text" autocomplete="off" /></div>
+        <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" /></div>
+        <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" /></div>
 
-    <!-- Year -->
-    <div class="field">
-      <label for="yearOfBirth">Year of Birth (4 digits)</label>
-      <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" />
-      <div id="yearWarn" class="hint warn">Year should be between 1900 and 2025.</div>
-    </div>
+        <div class="field">
+          <label for="yearOfBirth">Year of Birth (4 digits)</label>
+          <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" />
+          <div id="yearWarn" class="hint warn">Year should be between 1900 and 2025.</div>
+        </div>
 
-    <div class="field">
-      <label for="ca">CA (0–100)</label>
-      <input id="ca" type="number" min="0" max="100" inputmode="numeric" />
-      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
-    </div>
+        <div class="field">
+          <label for="ca">CA (0–100)</label>
+          <input id="ca" type="number" min="0" max="100" inputmode="numeric" />
+          <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
+        </div>
 
-    <div class="field">
-      <label for="pa">PA (0–100)</label>
-      <input id="pa" type="number" min="0" max="100" inputmode="numeric" />
-      <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
-    </div>
+        <div class="field">
+          <label for="pa">PA (0–100)</label>
+          <input id="pa" type="number" min="0" max="100" inputmode="numeric" />
+          <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
+        </div>
+      </section>
 
-    <!-- Results -->
-    <div class="result-label">Results</div>
-    <div id="results" class="empty">
-      <div class="empty-state">No results yet</div>
-    </div>
+      <section class="results-col">
+        <div class="result-label">Results</div>
+        <div id="results" class="empty">
+          <div class="empty-state">No results yet</div>
+        </div>
 
-    <!-- Buttons -->
-    <button class="btn full-width cta" id="addBtn">Add Result</button>
-    <div class="actions-row">
-      <button class="btn" id="copyBtn">Copy All</button>
-      <button class="btn btn-secondary" id="clearBtn">Clear</button>
+        <button class="btn full-width cta" id="addBtn">Add Result</button>
+        <div class="actions-row">
+          <button class="btn" id="copyBtn">Copy All</button>
+          <button class="btn btn-secondary" id="clearBtn">Clear</button>
+        </div>
+        <div id="copyStatus" class="copy-status"></div>
+      </section>
     </div>
-    <div id="copyStatus" class="copy-status"></div>
   </div>
 
   <script>
@@ -331,9 +346,6 @@
       const THEME_KEY = "playerEditorTheme";
       const YEAR_MIN = 1900, YEAR_MAX = 2025;
 
-      /* Transparent 1x1 GIF for "no logo" — ensures no visible placeholder */
-      const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-
       const clubs = [
         { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
         { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
@@ -341,7 +353,7 @@
         { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
       ];
 
-      /* ===== Theming ===== */
+      /* ===== Theme ===== */
       const root = document.documentElement;
       function applyTheme(theme){
         root.setAttribute('data-theme', theme);
@@ -352,7 +364,7 @@
         applyTheme(saved === 'light' || saved === 'dark' ? saved : 'dark');
       }
 
-      /* ===== Shortcuts & helpers ===== */
+      /* ===== Helpers ===== */
       const $ = (id) => document.getElementById(id);
       const resultsEl = $('results');
       const addBtn = $('addBtn');
@@ -409,7 +421,7 @@
         });
       }
 
-      /* ===== Results list (per-line) ===== */
+      /* ===== Results list ===== */
       function makeLineEl(text){
         const line = document.createElement('div');
         line.className = 'res-line';
@@ -459,19 +471,15 @@
         saveResults();
         updateEmptyState();
       }
-
       function getAllLines(){
         return Array.from(resultsEl.querySelectorAll('.res-text')).map(el => el.textContent);
       }
-
       function renderFromLines(lines){
         resultsEl.querySelectorAll('.res-line').forEach(el => el.remove());
         lines.forEach(t => { if (t && String(t).trim()!=='') resultsEl.appendChild(makeLineEl(t)); });
         updateEmptyState();
       }
-
       function saveResults(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(getAllLines())); }
-
       function loadResults(){
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) { updateEmptyState(); return; }
@@ -481,7 +489,7 @@
         renderFromLines(lines);
       }
 
-      /* ===== Build result string ===== */
+      /* ===== Build result ===== */
       function buildResult() {
         const g = id => ($(id)?.value || "").trim();
         const first = capWords(g("firstName"));
@@ -498,16 +506,24 @@
         return `"PLAYER" "${first}" "${last}" "${curr}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
       }
 
-      function clearAllInputs() {
-        ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"]
-          .forEach(id => { const el=$(id); if(el) el.value=""; });
-        $("comboCurrent").classList.remove("has-logo");
-        $("comboNew").classList.remove("has-logo");
-        $('yearWarn').style.display='none';
-        $('yearOfBirth').classList.remove('error');
+      /* ===== Required fields ===== */
+      const requiredInputs = ['firstName','lastName','currentClub'];
+      function markReqFor(inputEl){
+        const fieldEl = inputEl.closest('.field'); if (!fieldEl) return;
+        fieldEl.classList.add('req','shake'); setTimeout(()=>fieldEl.classList.remove('shake'),260);
+      }
+      function clearReqFor(inputEl){
+        const fieldEl = inputEl.closest('.field'); if (!fieldEl) return;
+        fieldEl.classList.remove('req');
+      }
+      function validateRequired(show=false){
+        const miss=[];
+        requiredInputs.forEach(id=>{ const el=$(id); if(!el.value.trim()) miss.push(el); });
+        if(show && miss.length){ miss.forEach(el=>markReqFor(el)); const f=miss[0]; f.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>f.focus(),220); }
+        return miss.length===0;
       }
 
-      /* ===== Year & number validation ===== */
+      /* ===== Year & numbers ===== */
       function limitYear(el){
         el.value = el.value.replace(/\D+/g, '').slice(0, 4);
         const warn = $('yearWarn'); const val = el.value;
@@ -522,10 +538,10 @@
       }
       function clampPercent(el){
         if (el.value === "") return;
-        let n = parseInt(el.value,10); if (isNaN(n)) { el.value=""; return; } el.value = clamp01(n);
+        let n = parseInt(el.value,10); if (isNaN(n)) { el.value=""; return; } el.value = Math.max(0, Math.min(100, n));
       }
 
-      /* ===== Combo (searchable dropdown with *just* logo) ===== */
+      /* ===== Combo (searchable dropdown with just logo) ===== */
       function initCombo(comboId, inputId, logoId) {
         const combo = $(comboId), input = $(inputId), logo = $(logoId), panel = combo.querySelector(".combo-panel");
         let visible = [], activeIndex = -1;
@@ -540,16 +556,12 @@
         }
         function render(list){
           panel.innerHTML = ""; visible = list;
-          if (!list.length){
-            const d=document.createElement("div"); d.className="combo-item"; d.style.opacity=".7"; d.textContent="No matches"; panel.appendChild(d); return;
-          }
+          if (!list.length){ const d=document.createElement("div"); d.className="combo-item"; d.style.opacity=".7"; d.textContent="No matches"; panel.appendChild(d); return; }
           list.forEach((club, idx) => {
             const item = document.createElement("div"); item.className="combo-item"; item.dataset.index=idx;
             const img = document.createElement("img");
-            if (club.logo) { img.src = club.logo; }
-            else { img.style.display = 'none'; } // no placeholder
-            img.alt = club.name;
-            img.onerror = () => { img.style.display = 'none'; };
+            if (club.logo) { img.src = club.logo; img.alt = club.name; img.onerror=()=>{img.style.display='none';}; }
+            else { img.style.display='none'; }
             const span = document.createElement("span"); span.textContent = club.name;
             item.append(img, span);
             item.addEventListener("mousedown",(e)=>{ e.preventDefault(); select(idx); });
@@ -559,18 +571,9 @@
         function select(idx){
           const club = visible[idx]; if (!club) return;
           input.value = club.name;
-          if (club.logo) {
-            logo.src = club.logo;
-            logo.style.display = 'block';
-            combo.classList.add("has-logo");
-            logo.onerror = () => { combo.classList.remove("has-logo"); logo.style.display='none'; };
-          } else {
-            combo.classList.remove("has-logo");
-            logo.style.display = 'none';
-            logo.src = TRANSPARENT_PIXEL;
-          }
-          close();
-          clearReqFor(input);
+          if (club.logo) { logo.src = club.logo; combo.classList.add("has-logo"); logo.style.display='block'; logo.onerror=()=>{combo.classList.remove("has-logo"); logo.style.display='none';}; }
+          else { combo.classList.remove("has-logo"); logo.style.display='none'; }
+          close(); clearReqFor(input);
         }
         function moveActive(delta){
           if (!isOpen()) open();
@@ -600,30 +603,6 @@
         document.addEventListener("click", (e) => { if (!combo.contains(e.target)) close(); });
       }
 
-      /* ===== Required fields UX ===== */
-      const requiredInputs = [
-        { id: 'firstName', field: 'field-first', msg: 'msg-first' },
-        { id: 'lastName',  field: 'field-last',  msg: 'msg-last' },
-        { id: 'currentClub', field: 'field-current', msg: 'msg-current' }
-      ];
-      function markReqFor(inputEl){
-        const fieldEl = inputEl.closest('.field'); if (!fieldEl) return;
-        fieldEl.classList.add('req', 'shake'); setTimeout(() => fieldEl.classList.remove('shake'), 260);
-      }
-      function clearReqFor(inputEl){
-        const fieldEl = inputEl.closest('.field'); if (!fieldEl) return;
-        fieldEl.classList.remove('req');
-      }
-      function validateRequired(showFeedback = false){
-        const missing = [];
-        requiredInputs.forEach(({id}) => { const el = $(id); if (!el || !el.value.trim()) missing.push(el); });
-        if (showFeedback && missing.length) {
-          missing.forEach(el => markReqFor(el));
-          const first = missing[0]; first.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => first.focus(), 220);
-        }
-        return missing.length === 0;
-      }
-
       /* ===== Actions ===== */
       function addResult(){
         if (!validateRequired(true)) return;
@@ -632,9 +611,13 @@
           alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).');
           return;
         }
-        const line = buildResult(); if (!line) return;
+        const line = buildResult();
+        if (!line) return;
         appendResultLine(line);
-        clearAllInputs();
+        ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"]
+          .forEach(id => { const el=$(id); if(el) el.value=""; });
+        ["comboCurrent","comboNew"].forEach(id => { const c=$(id); if(c){ c.classList.remove("has-logo"); const img=c.querySelector(".combo-logo"); if(img) img.style.display="none"; }});
+        $('yearWarn').style.display='none'; $('yearOfBirth').classList.remove('error');
       }
       function copyResults(){
         const text = getAllLines().join('\n').trim(); if (!text) return;
@@ -642,42 +625,36 @@
       }
       function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); setCopyStatus(''); updateEmptyState(); }
 
-      /* ===== DOM Ready ===== */
+      /* ===== Init ===== */
       document.addEventListener('DOMContentLoaded', () => {
-        // Theme
         initTheme();
         $('themeToggle').addEventListener('click', () => {
           const next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
           applyTheme(next);
         });
 
-        // Data
         loadResults();
         initCombo("comboCurrent", "currentClub", "logoCurrent");
         initCombo("comboNew",     "newClub",     "logoNew");
 
-        // Validation wiring
         $('yearOfBirth').addEventListener('input', e => limitYear(e.target));
         $('ca').addEventListener('input', e => clampPercent(e.target));
         $('pa').addEventListener('input', e => clampPercent(e.target));
 
-        // Clear req highlighting as user types
         ['firstName','lastName','currentClub'].forEach(id => {
           $(id).addEventListener('input', (e) => { if (e.target.value.trim()) clearReqFor(e.target); });
         });
 
-        // Buttons
         $('addBtn').addEventListener('click', addResult);
         $('copyBtn').addEventListener('click', copyResults);
         $('clearBtn').addEventListener('click', clearResults);
 
-        // Global Enter-to-Add (ignore if a combo is open or editing a result line)
         document.addEventListener('keydown', (e) => {
           if (e.key !== 'Enter') return;
           const active = document.activeElement;
-          const editingResult = active && active.classList && active.classList.contains('res-text') && active.isContentEditable;
+          const editing = active && active.classList && active.classList.contains('res-text') && active.isContentEditable;
           const comboOpen = document.querySelector('.combo.open');
-          if (!editingResult && !comboOpen) { e.preventDefault(); addResult(); }
+          if (!editing && !comboOpen) { e.preventDefault(); addResult(); }
         });
 
         updateEmptyState();
