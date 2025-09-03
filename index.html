@@ -135,7 +135,7 @@
     @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 50%{transform:translateX(5px);} 75%{transform:translateX(-3px);} }
 
     /* Results */
-    .result-label { margin-top:0; margin-bottom:6px; font-size:15px; font-weight:600; color:var(--accent); } /* << aligned */
+    .result-label { margin-top:0; margin-bottom:6px; font-size:15px; font-weight:600; color:var(--accent); }
 
     #results {
       padding:16px; border:1px solid var(--border); border-radius:16px; background:var(--input-bg);
@@ -244,8 +244,12 @@
             <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
             <div class="combo-panel"></div>
           </div>
+          <!-- concise helper -->
+          <div class="hint">
+            Contracted club only; use full official name (e.g., “Manchester United”). If unattached, enter “free”.
+            • Type to search, ↑/↓ move, Enter select.
+          </div>
           <div class="req-msg" id="msg-current">This field is required.</div>
-          <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
         </div>
 
         <div class="field">
@@ -255,29 +259,42 @@
             <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" />
             <div class="combo-panel"></div>
           </div>
-          <div class="hint">Type to search, ↑/↓ to move, Enter to select.</div>
+          <div class="hint">Use full official name. • Type to search, ↑/↓ move, Enter select.</div>
         </div>
 
-        <div class="field"><label for="newFirstName">New First Name</label><input id="newFirstName" type="text" autocomplete="off" /></div>
-        <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" /></div>
-        <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" /></div>
+        <div class="field">
+          <label for="newFirstName">New First Name</label>
+          <input id="newFirstName" type="text" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="newLastName">New Last Name</label>
+          <input id="newLastName" type="text" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="newShortName">New Short Name</label>
+          <input id="newShortName" type="text" autocomplete="off" />
+          <div class="hint">Common/short name (e.g., Neymar). You can add one; you can’t remove an existing one in-game.</div>
+        </div>
 
         <div class="field">
           <label for="yearOfBirth">Year of Birth (4 digits)</label>
           <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" />
+          <div class="hint">Must be 4 digits; player must be 16+ at game start.</div>
           <div id="yearWarn" class="hint warn">Year should be between 1900 and 2025.</div>
         </div>
 
         <div class="field">
           <label for="ca">CA (0–100)</label>
           <input id="ca" type="number" min="0" max="100" inputmode="numeric" />
-          <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
+          <div class="hint">Current Ability. Enter 0–100 here; we convert to 0–200 (max 200).</div>
         </div>
 
         <div class="field">
           <label for="pa">PA (0–100)</label>
           <input id="pa" type="number" min="0" max="100" inputmode="numeric" />
-          <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
+          <div class="hint">Potential Ability. Enter 0–100 here; we convert to 0–200 (max 200).</div>
         </div>
       </section>
 
@@ -484,7 +501,10 @@
       /* Init */
       document.addEventListener('DOMContentLoaded', () => {
         initTheme();
-        $('themeToggle').addEventListener('click', () => { const next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light'; applyTheme(next); });
+        document.getElementById('themeToggle').addEventListener('click', () => {
+          const next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
+          applyTheme(next);
+        });
 
         loadResults();
         initCombo("comboCurrent", "currentClub", "logoCurrent");
@@ -494,7 +514,9 @@
         $('ca').addEventListener('input', e => clampPercent(e.target));
         $('pa').addEventListener('input', e => clampPercent(e.target));
 
-        ['firstName','lastName','currentClub'].forEach(id => { $(id).addEventListener('input', e => { if (e.target.value.trim()) clearReqFor(e.target); }); });
+        ['firstName','lastName','currentClub'].forEach(id => {
+          $(id).addEventListener('input', e => { if (e.target.value.trim()) clearReqFor(e.target); });
+        });
 
         $('addBtn').addEventListener('click', addResult);
         $('copyBtn').addEventListener('click', copyResults);
