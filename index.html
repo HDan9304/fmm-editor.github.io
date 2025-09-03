@@ -39,39 +39,27 @@
       box-shadow:0 4px 12px rgba(0,0,0,.4); display:flex; flex-direction:column; gap:8px;
     }
 
-    /* Header + Theme toggle (re-centered & clipped) */
+    /* Header + Theme toggle */
     .header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px 8px}
     h2{margin:0;font-size:22px;font-weight:600}
     .theme-toggle{border:0;background:transparent;padding:0;cursor:pointer;line-height:0}
     .toggle-track{
-      --shift:0px;               /* updated by theme */
-      position:relative;
-      width:58px; height:30px;   /* slightly taller for perfect centering across devices */
-      border-radius:999px;
-      background:var(--toggle-track);
-      border:1px solid var(--border);
-      overflow:hidden;           /* clip thumb cleanly */
-      display:inline-block;
+      --shift:0px;
+      position:relative;width:58px;height:30px;border-radius:999px;background:var(--toggle-track);
+      border:1px solid var(--border);overflow:hidden;display:inline-block;
       box-shadow:inset 0 2px 6px var(--toggle-shadow);
     }
     .toggle-thumb{
-      position:absolute; left:2px; top:50%;
-      width:26px; height:26px; border-radius:999px;
-      background:var(--toggle-thumb);
-      box-shadow:0 2px 6px rgba(0,0,0,.25);
-      transform:translate(var(--shift), -50%); /* X via CSS var, Y perfectly centered */
-      transition:transform .28s cubic-bezier(.2,.8,.2,1);
+      position:absolute;left:2px;top:50%;width:26px;height:26px;border-radius:999px;background:var(--toggle-thumb);
+      box-shadow:0 2px 6px rgba(0,0,0,.25);transform:translate(var(--shift),-50%);
+      transition:transform .28s cubic-bezier(.2,.8,.2,1)
     }
-    .toggle-icon{
-      position:absolute; top:50%; transform:translateY(-50%);
-      width:16px; height:16px; opacity:.9; pointer-events:none
-    }
+    .toggle-icon{position:absolute;top:50%;transform:translateY(-50%);width:16px;height:16px;opacity:.9;pointer-events:none}
     .toggle-icon.sun{left:10px;color:#ffb84d}
     .toggle-icon.moon{right:10px;color:#8ea0ff}
     .toggle-icon svg{width:16px;height:16px;display:block}
-    [data-theme="light"] .toggle-track{--shift:26px} /* travel distance = 58 - 2*2 - 26 = 26 */
-
-    @media (max-width:420px){ .header { padding-right:8px } }
+    [data-theme="light"] .toggle-track{--shift:26px}
+    @media (max-width:420px){ .header{padding-right:8px} }
 
     .field{margin-bottom:10px}
     .field-label{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:500;font-size:14px;opacity:.9}
@@ -80,9 +68,17 @@
     .field input[type=text]{text-transform:capitalize}
     .field input:focus{border-color:var(--accent);background:rgba(43,44,63,.12);box-shadow:0 0 8px var(--focus-glow)}
     .error{border-color:var(--error)!important;box-shadow:0 0 8px rgba(255,77,154,.6)!important}
+
+    /* helper badge + tooltip */
     .help{position:relative;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--accent);color:var(--accent);font-size:12px;line-height:18px;cursor:pointer}
-    .help .tip{position:absolute;bottom:calc(100% + 10px);left:0;min-width:220px;max-width:320px;background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.35;box-shadow:0 10px 24px rgba(0,0,0,.35);z-index:4000;visibility:hidden;opacity:0;transform:translateY(-6px) scale(.98);transition:opacity .18s,transform .18s,visibility 0s .18s}
+    .help .tip{
+      position:absolute;bottom:calc(100% + 10px);left:0;min-width:220px;max-width:320px;background:var(--input-bg);color:var(--text);
+      border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.35;
+      box-shadow:0 10px 24px rgba(0,0,0,.35);z-index:4000;visibility:hidden;opacity:0;transform:translateY(-6px) scale(.98);
+      transition:opacity .18s,transform .18s,visibility 0s .18s;
+    }
     .help.open .tip{visibility:visible;opacity:1;transform:translateY(0) scale(1);transition:opacity .22s,transform .22s,visibility 0s}
+
     .mini-note{margin-left:auto;font-size:12px;color:var(--muted)}
     .req-msg{display:none;font-size:12px;color:var(--error);margin-top:6px}
     .field.req .req-msg{display:block}
@@ -186,7 +182,7 @@
         <div class="field" id="field-current">
           <div class="field-label">
             <label for="currentClub">Current Club <span class="required">*</span></label>
-            <span class="help" tabindex="0">i
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
               <span class="tip">Contracted club only. Use full official name (e.g., “Manchester United”). If unattached, enter “free”.</span>
             </span>
           </div>
@@ -201,7 +197,7 @@
         <div class="field">
           <div class="field-label">
             <label for="newClub">New Club</label>
-            <span class="help" tabindex="0">i
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
               <span class="tip">Use the full official name. Type to search, use ↑/↓ to move, Enter to select.</span>
             </span>
           </div>
@@ -218,7 +214,7 @@
         <div class="field">
           <div class="field-label">
             <label for="newShortName">New Short Name</label>
-            <span class="help" tabindex="0">i
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
               <span class="tip">Common/short name (e.g., Neymar/Willian). You can add one; you can’t remove an existing one in-game.</span>
             </span>
           </div>
@@ -228,7 +224,7 @@
         <div class="field">
           <div class="field-label">
             <label for="yearOfBirth">Year of Birth</label>
-            <span class="help" tabindex="0">i
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
               <span class="tip">Must be a 4-digit year. Player must be at least 16 at game start.</span>
             </span>
           </div>
@@ -239,7 +235,7 @@
         <div class="field">
           <div class="field-label">
             <label for="ca">CA</label>
-            <span class="help" tabindex="0">i
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
               <span class="tip">Current Ability. Enter 0–100; we convert to 0–200.</span>
             </span>
             <span class="mini-note" id="caOut">→ 0–200: —</span>
@@ -253,7 +249,7 @@
         <div class="field">
           <div class="field-label">
             <label for="pa">PA</label>
-            <span class="help" tabindex="0">i
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
               <span class="tip">Potential Ability. Enter 0–100; we convert to 0–200.</span>
             </span>
             <span class="mini-note" id="paOut">→ 0–200: —</span>
@@ -270,7 +266,7 @@
         <div class="result-header">
           <div class="result-label">Results</div>
           <div class="result-tools">
-            <!-- Single-path curved arrows -->
+            <!-- single-path curved arrows -->
             <button id="undoBtn" class="icon-btn" title="Undo (Ctrl/⌘+Z)" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 4 L4 9 L9 14 M4 9h7a8 8 0 1 1 0 16"/>
@@ -369,6 +365,7 @@
       return `"PLAYER" "${first}" "${last}" "${curr}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
     }
 
+    /* -------- Required & year -------- */
     const requiredInputs=["firstName","lastName","currentClub"];
     function markReqFor(el){const f=el.closest(".field");if(!f) return;f.classList.add("req","shake");setTimeout(()=>f.classList.remove("shake"),260)}
     function clearReqFor(el){const f=el.closest(".field");if(!f) return;f.classList.remove("req")}
@@ -376,6 +373,7 @@
     function limitYear(el){el.value=el.value.replace(/\D+/g,"").slice(0,4);const warn=$("yearWarn");const val=el.value;if(val&&(val.length!==4||+val<YEAR_MIN||+val>YEAR_MAX)){el.classList.add("error");warn.style.display="block"}else{el.classList.remove("error");warn.style.display="none"}}
     function isYearValidOrEmpty(){const s=($("yearOfBirth").value||"").trim();if(!s)return true;if(s.length!==4)return false;const n=+s;return !(isNaN(n)||n<YEAR_MIN||n>YEAR_MAX)}
 
+    /* -------- Number + slider link -------- */
     function setRangeFill(sl){const v=Math.max(0,Math.min(100,Number(sl.value)||0));sl.style.setProperty("--fill",v+"%")}
     function bindNumberAndSlider(numId,sliderId,outId){
       const num=$(numId), sl=$(sliderId), out=$(outId);
@@ -385,6 +383,7 @@
       num.addEventListener("input",fromNum); sl.addEventListener("input",fromSl); setRangeFill(sl); upd();
     }
 
+    /* -------- Combobox (club search) -------- */
     function initCombo(comboId,inputId,logoId){
       const combo=$(comboId), input=$(inputId), logo=$(logoId), panel=combo.querySelector(".combo-panel");
       let visible=[], activeIndex=-1;
@@ -412,15 +411,7 @@
     function redo(){if(!redoStack.length)return;const cur=snapshot(), next=redoStack.pop();historyStack.push(cur);renderFromLines(next);saveResults();updateUndoRedoButtons();status("Redo")}
     undoBtn.addEventListener("click",undo); redoBtn.addEventListener("click",redo);
 
-    function buildResult(){
-      const v=id=>($(id)?.value||"").trim();
-      const first=capWords(v("firstName")), last=capWords(v("lastName")), curr=capWords(v("currentClub"));
-      if(!first||!last||!curr) return "";
-      const newFirst=capWords(v("newFirstName")), newLast=capWords(v("newLastName")), shortName=capWords(v("newShortName"));
-      const year=v("yearOfBirth"), ca=convertTo200Scale(v("ca")), pa=convertTo200Scale(v("pa")), newClub=capWords(v("newClub"));
-      return `"PLAYER" "${first}" "${last}" "${curr}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
-    }
-
+    /* -------- Actions -------- */
     function addResult(){
       if(!validateRequired(true)) return;
       if(!isYearValidOrEmpty()){ $("yearOfBirth").classList.add("error"); $("yearWarn").style.display="block"; alert("Year must be a 4-digit number between 1900 and 2025 (or empty)."); return; }
@@ -437,6 +428,49 @@
     }
     function copyResults(){const text=getAllLines().join("\n").trim();if(!text)return;copyToClipboard(text).then(()=>status("Copied all results")).catch(err=>alert("Copy failed: "+err))}
     function clearResults(){if(!resultsEl.querySelector(".res-line"))return;beginHistory();resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());saveResults();updateEmptyState();updateUndoRedoButtons();status("Cleared")}
+
+    /* -------- Helper tooltips wiring -------- */
+    function initHelpTips(){
+      document.querySelectorAll('.help').forEach(h=>{
+        const tip=h.querySelector('.tip');
+        h.setAttribute('aria-expanded','false');
+
+        const show = (autohide=true)=>{
+          h.classList.add('open');
+          h.setAttribute('aria-expanded','true');
+          clearTimeout(h._hideTimer);
+          if(autohide){
+            const len=(tip?.textContent||'').trim().length;
+            const dur=Math.min(6500, 1400 + len*35); // longer text → longer display
+            h._hideTimer=setTimeout(hide, dur);
+          }
+        };
+        const hide = ()=>{
+          h.classList.remove('open');
+          h.setAttribute('aria-expanded','false');
+          clearTimeout(h._hideTimer);
+        };
+
+        h.addEventListener('click', e=>{
+          e.stopPropagation();
+          h.classList.contains('open') ? hide() : show(true);
+        });
+        h.addEventListener('mouseenter', ()=>show(false));
+        h.addEventListener('mouseleave', hide);
+        h.addEventListener('focus', ()=>show(false));
+        h.addEventListener('blur', hide);
+        h.addEventListener('keydown', e=>{
+          if(e.key==='Enter'||e.key===' '){
+            e.preventDefault();
+            h.classList.contains('open') ? hide() : show(true);
+          }
+        });
+        // Close if user taps anywhere else
+        document.addEventListener('click', ev=>{
+          if(!h.contains(ev.target)) hide();
+        });
+      });
+    }
 
     /* -------- Init -------- */
     document.addEventListener("DOMContentLoaded",()=>{
@@ -464,22 +498,9 @@
         if(!editing && !openCombo){ e.preventDefault(); addResult(); }
       });
 
+      initHelpTips();
       updateEmptyState(); updateUndoRedoButtons();
     });
-
-    /* Helpers used above */
-    function getAllLines(){return Array.from(resultsEl.querySelectorAll(".res-text")).map(el=>el.textContent)}
-    function saveResults(){localStorage.setItem(STORAGE_KEY,JSON.stringify(getAllLines()))}
-    function renderFromLines(lines){resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());lines.forEach(t=>{if(t&&String(t).trim()!=="")resultsEl.appendChild(makeLineEl(t))});updateEmptyState()}
-    function validateRequired(show=false){const miss=[];["firstName","lastName","currentClub"].forEach(id=>{const el=$(id);if(!el.value.trim())miss.push(el)});if(show&&miss.length){miss.forEach(el=>{const f=el.closest(".field");f.classList.add("req","shake");setTimeout(()=>f.classList.remove("shake"),260)});const f=miss[0];f.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>f.focus(),220)}return miss.length===0}
-    function setRangeFill(sl){const v=Math.max(0,Math.min(100,Number(sl.value)||0));sl.style.setProperty("--fill",v+"%")}
-    function bindNumberAndSlider(numId,sliderId,outId){
-      const num=$(numId), sl=$(sliderId), out=$(outId);
-      const upd=()=>{const c=convertTo200Scale(num.value);out.textContent="→ 0–200: "+(c===""?"—":c)}
-      const fromNum=()=>{if(num.value===""){sl.value=0;setRangeFill(sl);upd();return}let n=parseInt(num.value,10);if(isNaN(n))n=0;n=Math.max(0,Math.min(100,n));num.value=n;sl.value=n;setRangeFill(sl);upd()}
-      const fromSl =()=>{num.value=sl.value;setRangeFill(sl);upd()}
-      num.addEventListener("input",fromNum); sl.addEventListener("input",fromSl); setRangeFill(sl); upd();
-    }
   })();
   </script>
 </body>
