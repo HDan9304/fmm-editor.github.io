@@ -154,23 +154,39 @@
       font-size: 12px;
       line-height: 1.35;
       box-shadow: 0 10px 24px rgba(0,0,0,0.35);
-      display: none;
-      z-index: 4000; /* ensure above inputs/panels */
+      z-index: 4000;               /* above inputs & dropdown */
+      visibility: hidden;          /* enable transitions */
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(0) scale(.98);
+      transition:
+        opacity .18s ease,
+        transform .18s cubic-bezier(.2,.8,.2,1),
+        visibility 0s linear .18s; /* hide after fade-out */
     }
-    /* Position variants decided in JS */
-    .help .tip.above { bottom: calc(100% + 10px); left: 0; }
-    .help .tip.below { top: calc(100% + 10px); left: 0; }
-    /* Arrow for above */
+    /* Direction presets; JS toggles above/below */
+    .help .tip.above { bottom: calc(100% + 10px); left: 0; transform: translateY(-6px) scale(.98); }
+    .help .tip.below { top: calc(100% + 10px);    left: 0; transform: translateY( 6px) scale(.98); }
+    /* Visible state */
+    .help.open .tip {
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition:
+        opacity .22s ease,
+        transform .22s cubic-bezier(.2,.8,.2,1),
+        visibility 0s;
+      pointer-events: auto;
+    }
+    /* Arrow tips */
     .help .tip.above::before{
       content:""; position:absolute; left:12px; bottom:-6px;
       border-left:6px solid transparent; border-right:6px solid transparent; border-top:6px solid var(--border);
     }
-    /* Arrow for below */
     .help .tip.below::before{
       content:""; position:absolute; left:12px; top:-6px;
       border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:6px solid var(--border);
     }
-    .help.open .tip { display:block; }
 
     /* Required-field feedback */
     .field.req .req-msg { display:block; }
@@ -343,10 +359,10 @@
 
         <div class="field">
           <div class="field-label">
-            <label for="yearOfBirth">Year of Birth (4 digits)</label>
+            <label for="yearOfBirth">Year of Birth</label>
             <span class="help" tabindex="0" role="button" aria-expanded="false">
               i
-              <span class="tip">Must be 4 digits. Player must be at least 16 at game start.</span>
+              <span class="tip">Must be a 4-digit year. Player must be at least 16 at game start.</span>
             </span>
           </div>
           <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" />
@@ -355,7 +371,7 @@
 
         <div class="field">
           <div class="field-label">
-            <label for="ca">CA (0–100)</label>
+            <label for="ca">CA</label>
             <span class="help" tabindex="0" role="button" aria-expanded="false">
               i
               <span class="tip">Current Ability. Enter 0–100 here; we convert to 0–200 (max 200).</span>
@@ -366,7 +382,7 @@
 
         <div class="field">
           <div class="field-label">
-            <label for="pa">PA (0–100)</label>
+            <label for="pa">PA</label>
             <span class="help" tabindex="0" role="button" aria-expanded="false">
               i
               <span class="tip">Potential Ability (past or future). Enter 0–100 here; we convert to 0–200 (max 200).</span>
@@ -563,27 +579,45 @@
         document.addEventListener("click", (e) => { if (!combo.contains(e.target)) close(); });
       }
 
-      /* Help bubble behavior: smart position + auto-dismiss */
+      /* Help bubbles: smart position + variable duration + smooth anim */
       function initHelpBubbles(){
         const helps = document.querySelectorAll('.help');
         const timers = new WeakMap();
 
-        function closeAll(){ helps.forEach(h => { h.classList.remove('open'); h.setAttribute('aria-expanded','false'); }); }
+        function close(h){
+          if(!h) return;
+          h.classList.remove('open');
+          h.setAttribute('aria-expanded','false');
+          if (timers.get(h)) clearTimeout(timers.get(h));
+        }
         function placeTip(h){
           const tip = h.querySelector('.tip');
           tip.classList.remove('above','below');
           const rect = h.getBoundingClientRect();
-          // If close to top, show below; else above
-          if (rect.top < 80) tip.classList.add('below'); else tip.classList.add('above');
+          // Decide based on available space above vs below
+          const viewportH = window.innerHeight || document.documentElement.clientHeight;
+          // Temporarily make visible to measure height
+          const prevVis = tip.style.visibility; const prevOp = tip.style.opacity;
+          tip.style.visibility='hidden'; tip.style.opacity='0'; tip.classList.add('below');
+          const tipH = tip.offsetHeight || 80;
+          tip.classList.remove('below');
+          tip.style.visibility=prevVis; tip.style.opacity=prevOp;
+
+          const spaceBelow = viewportH - rect.bottom;
+          if (spaceBelow < tipH + 16 && rect.top > tipH + 16) tip.classList.add('above');
+          else tip.classList.add('below');
+        }
+        function tipDuration(tipEl){
+          const len = (tipEl.textContent || '').trim().length;
+          // ~25ms per char, min 1400ms, max 5200ms
+          return Math.max(1400, Math.min(5200, 25 * len));
         }
         function openTip(h){
+          const tip = h.querySelector('.tip');
           placeTip(h);
           h.classList.add('open'); h.setAttribute('aria-expanded','true');
-          // reset timer
           if (timers.get(h)) clearTimeout(timers.get(h));
-          timers.set(h, setTimeout(() => {
-            h.classList.remove('open'); h.setAttribute('aria-expanded','false');
-          }, 1200)); // auto-close ~1.2s
+          timers.set(h, setTimeout(() => close(h), tipDuration(tip)));
         }
 
         helps.forEach(h => {
@@ -593,7 +627,8 @@
           });
         });
 
-        document.addEventListener('click', () => closeAll(), { capture:true });
+        document.addEventListener('click', () => { helps.forEach(close); }, { capture:true });
+        window.addEventListener('resize', () => { document.querySelectorAll('.help.open').forEach(placeTip); });
       }
 
       /* Actions */
