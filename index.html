@@ -255,34 +255,49 @@
       .num-range { grid-template-columns: 1fr; }
     }
 
-    /* Range (slider) styles with instant fill using CSS var */
-    input[type="range"] {
+    /* ===== Rebuilt slider (thumb perfectly centered) ===== */
+    input[type="range"]{
       --fill: 0%;
+      appearance: none;
       -webkit-appearance: none;
       width: 100%;
-      height: 6px;
+      height: 28px;             /* control box height (space for thumb) */
+      background: transparent;  /* track handled below */
+      border: none;
+      padding: 0;
+    }
+    /* WebKit track */
+    input[type="range"]::-webkit-slider-runnable-track{
+      height: 10px;
       border-radius: 999px;
       background:
-        linear-gradient(90deg,var(--grad-start),var(--grad-end)) 0/var(--fill) 100% no-repeat,
+        linear-gradient(90deg, var(--grad-start), var(--grad-end)) 0/var(--fill) 100% no-repeat,
         #3a3b52;
-      outline: none;
       border: 1px solid var(--border);
-      transition: background-size .0s; /* instant */
     }
-    input[type="range"]::-webkit-slider-thumb {
+    /* WebKit thumb (centered: (thumb 18 - track 10)/2 = 4px) */
+    input[type="range"]::-webkit-slider-thumb{
       -webkit-appearance: none;
-      appearance: none;
       width: 18px; height: 18px; border-radius: 50%;
-      background: #fff;
+      background: #fff; border: 2px solid var(--accent);
+      box-shadow: 0 2px 6px rgba(0,0,0,.35);
+      margin-top: -4px; /* centers the thumb vertically */
+      cursor: pointer;
+    }
+    /* Firefox track & progress */
+    input[type="range"]::-moz-range-track{
+      height: 10px; border-radius: 999px;
+      background: #3a3b52; border: 1px solid var(--border);
+    }
+    input[type="range"]::-moz-range-progress{
+      height: 10px; border-radius: 999px;
+      background: linear-gradient(90deg, var(--grad-start), var(--grad-end));
+    }
+    input[type="range"]::-moz-range-thumb{
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--accent);
       box-shadow: 0 2px 6px rgba(0,0,0,.35);
       cursor: pointer;
-      border: 2px solid var(--accent);
-      margin-top: -6px;
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 18px; height: 18px; border-radius: 50%;
-      background: #fff; border: 2px solid var(--accent); cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,.35);
     }
 
     /* Desktop layout: two columns, sticky results */
@@ -565,7 +580,7 @@
       }
       function clampPercent(el){ if (el.value === "") return; let n=parseInt(el.value,10); if(isNaN(n)){el.value=""; return;} el.value=Math.max(0, Math.min(100, n)); }
 
-      /* Range helpers (instant fill via CSS var) */
+      /* Range helpers (instant fill via CSS var on the track) */
       function setRangeFill(slider) {
         const v = Math.max(0, Math.min(100, Number(slider.value)||0));
         slider.style.setProperty('--fill', v + '%');
@@ -657,7 +672,7 @@
         document.addEventListener("click", (e) => { if (!combo.contains(e.target)) close(); });
       }
 
-      /* Help bubbles: fixed ABOVE + variable duration + smooth anim */
+      /* Help bubbles */
       function initHelpBubbles(){
         const helps = document.querySelectorAll('.help');
         const timers = new WeakMap();
@@ -670,7 +685,7 @@
         }
         function tipDuration(tipEl){
           const len = (tipEl.textContent || '').trim().length;
-          return Math.max(1400, Math.min(5200, 25 * len)); // ~25ms/char
+          return Math.max(1400, Math.min(5200, 25 * len));
         }
         function openTip(h){
           const tip = h.querySelector('.tip');
@@ -696,7 +711,6 @@
         const line = buildResult(); if (!line) return;
         appendResultLine(line);
         ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"].forEach(id=>{ const el=$(id); if(el) el.value=""; });
-        // Reset sliders visually
         ["caSlider","paSlider"].forEach(id => { const s=$(id); if(s){ s.value=0; setRangeFill(s); }});
         ["comboCurrent","comboNew"].forEach(id=>{ const c=$(id); if(c){ c.classList.remove("has-logo"); const img=c.querySelector(".combo-logo"); if(img) img.style.display="none"; }});
         $('yearWarn').style.display='none'; $('yearOfBirth').classList.remove('error');
@@ -705,6 +719,25 @@
       }
       function copyResults(){ const text=getAllLines().join('\n').trim(); if(!text) return; copyToClipboard(text).then(()=>{ setCopyStatus('Copied all results ✅'); }).catch(err=>alert('Copy failed: '+err)); }
       function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); setCopyStatus(''); updateEmptyState(); }
+
+      /* Results helpers */
+      function getAllLines(){ return Array.from(resultsEl.querySelectorAll('.res-text')).map(el => el.textContent); }
+      function saveResults(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(getAllLines())); }
+      function renderFromLines(lines){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); lines.forEach(t=>{ if(t&&String(t).trim()!=='') resultsEl.appendChild(makeLineEl(t)); }); updateEmptyState(); }
+      function loadResults(){ const raw=localStorage.getItem(STORAGE_KEY); if(!raw){updateEmptyState();return;} let lines=[]; try{const p=JSON.parse(raw); lines=Array.isArray(p)?p:String(raw).split(/\n/);}catch{lines=String(raw).split(/\n/);} renderFromLines(lines); }
+      function makeLineEl(text){
+        const line = document.createElement('div'); line.className = 'res-line';
+        const span = document.createElement('span'); span.className='res-text'; span.contentEditable='true'; span.textContent=text;
+        const copyBtn = document.createElement('button'); copyBtn.className='icon-btn'; copyBtn.title='Copy line'; copyBtn.setAttribute('aria-label','Copy line'); copyBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>`;
+        const delBtn  = document.createElement('button'); delBtn.className='icon-btn';  delBtn.title='Delete line'; delBtn.setAttribute('aria-label','Delete line'); delBtn.innerHTML  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`;
+
+        copyBtn.addEventListener('click', () => { copyToClipboard(span.textContent.trim()).then(()=>setCopyStatus('Copied line ✅')).catch(err=>alert('Copy failed: '+err)); });
+        delBtn.addEventListener('click',  () => { line.remove(); saveResults(); updateEmptyState(); });
+        span.addEventListener('input', () => saveResults());
+
+        line.append(span, copyBtn, delBtn);
+        return line;
+      }
 
       /* Init */
       document.addEventListener('DOMContentLoaded', () => {
@@ -720,8 +753,8 @@
         initHelpBubbles();
 
         $('yearOfBirth').addEventListener('input', e => limitYear(e.target));
-        $('ca').addEventListener('input', e => clampPercent(e.target));
-        $('pa').addEventListener('input', e => clampPercent(e.target));
+        $('ca').addEventListener('input', e => { clampPercent(e.target); setRangeFill($('caSlider')); });
+        $('pa').addEventListener('input', e => { clampPercent(e.target); setRangeFill($('paSlider')); });
 
         // Bind and sync sliders with numbers (instant fill)
         bindNumberAndSlider('ca','caSlider','caOut');
