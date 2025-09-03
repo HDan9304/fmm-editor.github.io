@@ -51,9 +51,10 @@
     <div class="guide">
       <h3>Quick guide</h3>
       <ol>
-        <li>CSV can be <b>with or without header</b>. If no header, we assume <code>common, official, logo, aliases</code>. Optional: <code>wiki</code> (Wikipedia title or Wikidata QID) to disambiguate (e.g. <i>Arsenal F.C.</i>).</li>
+        <li>CSV can be <b>with or without header</b>. If no header, we assume <code>common, official, logo, aliases</code>. Optional: <code>wiki</code> (Wikipedia title or Wikidata QID).</li>
         <li>(Optional) Load your current <code>clubs.json</code> to merge with the new rows.</li>
-        <li>Tick <b>auto-fetch</b>. The tool tries: <b>wiki hint → aliases (in order) → official → common</b>. It prefers **Wikidata logos** and filters Wikipedia images to **crest/badge files**.</li>
+        <li>Tick <b>auto-fetch</b>. The tool tries: <b>wiki hint → aliases (in order) → official → common</b>.  
+            Default is **crest-only via Wikidata P154**; we won’t use random photos.</li>
         <li>Download the merged <b>clubs.json</b> and commit it.</li>
       </ol>
     </div>
@@ -73,8 +74,8 @@ Aston Villa,Aston Villa,,Villa
 
 Header example:
 common,official,logo,aliases,wiki
-Arsenal,Arsenal,,,Arsenal F.C.
-Man United,Manchester United,,,Q19016'></textarea>
+Arsenal,Arsenal,,Gunners,Arsenal F.C.
+Aston Villa,Aston Villa,,,Q18772'></textarea>
 
         <div class="row" style="margin-top:10px">
           <button class="btn" id="convertBtn">Convert → JSON</button>
@@ -83,14 +84,14 @@ Man United,Manchester United,,,Q19016'></textarea>
 
         <div style="margin-top:10px;padding:10px;border:1px solid var(--border);border-radius:12px">
           <label class="row" style="gap:8px;margin:0">
-            <input type="checkbox" id="wikicb"> Try to <b>auto-fetch missing logos</b> (Wikidata → Wikipedia)
+            <input type="checkbox" id="wikicb" checked> Try to <b>auto-fetch missing logos</b>
           </label>
-          <div id="wkBox" style="display:none;margin-top:10px">
+          <div id="wkBox" style="display:block;margin-top:10px">
             <div class="row" style="justify-content:space-between;align-items:center">
               <div class="row" style="gap:12px;align-items:center">
                 <label class="row" style="gap:8px;margin:0">
                   <input type="checkbox" id="crestOnly" checked>
-                  <span class="note">Prefer crest/logo only (avoid photos)</span>
+                  <span class="note">Crest-only (Wikidata <code>P154</code>); don’t use photos</span>
                 </label>
                 <div class="chip"><span id="wkCount">0</span> to fetch</div>
               </div>
@@ -204,13 +205,10 @@ function toObj(headers, row, lineNo){
   return {obj:o, errors};
 }
 
-/* ---------- Wikidata / Wikipedia ---------- */
+/* ---------- Wikidata helpers ---------- */
 function commonsFileUrl(filename, width=512){
   return 'https://commons.wikimedia.org/wiki/Special:FilePath/' +
          encodeURIComponent(filename) + (width?`?width=${width}`:'');
-}
-function isLikelyLogoFilename(name){
-  return /logo|crest|badge|emblem|shield|coat[-_ ]?of[-_ ]?arms/i.test(name.replace(/_/g,' '));
 }
 async function fetchWikidataEntity(qid){
   const url = 'https://www.wikidata.org/wiki/Special:EntityData/' + encodeURIComponent(qid) + '.json';
@@ -223,18 +221,23 @@ function isFootballClub(entity){
   const ids = new Set(P31.map(c => c?.mainsnak?.datavalue?.value?.id).filter(Boolean));
   return ids.has('Q476028') || ids.has('Q847017'); // association football club / football club
 }
-function extractLogoFromEntity(entity, crestOnly=true){
-  const p154 = entity?.claims?.P154?.[0]?.mainsnak?.datavalue?.value; // logo image
-  if(p154) return commonsFileUrl(p154);
-  if(!crestOnly){
-    const p18  = entity?.claims?.P18?.[0]?.mainsnak?.datavalue?.value; // generic image
-    if(p18)  return commonsFileUrl(p18);
-  }else{
-    const p18  = entity?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
-    if(p18 && isLikelyLogoFilename(p18)) return commonsFileUrl(p18);
-  }
-  return null;
+function extractCrestP154(entity){
+  const p154 = entity?.claims?.P154?.[0]?.mainsnak?.datavalue?.value; // logo image filename
+  return p154 ? commonsFileUrl(p154) : null;
 }
+
+/* Resolve Wikipedia title -> Wikidata QID */
+async function titleToQid(title){
+  try{
+    const r = await fetch('https://en.wikipedia.org/w/api.php?origin=*&action=query&prop=pageprops&format=json&titles=' +
+                          encodeURIComponent(title));
+    const j = await r.json();
+    const page = j?.query?.pages ? Object.values(j.query.pages)[0] : null;
+    return page?.pageprops?.wikibase_item || null;
+  }catch(e){ return null; }
+}
+
+/* Wikidata search (for strings that aren’t QIDs or exact titles) */
 async function searchWikidataItem(term){
   const url = 'https://www.wikidata.org/w/api.php?origin=*&action=wbsearchentities&search=' +
               encodeURIComponent(term) + '&language=en&type=item&limit=8&format=json';
@@ -242,76 +245,34 @@ async function searchWikidataItem(term){
   const j = await r.json();
   return j?.search || [];
 }
-async function logoViaWikidata(termOrQ, crestOnly=true){
+
+/* Single best-crest resolver:
+   - If QID: fetch entity → P154
+   - Else if string: try title→QID; else Wikidata search (football clubs only) → P154
+*/
+async function resolveCrest(term){
   try{
-    if(/^Q\d+$/i.test(termOrQ)){
-      const ent = await fetchWikidataEntity(termOrQ);
-      if(ent && isFootballClub(ent)){
-        const url = extractLogoFromEntity(ent, crestOnly);
-        if(url) return url;
-      }
+    if(!term) return null;
+    // QID?
+    if(/^Q\d+$/i.test(term)){
+      const ent = await fetchWikidataEntity(term);
+      if(ent && isFootballClub(ent)) return extractCrestP154(ent);
       return null;
     }
-    const results = await searchWikidataItem(termOrQ);
+    // Wikipedia title → QID
+    const qFromTitle = await titleToQid(term);
+    if(qFromTitle){
+      const ent = await fetchWikidataEntity(qFromTitle);
+      if(ent && isFootballClub(ent)) return extractCrestP154(ent);
+    }
+    // Wikidata search → first football club with P154
+    const results = await searchWikidataItem(term);
     for(const res of results){
       const ent = await fetchWikidataEntity(res.id);
       if(ent && isFootballClub(ent)){
-        const url = extractLogoFromEntity(ent, crestOnly);
-        if(url) return url;
+        const crest = extractCrestP154(ent);
+        if(crest) return crest;
       }
-    }
-  }catch(e){}
-  return null;
-}
-function normalizeWikiImage(url){
-  try{
-    const u = new URL(url);
-    if (u.hostname === 'upload.wikimedia.org' && u.pathname.includes('/thumb/')) {
-      const parts = u.pathname.split('/');
-      if (parts.length >= 7) {
-        const lang = parts[2], h1 = parts[4], h2 = parts[5], filename = parts[6];
-        u.pathname = ['','wikipedia',lang,h1,h2,filename].join('/');
-        return u.toString();
-      }
-    }
-  }catch(e){}
-  return url;
-}
-async function pickCrestFromWikipediaTitle(title){
-  // Inspect page images list and prefer filenames that look like crests/logos
-  try{
-    const r = await fetch('https://en.wikipedia.org/w/api.php?origin=*&action=query&format=json&prop=images&imlimit=120&titles=' +
-                          encodeURIComponent(title));
-    const j = await r.json();
-    const page = j?.query?.pages ? Object.values(j.query.pages)[0] : null;
-    const files = (page?.images || []).map(i => i.title.replace(/^File:/i,''));
-    const crest = files.find(f => isLikelyLogoFilename(f));
-    if(crest) return commonsFileUrl(crest);
-  }catch(e){}
-  return null;
-}
-async function logoViaWikipedia(term, crestOnly=true){
-  try{
-    // Bias to club page
-    const candidates = [term, term+' F.C.', term+' FC', term+' football club'];
-    for(const cand of candidates){
-      // First try to find a crest-looking file on the page
-      const crest = await pickCrestFromWikipediaTitle(cand);
-      if(crest) return crest;
-
-      // Fallback to REST summary — only accept if looks like a crest (or if crestOnly is false)
-      try{
-        const r = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' +
-                              encodeURIComponent(cand) + '?redirect=true');
-        if(r.ok){
-          const j = await r.json();
-          const src = j.originalimage?.source || j.thumbnail?.source;
-          if(src){
-            const ok = !crestOnly || isLikelyLogoFilename(src);
-            if(ok) return normalizeWikiImage(src);
-          }
-        }
-      }catch(e){}
     }
   }catch(e){}
   return null;
@@ -380,18 +341,18 @@ file.addEventListener('change', async () => {
   const f = file.files[0]; if(!f) return;
   csv.value = await f.text();
 });
-wikiCB.addEventListener('change', () => { wkBox.style.display = wikiCB.checked ? 'block' : 'none'; });
 sampleBtn.addEventListener('click', () => {
-  csv.value = `Arsenal,Arsenal,,Gunners|Arsenal FC
-Aston Villa,Aston Villa,,Villa`;
+  csv.value = `Arsenal,Arsenal,,Gunners|Arsenal FC,Arsenal F.C.
+Aston Villa,Aston Villa,,Villa,Q18772`;
 });
-function setBaseCount(){ baseCount.textContent = baseClubs.length; }
+
 loadJsonBtn.addEventListener('click', async () => {
   const f = jsonFile.files?.[0]; if(!f){ alert('Choose a JSON file first.'); return; }
   try{
     const txt = await f.text(); const arr = JSON.parse(txt);
     if(!Array.isArray(arr)) throw new Error('Root must be an array');
-    baseClubs = arr; setBaseCount(); alert('Loaded ' + baseClubs.length + ' clubs from file.');
+    baseClubs = arr; baseCount.textContent = baseClubs.length;
+    alert('Loaded ' + baseClubs.length + ' clubs from file.');
   }catch(e){ alert('Invalid JSON: ' + e.message); }
 });
 loadPasteBtn.addEventListener('click', () => {
@@ -399,10 +360,11 @@ loadPasteBtn.addEventListener('click', () => {
     const txt = jsonPaste.value.trim(); if(!txt){ alert('Paste some JSON first.'); return; }
     const arr = JSON.parse(txt);
     if(!Array.isArray(arr)) throw new Error('Root must be an array');
-    baseClubs = arr; setBaseCount(); alert('Loaded ' + baseClubs.length + ' clubs from pasted JSON.');
+    baseClubs = arr; baseCount.textContent = baseClubs.length;
+    alert('Loaded ' + baseClubs.length + ' clubs from pasted JSON.');
   }catch(e){ alert('Invalid JSON: ' + e.message); }
 });
-clearBaseBtn.addEventListener('click', () => { baseClubs = []; setBaseCount(); });
+clearBaseBtn.addEventListener('click', () => { baseClubs = []; baseCount.textContent = 0; });
 
 function uniqueOrdered(arr){
   const seen = new Set(), out=[]; 
@@ -419,6 +381,7 @@ convertBtn.addEventListener('click', async () => {
   const raw = csv.value.trim();
   if(!raw){ out.textContent = '// Paste CSV first'; return; }
 
+  // Parse CSV
   const rows = parseCSV(raw);
   if(rows.length < 1){ out.textContent = '// No rows found'; return; }
 
@@ -435,9 +398,8 @@ convertBtn.addEventListener('click', async () => {
     if(errors.length) msgs.push(...errors);
   });
 
-  // Auto-fetch: wiki → aliases → official → common (logo/crest preferred)
+  // Auto-fetch (crest-only by default via Wikidata P154)
   if(wikiCB.checked){
-    const crestOnly = crestOnlyCB.checked;
     const missing = incoming.filter(d => !d.logo && (d.official || d.common || (d.aliases && d.aliases.length)));
     wkCount.textContent = missing.length;
     wkBar.style.width = missing.length ? '0%' : '100%';
@@ -445,25 +407,30 @@ convertBtn.addEventListener('click', async () => {
     for(let i=0;i<missing.length;i++){
       const row = missing[i];
       const aliasList = Array.isArray(row.aliases) ? row.aliases : [];
+      // candidates: wiki → aliases → official → common
       const candidates = uniqueOrdered([
-        row.wiki?.trim(),                  // explicit hint first
-        ...aliasList,                      // aliases first
+        row.wiki?.trim(),
+        ...aliasList,
         row.official || '',
         row.common   || ''
       ]).filter(Boolean);
 
-      let src = null;
+      let crestUrl = null;
       for(const term of candidates){
-        src = await logoViaWikidata(term, crestOnly) || await logoViaWikipedia(term, crestOnly);
-        if(src) break;
+        crestUrl = await resolveCrest(term);
+        if(crestUrl) break;
       }
-      if(src) row.logo = src; else msgs.push(`No crest/logo found for “${row.official || row.common || aliasList[0] || 'unknown'}”`);
 
+      if(crestUrl){
+        row.logo = crestUrl;
+      }else{
+        msgs.push(`No crest (P154) found for “${row.official || row.common || aliasList[0] || 'unknown'}” — add a QID in the 'wiki' column or paste a logo URL manually.`);
+      }
       wkBar.style.width = (((i+1)/missing.length)*100).toFixed(1) + '%';
     }
   }
 
-  // Merge
+  // Merge with loaded base if requested
   const prefer = preferSelect.value;
   let result = incoming;
   if(autoMerge.checked && baseClubs.length){
@@ -477,7 +444,7 @@ convertBtn.addEventListener('click', async () => {
   // Drop helper field 'wiki' from final output
   jsonData = result.map(({wiki, ...rest}) => rest);
 
-  const jsonText = stringifyPrettyInline(jsonData);
+  jsonText = stringifyPrettyInline(jsonData);
   out.textContent = jsonText;
   countEl.textContent = jsonData.length;
   downloadBtn.disabled = jsonData.length===0;
