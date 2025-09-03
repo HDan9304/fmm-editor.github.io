@@ -27,34 +27,14 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/d/d0/Brighton_and_Hove_Albion_FC_crest.svg"
   },
 {
-    "common": "Burnley",
-    "official": "Burnley",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/6/6d/Burnley_FC_Logo.svg"
-  },
-{
-    "common": "Chelsea",
-    "official": "Chelsea",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg"
-  },
-{
-    "common": "Crystal Palace",
-    "official": "Crystal Palace",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/a/a2/Crystal_Palace_FC_logo_%282022%29.svg"
-  },
-{
-    "common": "Everton",
-    "official": "Everton",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg"
-  },
-{
-    "common": "Fulham",
-    "official": "Fulham",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg"
-  },
-{
     "common": "Leeds",
     "official": "Leeds United",
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/54/Leeds_United_F.C._logo.svg"
+  },
+{
+    "common": "Liverpool",
+    "official": "Liverpool",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg"
   },
 {
     "common": "Man City",
@@ -65,5 +45,35 @@
     "common": "Man United",
     "official": "Manchester UFC",
     "logo": "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"
+  },
+{
+    "common": "Newcastle",
+    "official": "Newcastle United",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg"
+  },
+{
+    "common": "Nottingham Forest",
+    "official": "Nottingham Forest",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_F.C._logo.svg"
+  },
+{
+    "common": "Sunderland",
+    "official": "Sunderland",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/7/77/Logo_Sunderland.svg"
+  },
+{
+    "common": "Tottenham",
+    "official": "Tottenham Hotspur",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg"
+  },
+{
+    "common": "West Ham",
+    "official": "West Ham United",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg"
+  },
+{
+    "common": "Wolves",
+    "official": "Wolverhampton Wanderers",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/c/c9/Wolverhampton_Wanderers_FC_crest.svg"
   }
 ]
