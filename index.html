@@ -74,16 +74,16 @@
       border: 1px solid #444;
       border-radius: 16px;
       background: #242537;
-      min-height: 160px;                 /* bigger area */
+      min-height: 160px;
       max-height: 300px;
       overflow-y: auto;
-      display: flex;                      /* neat spacing for lines */
+      display: flex;
       flex-direction: column;
       gap: 12px;
       position: relative;
       margin-bottom: 14px;
     }
-    #results.empty { justify-content: center; } /* center empty-state vertically */
+    #results.empty { justify-content: center; }
 
     .empty-state {
       display: none;
@@ -91,7 +91,7 @@
       background: #202233;
       color: #b9b9c9;
       border-radius: 16px;
-      height: 72px;                       /* looks “bigger” */
+      height: 72px;
       padding: 0 16px;
       align-items: center;
       justify-content: center;
@@ -116,10 +116,11 @@
       border-radius: 8px; padding: 2px 4px;
     }
 
-    /* Minimal delete icon */
+    /* Minimal icon buttons */
     .icon-btn {
       border: none; background: transparent; color: #ff9bd9;
-      padding: 6px 8px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      padding: 6px 8px; border-radius: 8px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
     }
     .icon-btn:hover { background: rgba(255,90,200,0.1); }
     .icon-btn svg { width: 18px; height: 18px; display: block; }
@@ -131,10 +132,7 @@
     }
     .btn:hover { filter: brightness(1.06); }
 
-    .btn.cta {                     /* larger when no results */
-      padding: 16px; font-size: 16px; border-radius: 16px;
-    }
-
+    .btn.cta { padding: 16px; font-size: 16px; border-radius: 16px; }
     .btn-secondary { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
     .btn-secondary:hover { background: rgba(255,90,200,0.08); }
 
@@ -263,7 +261,7 @@
         { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
       ];
 
-      /* ===== Utilities ===== */
+      /* ===== Shortcuts & helpers ===== */
       const $ = (id) => document.getElementById(id);
       const resultsEl = $('results');
       const addBtn = $('addBtn');
@@ -271,6 +269,7 @@
       function capWords(str){ return String(str||'').trim().replace(/\b([a-zA-Z])/g,(m,p)=>p.toUpperCase()); }
       function clamp01(n){ return Math.max(0, Math.min(100, n)); }
       function convertTo200Scale(v){ if(v===""||isNaN(+v))return ""; const n=clamp01(+v); return Math.round((n/100)*200); }
+      function setCopyStatus(msg){ $('copyStatus').textContent = msg || ''; }
 
       /* ===== Empty state & CTA sizing ===== */
       function updateEmptyState(){
@@ -279,7 +278,7 @@
         addBtn.classList.toggle('cta', !hasLines);
       }
 
-      /* ===== Results list (per-line) ===== */
+      /* ===== Minimal icons (inline SVG) ===== */
       function trashSVG(){
         return `
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -292,7 +291,38 @@
   <path d="M9 6V4h6v2"></path>
 </svg>`;
       }
+      function copySVG(){
+        return `
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true" focusable="false">
+  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+  <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+</svg>`;
+      }
 
+      /* Clipboard helper with fallback */
+      function copyToClipboard(text){
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text);
+        }
+        return new Promise((resolve, reject) => {
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            resolve();
+          } catch (e) { reject(e); }
+        });
+      }
+
+      /* ===== Results list (per-line) ===== */
       function makeLineEl(text){
         const line = document.createElement('div');
         line.className = 'res-line';
@@ -302,22 +332,43 @@
         span.contentEditable = 'true';
         span.textContent = text;
 
-        const del = document.createElement('button');
-        del.className = 'icon-btn';
-        del.title = 'Delete line';
-        del.setAttribute('aria-label','Delete line');
-        del.innerHTML = trashSVG();
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'icon-btn';
+        copyBtn.title = 'Copy line';
+        copyBtn.setAttribute('aria-label','Copy line');
+        copyBtn.innerHTML = copySVG();
 
-        del.addEventListener('click', () => { line.remove(); saveResults(); updateEmptyState(); });
-        del.addEventListener('keydown', (e) => { if(e.key==='Enter'||e.key===' '){e.preventDefault(); del.click();} });
-        span.addEventListener('input', saveResults);
+        const delBtn = document.createElement('button');
+        delBtn.className = 'icon-btn';
+        delBtn.title = 'Delete line';
+        delBtn.setAttribute('aria-label','Delete line');
+        delBtn.innerHTML = trashSVG();
 
-        line.append(span, del);
+        copyBtn.addEventListener('click', () => {
+          copyToClipboard(span.textContent.trim())
+            .then(() => setCopyStatus('Copied line ✅'))
+            .catch(err => alert('Copy failed: ' + err));
+        });
+        copyBtn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyBtn.click(); }
+        });
+
+        delBtn.addEventListener('click', () => {
+          line.remove();
+          saveResults();
+          updateEmptyState();
+        });
+        delBtn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); delBtn.click(); }
+        });
+
+        span.addEventListener('input', () => saveResults());
+
+        line.append(span, copyBtn, delBtn);
         return line;
       }
 
       function appendResultLine(text){
-        // remove empty-state node if present is fine; it stays but hidden via CSS
         resultsEl.appendChild(makeLineEl(text));
         resultsEl.scrollTop = resultsEl.scrollHeight;
         saveResults();
@@ -453,9 +504,9 @@
       }
       function copyResults(){
         const text = getAllLines().join('\n').trim(); if (!text) return;
-        navigator.clipboard.writeText(text).then(()=>{$('copyStatus').textContent='Copied all results ✅';}).catch(err=>alert('Copy failed: '+err));
+        navigator.clipboard.writeText(text).then(()=>{ setCopyStatus('Copied all results ✅'); }).catch(err=>alert('Copy failed: '+err));
       }
-      function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); $('copyStatus').textContent=''; updateEmptyState(); }
+      function clearResults(){ resultsEl.querySelectorAll('.res-line').forEach(el=>el.remove()); saveResults(); setCopyStatus(''); updateEmptyState(); }
 
       /* ===== DOM Ready ===== */
       document.addEventListener('DOMContentLoaded', () => {
@@ -463,12 +514,10 @@
         initCombo("comboCurrent", "currentClub", "logoCurrent");
         initCombo("comboNew",     "newClub",     "logoNew");
 
-        // Validation wiring
         $('yearOfBirth').addEventListener('input', e => limitYear(e.target));
         $('ca').addEventListener('input', e => clampPercent(e.target));
         $('pa').addEventListener('input', e => clampPercent(e.target));
 
-        // Buttons
         $('addBtn').addEventListener('click', addResult);
         $('copyBtn').addEventListener('click', copyResults);
         $('clearBtn').addEventListener('click', clearResults);
@@ -482,7 +531,6 @@
           if (!editingResult && !comboOpen) { e.preventDefault(); addResult(); }
         });
 
-        // Initial empty-state check
         updateEmptyState();
       });
     })();
