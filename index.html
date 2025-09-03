@@ -312,9 +312,7 @@
     }
 
     function limitYear(el){
-      // keep digits only and at most 4 chars
       el.value = el.value.replace(/\D+/g, '').slice(0, 4);
-
       const warn = document.getElementById('yearWarn');
       const val = el.value;
       if (val && (val.length !== 4 || Number(val) < YEAR_MIN || Number(val) > YEAR_MAX)) {
@@ -329,7 +327,7 @@
     function isYearValidOrEmpty() {
       const el = document.getElementById('yearOfBirth');
       const val = (el.value || '').trim();
-      if (val === '') return true; // empty is allowed
+      if (val === '') return true; // empty allowed
       if (val.length !== 4) return false;
       const n = Number(val);
       return !(isNaN(n) || n < YEAR_MIN || n > YEAR_MAX);
@@ -340,7 +338,7 @@
       let n = parseInt(el.value, 10);
       if (isNaN(n)) { el.value = ""; return; }
       if (n < 0) n = 0;
-      if (n > 100) n = 100;     // clamp to 0–100
+      if (n > 100) n = 100;
       el.value = n;
     }
 
@@ -356,7 +354,6 @@
       const first = capWords(g("firstName"));
       const last = capWords(g("lastName"));
       const currentClub = capWords(g("currentClub"));
-
       if (!first || !last || !currentClub) return "";
 
       const newFirst = capWords(g("newFirstName"));
@@ -384,10 +381,9 @@
       const line = buildResult();
       if (line) {
         resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
-        resultsEl.scrollTop = resultsEl.scrollHeight; // stay at bottom
+        resultsEl.scrollTop = resultsEl.scrollHeight;
         saveResults();
-        clearAllInputs();                 // auto-clear after adding
-        // no focus -> no page jump
+        clearAllInputs();
       } else {
         alert("Please fill in First Name, Last Name, and Current Club.");
       }
@@ -423,7 +419,7 @@
       if (saved) document.getElementById("results").textContent = saved;
     }
 
-    /* Clear all input fields + remove logos and their left padding */
+    /* Clear inputs + logos */
     function clearAllInputs() {
       const ids = [
         "firstName","lastName","currentClub","newClub",
@@ -434,10 +430,8 @@
         const el = document.getElementById(id);
         if (el) el.value = "";
       });
-      // Remove logo & padding state
       document.getElementById("comboCurrent").classList.remove("has-logo");
       document.getElementById("comboNew").classList.remove("has-logo");
-      // Hide year warning
       document.getElementById('yearWarn').style.display = 'none';
       document.getElementById('yearOfBirth').classList.remove('error');
     }
@@ -449,8 +443,7 @@
       const logo  = document.getElementById(logoId);
       const panel = combo.querySelector(".combo-panel");
 
-      const clubsList = [...clubs]; // local copy
-
+      const list = [...clubs];
       let visibleItems = [];
       let activeIndex = -1;
 
@@ -460,15 +453,15 @@
 
       function filter(q) {
         const query = (q || "").toLowerCase().trim();
-        if (!query) return clubsList.slice(0, 50);
-        return clubsList.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
+        if (!query) return list.slice(0, 50);
+        return list.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
       }
 
-      function render(list) {
+      function render(items) {
         panel.innerHTML = "";
-        visibleItems = list;
+        visibleItems = items;
 
-        if (list.length === 0) {
+        if (items.length === 0) {
           const empty = document.createElement("div");
           empty.className = "combo-item";
           empty.style.opacity = "0.7";
@@ -477,7 +470,7 @@
           return;
         }
 
-        list.forEach((club, idx) => {
+        items.forEach((club, idx) => {
           const item = document.createElement("div");
           item.className = "combo-item";
           item.dataset.index = idx;
@@ -504,10 +497,10 @@
       function select(idx) {
         const club = visibleItems[idx];
         if (!club) return;
-        input.value = club.name;              // show text in input
+        input.value = club.name;
         logo.src = club.logo || FALLBACK_LOGO;
         logo.onerror = () => { logo.src = FALLBACK_LOGO; };
-        combo.classList.add("has-logo");      // keep logo visible
+        combo.classList.add("has-logo");
         close();
       }
 
@@ -532,10 +525,7 @@
       });
 
       input.addEventListener("input", () => {
-        // KEEP the logo while typing; remove only if cleared
-        if (input.value.trim() === "") {
-          combo.classList.remove("has-logo");
-        }
+        if (input.value.trim() === "") combo.classList.remove("has-logo");
         render(filter(input.value));
         open();
       });
@@ -564,24 +554,23 @@
       });
     }
 
-    function setCopyStatus(msg) {
-      document.getElementById("copyStatus").textContent = msg;
-    }
-
-    function saveResults() {
-      localStorage.setItem(STORAGE_KEY, document.getElementById("results").textContent);
-    }
-
-    function loadResults() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) document.getElementById("results").textContent = saved;
-    }
-
     // Init combos + load saved results
     window.onload = function() {
       loadResults();
       initCombo("comboCurrent", "currentClub", "logoCurrent");
       initCombo("comboNew",     "newClub",     "logoNew");
+
+      // Enter-to-Add globally (but ignore if a combo dropdown is open or results box focused)
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        const active = document.activeElement;
+        const isResults = active && (active.id === 'results' || active.isContentEditable);
+        const comboOpen = document.querySelector('.combo.open');
+        if (!isResults && !comboOpen) {
+          e.preventDefault();
+          addResult();
+        }
+      });
     };
   </script>
 </body>
