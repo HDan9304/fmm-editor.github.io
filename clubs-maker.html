@@ -155,20 +155,31 @@ function toObj(headers, row, lineNo){
   return {obj:o, errors};
 }
 
-/* -------- Robust Wikipedia logo fetch -------- */
+/* -------- Wikipedia logo fetch (robust) -------- */
+function normalizeWikiImage(url){
+  try{
+    const u = new URL(url);
+    if (u.hostname === 'upload.wikimedia.org' && u.pathname.includes('/thumb/')) {
+      const parts = u.pathname.split('/');
+      if (parts.length >= 7) {
+        const lang = parts[2], h1 = parts[4], h2 = parts[5], filename = parts[6];
+        u.pathname = ['','wikipedia',lang,h1,h2,filename].join('/');
+        return u.toString();
+      }
+    }
+  }catch(e){}
+  return url;
+}
 async function wikiLogo(name){
-  // 1) REST Summary API (fast & often gives originalimage)
   try{
     const r = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' +
                           encodeURIComponent(name) + '?redirect=true');
     if(r.ok){
       const j = await r.json();
-      if(j.originalimage?.source) return j.originalimage.source;
-      if(j.thumbnail?.source)     return j.thumbnail.source;
+      if(j.originalimage?.source) return normalizeWikiImage(j.originalimage.source);
+      if(j.thumbnail?.source)     return normalizeWikiImage(j.thumbnail.source);
     }
-  }catch(e){ /* ignore */ }
-
-  // 2) Action API: search → pageimages (original or thumbnail)
+  }catch(e){}
   try{
     const s = await fetch('https://en.wikipedia.org/w/api.php?origin=*&action=query&format=json' +
                           '&list=search&srnamespace=0&srlimit=1&srwhat=text&utf8=1&srsearch=' +
@@ -181,12 +192,33 @@ async function wikiLogo(name){
                             encodeURIComponent(title));
       const pj = await p.json();
       const page = pj?.query?.pages ? Object.values(pj.query.pages)[0] : null;
-      if(page?.original?.source)  return page.original.source;
-      if(page?.thumbnail?.source) return page.thumbnail.source;
+      if(page?.original?.source)  return normalizeWikiImage(page.original.source);
+      if(page?.thumbnail?.source) return normalizeWikiImage(page.thumbnail.source);
     }
-  }catch(e){ /* ignore */ }
+  }catch(e){}
+  return null;
+}
 
-  return null; // not found
+/* -------- Pretty JSON formatter (inline arrays) -------- */
+const IND = '  ';
+function esc(s){ return JSON.stringify(s); }
+function isInlineArray(a){ return Array.isArray(a) && a.every(x => typeof x === 'string'); }
+function fmtAny(v, lvl){
+  if (isInlineArray(v)) return '[' + v.map(esc).join(', ') + ']';
+  if (Array.isArray(v)) {
+    return '[\n' + v.map(x => IND.repeat(lvl+1) + fmtAny(x, lvl+1)).join(',\n') + '\n' + IND.repeat(lvl) + ']';
+  }
+  if (v && typeof v === 'object') return fmtObj(v, lvl);
+  return JSON.stringify(v);
+}
+function fmtObj(o, lvl){
+  const pad = IND.repeat(lvl);
+  const lines = Object.entries(o).map(([k,v]) => pad + IND + esc(k) + ': ' + fmtAny(v, lvl+1));
+  return '{\n' + lines.join(',\n') + '\n' + pad + '}';
+}
+function stringifyPrettyInline(arr){
+  // arr is the clubs array
+  return '[\n' + arr.map(o => fmtObj(o, 1)).join(',\n') + '\n]';
 }
 
 /* -------- UI wiring -------- */
@@ -196,7 +228,8 @@ const convertBtn = $('convertBtn'), downloadBtn=$('downloadBtn'), copyBtn=$('cop
 const wikiCB = $('wikicb'), wkBox=$('wkBox'), wkCount=$('wkCount'), wkBar=$('wkBar');
 const errorsEl = $('errors'), sampleBtn = $('sampleBtn');
 
-let jsonData = [];
+let jsonData = [];      // array of club objects
+let jsonText  = '[]';   // formatted text using our custom formatter
 
 file.addEventListener('change', async () => {
   const f = file.files[0]; if(!f) return;
@@ -248,18 +281,17 @@ convertBtn.addEventListener('click', async () => {
     const missing = data.filter(d => !d.logo && (d.official || d.common));
     wkCount.textContent = missing.length;
     wkBar.style.width = missing.length ? '0%' : '100%';
-    let notFound = 0;
     for(let i=0;i<missing.length;i++){
       const name = missing[i].official || missing[i].common;
       const src = await wikiLogo(name);
-      if(src) missing[i].logo = src; else { notFound++; rowErrors.push(`No logo found for “${name}”`); }
+      if(src) missing[i].logo = src; else rowErrors.push(`No logo found for “${name}”`);
       wkBar.style.width = (((i+1)/missing.length)*100).toFixed(1) + '%';
     }
-    if(!missing.length){ rowErrors.push('Nothing to fetch — all rows already have a logo.'); }
   }
 
   jsonData = data;
-  out.textContent = JSON.stringify(jsonData, null, 2);
+  jsonText = stringifyPrettyInline(jsonData);   // <<–– custom format
+  out.textContent = jsonText;
   countEl.textContent = jsonData.length;
   downloadBtn.disabled = jsonData.length===0;
   copyBtn.disabled = jsonData.length===0;
@@ -274,7 +306,7 @@ convertBtn.addEventListener('click', async () => {
 });
 
 downloadBtn.addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(jsonData, null, 2)], {type:'application/json'});
+  const blob = new Blob([jsonText], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'clubs.json';
@@ -283,7 +315,7 @@ downloadBtn.addEventListener('click', () => {
 });
 copyBtn.addEventListener('click', async () => {
   try{
-    await navigator.clipboard.writeText(JSON.stringify(jsonData, null, 2));
+    await navigator.clipboard.writeText(jsonText);
     copyBtn.textContent = 'Copied!';
     setTimeout(()=>copyBtn.textContent='Copy JSON',1200);
   }catch(e){ alert('Copy failed: ' + e); }
