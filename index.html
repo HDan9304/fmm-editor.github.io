@@ -259,7 +259,6 @@
 
     <div class="field">
       <label for="yearOfBirth">Year of Birth (4 digits)</label>
-      <!-- Use text + JS to strictly enforce 4 digits -->
       <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" oninput="limitYear(this)" />
     </div>
 
@@ -304,8 +303,7 @@
       { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
       { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
       { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
-      { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" },
-      { name: "Arsenal", logo: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" }
+      { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
       // add more...
     ];
 
@@ -360,10 +358,10 @@
       const line = buildResult();
       if (line) {
         resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
-        resultsEl.scrollTop = resultsEl.scrollHeight;
+        resultsEl.scrollTop = resultsEl.scrollHeight; // scroll inside results only
         saveResults();
-        clearAllInputs();                 // auto-clear after adding
-        document.getElementById("firstName").focus();
+        clearAllInputs(); // auto-clear inputs
+        // (No focusing anything here, so the page doesn't jump to the top)
       } else {
         alert("Please fill in First Name, Last Name, and Current Club.");
       }
@@ -476,7 +474,7 @@
         input.value = club.name;              // show text in input
         logo.src = club.logo || FALLBACK_LOGO;
         logo.onerror = () => { logo.src = FALLBACK_LOGO; };
-        combo.classList.add("has-logo");      // show logo + add left padding
+        combo.classList.add("has-logo");      // keep logo visible
         close();
       }
 
@@ -501,8 +499,10 @@
       });
 
       input.addEventListener("input", () => {
-        // Remove logo & padding while user is typing a new query
-        combo.classList.remove("has-logo");
+        // KEEP the logo while typing; remove only if cleared
+        if (input.value.trim() === "") {
+          combo.classList.remove("has-logo");
+        }
         render(filter(input.value));
         open();
       });
