@@ -77,6 +77,8 @@
       color: #f5f5f5;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, padding-left 0.2s;
+      /* iOS: prevent zoom on focus */
+      font-size: 16px;
     }
     .field input[type="text"] { text-transform: capitalize; }
 
@@ -108,7 +110,6 @@
       white-space: pre-wrap;
       padding: 16px 12px;
       font-family: 'Poppins', monospace;
-      font-size: 14px;
       min-height: 120px;
       max-height: 300px;
       overflow-y: auto;
@@ -207,7 +208,7 @@
     /* Sliders */
     .range-row {
       display: grid;
-      grid-template-columns: 1fr 70px;
+      grid-template-columns: 1fr 90px;
       gap: 10px;
       align-items: center;
     }
@@ -262,7 +263,7 @@
     <!-- Year with guardrails -->
     <div class="field">
       <label for="yearOfBirth">Year of Birth (4 digits)</label>
-      <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" oninput="limitYear(this)" enterkeyhint="done" />
+      <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" enterkeyhint="done" />
       <div id="yearWarn" class="hint warn">Year should be between 1900 and 2025.</div>
     </div>
 
@@ -270,8 +271,8 @@
     <div class="field">
       <label for="ca">CA (0–100)</label>
       <div class="range-row">
-        <input id="caRange" type="range" min="0" max="100" value="0" oninput="syncRangeToNumber('caRange','ca')" />
-        <input id="ca" type="number" min="0" max="100" inputmode="numeric" value="0" oninput="syncNumberToRange('ca','caRange')" />
+        <input id="caRange" type="range" min="0" max="100" value="0" />
+        <input id="ca" type="number" min="0" max="100" inputmode="numeric" value="0" />
       </div>
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
@@ -280,8 +281,8 @@
     <div class="field">
       <label for="pa">PA (0–100)</label>
       <div class="range-row">
-        <input id="paRange" type="range" min="0" max="100" value="0" oninput="syncRangeToNumber('paRange','pa')" />
-        <input id="pa" type="number" min="0" max="100" inputmode="numeric" value="0" oninput="syncNumberToRange('pa','paRange')" />
+        <input id="paRange" type="range" min="0" max="100" value="0" />
+        <input id="pa" type="number" min="0" max="100" inputmode="numeric" value="0" />
       </div>
       <div class="hint">Converted to 0–200 in result: (a ÷ 100) × 200</div>
     </div>
@@ -291,191 +292,27 @@
     <div id="results" contenteditable="true"></div>
 
     <!-- Buttons -->
-    <button class="btn full-width" onclick="addResult()">Add Result</button>
+    <button class="btn full-width" id="addBtn">Add Result</button>
     <div class="actions-row">
-      <button class="btn" onclick="copyResults()">Copy All</button>
-      <button class="btn btn-secondary" onclick="clearResults()">Clear</button>
+      <button class="btn" id="copyBtn">Copy All</button>
+      <button class="btn btn-secondary" id="clearBtn">Clear</button>
     </div>
     <div class="file-row">
-      <button class="btn btn-secondary" onclick="downloadResults()">Download .txt</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Upload .txt</button>
+      <button class="btn btn-secondary" id="downloadBtn">Download .txt</button>
+      <button class="btn btn-secondary" id="uploadBtn">Upload .txt</button>
       <input id="fileInput" type="file" accept=".txt,text/plain" style="display:none" />
     </div>
     <div id="copyStatus" class="copy-status"></div>
   </div>
 
   <script>
-    const STORAGE_KEY = "playerEditorResults";
-    const YEAR_MIN = 1900;
-    const YEAR_MAX = 2025;
+    (function(){
+      "use strict";
 
-    const FALLBACK_LOGO =
-      'data:image/svg+xml;utf8,' +
-      encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
-        <rect width="100%" height="100%" fill="#18192B"/>
-        <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
-      </svg>`);
-
-    const clubs = [
-      { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
-      { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
-      { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
-      { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
-      // add more...
-    ];
-
-    /* ===== Utilities ===== */
-    function capWords(str) {
-      const s = String(str || "").trim();
-      return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
-    }
-
-    function limitYear(el){
-      el.value = el.value.replace(/\D+/g, '').slice(0, 4);
-      const warn = document.getElementById('yearWarn');
-      if (el.value && (Number(el.value) < YEAR_MIN || Number(el.value) > YEAR_MAX)) {
-        el.classList.add('error');
-        warn.style.display = 'block';
-      } else {
-        el.classList.remove('error');
-        warn.style.display = 'none';
-      }
-    }
-
-    function clamp01(n){ return Math.max(0, Math.min(100, n)); }
-
-    function syncRangeToNumber(rangeId, numId){
-      const r = document.getElementById(rangeId);
-      const n = document.getElementById(numId);
-      n.value = r.value;
-    }
-    function syncNumberToRange(numId, rangeId){
-      const n = document.getElementById(numId);
-      let v = parseInt(n.value || 0, 10);
-      if (isNaN(v)) v = 0;
-      v = clamp01(v);
-      n.value = v;
-      document.getElementById(rangeId).value = v;
-    }
-
-    function convertTo200Scale(v) {
-      if (v === "" || isNaN(Number(v))) return "";
-      const num = clamp01(Number(v));
-      const scaled = Math.round((num / 100) * 200);
-      return Math.max(0, Math.min(200, scaled));
-    }
-
-    function buildResult() {
-      const g = id => document.getElementById(id).value.trim();
-
-      const first = capWords(g("firstName"));
-      const last  = capWords(g("lastName"));
-      const currClub = capWords(g("currentClub"));
-      if (!first || !last || !currClub) return "";
-
-      const newFirst  = capWords(g("newFirstName"));
-      const newLast   = capWords(g("newLastName"));
-      const shortName = capWords(g("newShortName"));
-      const year      = g("yearOfBirth");
-      const ca        = convertTo200Scale(g("ca"));
-      const pa        = convertTo200Scale(g("pa"));
-      const newClub   = capWords(g("newClub"));
-
-      return `"PLAYER" "${first}" "${last}" "${currClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
-    }
-
-    function addResult() {
-      const resultsEl = document.getElementById("results");
-      const line = buildResult();
-      if (line) {
-        resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
-        resultsEl.scrollTop = resultsEl.scrollHeight; // scroll inside results only
-        saveResults();
-        clearAllInputs();
-      } else {
-        alert("Please fill in First Name, Last Name, and Current Club.");
-      }
-    }
-
-    function clearResults() {
-      document.getElementById("results").textContent = "";
-      saveResults();
-      setCopyStatus("");
-    }
-
-    function copyResults() {
-      const text = document.getElementById("results").textContent.trim();
-      if (text) {
-        navigator.clipboard.writeText(text)
-          .then(() => setCopyStatus("Copied all results ✅"))
-          .catch(err => alert("Copy failed: " + err));
-      }
-    }
-
-    function downloadResults(){
-      const txt = document.getElementById('results').textContent || "";
-      const blob = new Blob([txt], {type:'text/plain'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'player-results.txt';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    document.getElementById('fileInput').addEventListener('change', (e)=>{
-      const file = e.target.files[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const incoming = String(reader.result || "").replace(/\r\n/g,"\n").trim();
-        if (!incoming) return;
-        const replace = confirm("Replace current results with file content?\nPress OK to REPLACE, Cancel to APPEND.");
-        const el = document.getElementById('results');
-        if (replace) el.textContent = incoming;
-        else el.textContent += (el.textContent ? "\n" : "") + incoming;
-        saveResults();
-        setCopyStatus(replace ? "Results replaced from file." : "Results appended from file.");
-        e.target.value = ""; // reset
-      };
-      reader.readAsText(file);
-    });
-
-    function setCopyStatus(msg) { document.getElementById("copyStatus").textContent = msg; }
-    function saveResults() { localStorage.setItem(STORAGE_KEY, document.getElementById("results").textContent); }
-    function loadResults() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) document.getElementById("results").textContent = saved;
-    }
-
-    function clearAllInputs() {
-      const ids = [
-        "firstName","lastName","currentClub","newClub",
-        "newFirstName","newLastName","newShortName",
-        "yearOfBirth","ca","pa","caRange","paRange"
-      ];
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (el.type === 'range' || el.type === 'number' || el.type === 'text') {
-          if (id === 'ca' || id === 'pa' || id === 'caRange' || id === 'paRange') el.value = 0;
-          else el.value = "";
-        }
-      });
-      document.getElementById("comboCurrent").classList.remove("has-logo");
-      document.getElementById("comboNew").classList.remove("has-logo");
-      document.getElementById('yearWarn').style.display = 'none';
-      document.getElementById('yearOfBirth').classList.remove('error');
-    }
-
-    /* ===== Searchable dropdown with square logo inside input ===== */
-    function initCombo(comboId, inputId, logoId) {
-      const combo = document.getElementById(comboId);
-      const input = document.getElementById(inputId);
-      const logo  = document.getElementById(logoId);
-      const panel = combo.querySelector(".combo-panel");
+      /* ==== Config & Data ==== */
+      const STORAGE_KEY = "playerEditorResults";
+      const YEAR_MIN = 1900;
+      const YEAR_MAX = 2025;
 
       const FALLBACK_LOGO =
         'data:image/svg+xml;utf8,' +
@@ -484,110 +321,285 @@
           <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
         </svg>`);
 
-      let visibleItems = [];
-      let activeIndex = -1;
+      const clubs = [
+        { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
+        { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
+        { name: "Manchester United", logo: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" },
+        { name: "Liverpool", logo: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" }
+        // add more...
+      ];
 
-      function open() { combo.classList.add("open"); }
-      function close() { combo.classList.remove("open"); activeIndex = -1; }
-      function isOpen() { return combo.classList.contains("open"); }
-
-      function filter(q) {
-        const query = (q || "").toLowerCase().trim();
-        if (!query) return clubs.slice(0, 50);
-        return clubs.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
+      /* ==== Utilities ==== */
+      function capWords(str) {
+        const s = String(str || "").trim();
+        return s.replace(/\b([a-zA-Z])/g, (m, p1) => p1.toUpperCase());
       }
 
-      function render(list) {
-        panel.innerHTML = "";
-        visibleItems = list;
+      function clamp01(n){ return Math.max(0, Math.min(100, n)); }
 
-        if (list.length === 0) {
-          const empty = document.createElement("div");
-          empty.className = "combo-item";
-          empty.style.opacity = "0.7";
-          empty.textContent = "No matches";
-          panel.appendChild(empty);
-          return;
+      function setCopyStatus(msg) {
+        const el = document.getElementById("copyStatus");
+        if (el) el.textContent = msg || "";
+      }
+
+      function saveResults() {
+        const el = document.getElementById("results");
+        if (el) localStorage.setItem(STORAGE_KEY, el.textContent);
+      }
+
+      function loadResults() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        const el = document.getElementById("results");
+        if (el && saved != null) el.textContent = saved;
+      }
+
+      function convertTo200Scale(v) {
+        if (v === "" || isNaN(Number(v))) return "";
+        const num = clamp01(Number(v));
+        const scaled = Math.round((num / 100) * 200);
+        return Math.max(0, Math.min(200, scaled));
+      }
+
+      function buildResult() {
+        const g = id => (document.getElementById(id)?.value || "").trim();
+
+        const first = capWords(g("firstName"));
+        const last  = capWords(g("lastName"));
+        const currClub = capWords(g("currentClub"));
+        if (!first || !last || !currClub) return "";
+
+        const newFirst  = capWords(g("newFirstName"));
+        const newLast   = capWords(g("newLastName"));
+        const shortName = capWords(g("newShortName"));
+        const year      = g("yearOfBirth");
+        const ca        = convertTo200Scale(g("ca"));
+        const pa        = convertTo200Scale(g("pa"));
+        const newClub   = capWords(g("newClub"));
+
+        return `"PLAYER" "${first}" "${last}" "${currClub}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
+      }
+
+      function addResult() {
+        const resultsEl = document.getElementById("results");
+        if (!resultsEl) return;
+        const line = buildResult();
+        if (line) {
+          resultsEl.textContent += (resultsEl.textContent ? "\n" : "") + line;
+          resultsEl.scrollTop = resultsEl.scrollHeight; // stay at bottom
+          saveResults();
+          clearAllInputs();
+        } else {
+          alert("Please fill in First Name, Last Name, and Current Club.");
+        }
+      }
+
+      function clearAllInputs() {
+        const ids = [
+          "firstName","lastName","currentClub","newClub",
+          "newFirstName","newLastName","newShortName",
+          "yearOfBirth","ca","pa","caRange","paRange"
+        ];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (el.type === 'range' || el.type === 'number' || el.type === 'text') {
+            if (id === 'ca' || id === 'pa' || id === 'caRange' || id === 'paRange') el.value = 0;
+            else el.value = "";
+          }
+        });
+        const yc = document.getElementById('yearOfBirth');
+        const yw = document.getElementById('yearWarn');
+        if (yc) yc.classList.remove('error');
+        if (yw) yw.style.display = 'none';
+
+        const cc = document.getElementById("comboCurrent");
+        const nc = document.getElementById("comboNew");
+        if (cc) cc.classList.remove("has-logo");
+        if (nc) nc.classList.remove("has-logo");
+      }
+
+      function clearResults() {
+        const el = document.getElementById("results");
+        if (el) el.textContent = "";
+        saveResults();
+        setCopyStatus("");
+      }
+
+      function copyResults() {
+        const text = document.getElementById("results")?.textContent.trim();
+        if (text) {
+          navigator.clipboard.writeText(text)
+            .then(() => setCopyStatus("Copied all results ✅"))
+            .catch(err => alert("Copy failed: " + err));
+        }
+      }
+
+      function downloadResults(){
+        const txt = document.getElementById('results')?.textContent || "";
+        const blob = new Blob([txt], {type:'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'player-results.txt';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function limitYear(el){
+        if (!el) return;
+        el.value = el.value.replace(/\D+/g, '').slice(0, 4);
+        const warn = document.getElementById('yearWarn');
+        if (el.value && (Number(el.value) < YEAR_MIN || Number(el.value) > YEAR_MAX)) {
+          el.classList.add('error');
+          if (warn) warn.style.display = 'block';
+        } else {
+          el.classList.remove('error');
+          if (warn) warn.style.display = 'none';
+        }
+      }
+
+      function syncRangeToNumber(rangeId, numId){
+        const r = document.getElementById(rangeId);
+        const n = document.getElementById(numId);
+        if (!r || !n) return;
+        n.value = r.value;
+      }
+      function syncNumberToRange(numId, rangeId){
+        const n = document.getElementById(numId);
+        const r = document.getElementById(rangeId);
+        if (!n || !r) return;
+        let v = parseInt(n.value || 0, 10);
+        if (isNaN(v)) v = 0;
+        v = clamp01(v);
+        n.value = v;
+        r.value = v;
+      }
+
+      /* ===== Searchable dropdown with square logo inside input ===== */
+      function initCombo(comboId, inputId, logoId) {
+        const combo = document.getElementById(comboId);
+        const input = document.getElementById(inputId);
+        const logo  = document.getElementById(logoId);
+        if (!combo || !input || !logo) return;
+        const panel = combo.querySelector(".combo-panel");
+
+        let visibleItems = [];
+        let activeIndex = -1;
+
+        function open() { combo.classList.add("open"); }
+        function close() { combo.classList.remove("open"); activeIndex = -1; }
+        function isOpen() { return combo.classList.contains("open"); }
+
+        function filter(q) {
+          const query = (q || "").toLowerCase().trim();
+          if (!query) return clubs.slice(0, 50);
+          return clubs.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
         }
 
-        list.forEach((club, idx) => {
-          const item = document.createElement("div");
-          item.className = "combo-item";
-          item.dataset.index = idx;
+        function render(list) {
+          if (!panel) return;
+          panel.innerHTML = "";
+          visibleItems = list;
 
-          const img = document.createElement("img");
-          img.src = club.logo || FALLBACK_LOGO;
-          img.alt = club.name;
-          img.onerror = () => { img.src = FALLBACK_LOGO; };
+          if (list.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "combo-item";
+            empty.style.opacity = "0.7";
+            empty.textContent = "No matches";
+            panel.appendChild(empty);
+            return;
+          }
 
-          const span = document.createElement("span");
-          span.textContent = club.name;
+          list.forEach((club, idx) => {
+            const item = document.createElement("div");
+            item.className = "combo-item";
+            item.dataset.index = idx;
 
-          item.append(img, span);
+            const img = document.createElement("img");
+            img.src = club.logo || FALLBACK_LOGO;
+            img.alt = club.name;
+            img.onerror = () => { img.src = FALLBACK_LOGO; };
 
-          item.addEventListener("mousedown", (e) => {
-            e.preventDefault();
-            select(idx);
+            const span = document.createElement("span");
+            span.textContent = club.name;
+
+            item.append(img, span);
+
+            item.addEventListener("mousedown", (e) => {
+              e.preventDefault();  // keep focus on input
+              select(idx);
+            });
+
+            panel.appendChild(item);
           });
+        }
 
-          panel.appendChild(item);
+        function select(idx) {
+          const club = visibleItems[idx];
+          if (!club) return;
+          input.value = club.name;              // show text in input
+          logo.src = club.logo || FALLBACK_LOGO;
+          logo.onerror = () => { logo.src = FALLBACK_LOGO; };
+          combo.classList.add("has-logo");      // keep logo visible
+          close();
+        }
+
+        function moveActive(delta) {
+          if (!isOpen()) open();
+          const items = panel.querySelectorAll(".combo-item");
+          if (items.length === 0) return;
+          activeIndex = (activeIndex + delta + items.length) % items.length;
+          items.forEach(el => el.classList.remove("active"));
+          const activeEl = items[activeIndex];
+          activeEl.classList.add("active");
+
+          const panelRect = panel.getBoundingClientRect();
+          const itemRect  = activeEl.getBoundingClientRect();
+          if (itemRect.top < panelRect.top) panel.scrollTop -= (panelRect.top - itemRect.top);
+          if (itemRect.bottom > panelRect.bottom) panel.scrollTop += (itemRect.bottom - panelRect.bottom);
+        }
+
+        input.addEventListener("focus", () => {
+          render(filter(input.value));
+          open();
+        });
+
+        input.addEventListener("input", () => {
+          if (input.value.trim() === "") combo.classList.remove("has-logo");
+          render(filter(input.value));
+          open();
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (!isOpen() && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+            render(filter(input.value));
+            open();
+          }
+          switch (e.key) {
+            case "ArrowDown": e.preventDefault(); moveActive(1); break;
+            case "ArrowUp":   e.preventDefault(); moveActive(-1); break;
+            case "Enter":
+              if (isOpen()) {
+                e.preventDefault();
+                if (activeIndex >= 0) select(activeIndex);
+                else if (visibleItems.length > 0) select(0);
+              }
+              break;
+            case "Escape": close(); break;
+          }
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!combo.contains(e.target)) close();
         });
       }
 
-      function select(idx) {
-        const club = visibleItems[idx];
-        if (!club) return;
-        input.value = club.name;
-        logo.src = club.logo || FALLBACK_LOGO;
-        logo.onerror = () => { logo.src = FALLBACK_LOGO; };
-        combo.classList.add("has-logo");
-        close();
-      }
+      /* ===== DOM Ready Init ===== */
+      window.addEventListener('DOMContentLoaded', () => {
+        // Load saved results
+        loadResults();
 
-      function moveActive(delta) {
-        if (!isOpen()) open();
-        const items = panel.querySelectorAll(".combo-item");
-        if (items.length === 0) return;
-        activeIndex = (activeIndex + delta + items.length) % items.length;
-        items.forEach(el => el.classList.remove("active"));
-        const activeEl = items[activeIndex];
-        activeEl.classList.add("active");
-
-        const panelRect = panel.getBoundingClientRect();
-        const itemRect  = activeEl.getBoundingClientRect();
-        if (itemRect.top < panelRect.top) panel.scrollTop -= (panelRect.top - itemRect.top);
-        if (itemRect.bottom > panelRect.bottom) panel.scrollTop += (itemRect.bottom - panelRect.bottom);
-      }
-
-      input.addEventListener("focus", () => {
-        render(filter(input.value));
-        open();
-      });
-
-      input.addEventListener("input", () => {
-        if (input.value.trim() === "") combo.classList.remove("has-logo");
-        render(filter(input.value));
-        open();
-      });
-
-      input.addEventListener("keydown", (e) => {
-        if (!isOpen() && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-          render(filter(input.value));
-          open();
-        }
-        switch (e.key) {
-          case "ArrowDown": e.preventDefault(); moveActive(1); break;
-          case "ArrowUp":   e.preventDefault(); moveActive(-1); break;
-          case "Enter":
-            if (isOpen()) {
-              e.preventDefault();
-              if (activeIndex >= 0) select(activeIndex);
-              else if (visibleItems.length > 0) select(0);
-            }
-            break;
-          case "Escape": close(); break;
-        }
-      });
-
-      document.addEventListener("click", (e) => {
-        if (!com
+        // Init combos
+        initCombo("comboCur
