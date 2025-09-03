@@ -1,0 +1,38 @@
+[
+  {
+    "common": "Barcelona",
+    "official": "FC Barcelona",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
+    "aliases": ["Barca", "Barcelona FC", "Futbol Club Barcelona"]
+  },
+  {
+    "common": "Real Madrid",
+    "official": "Real Madrid CF",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+    "aliases": ["Real", "Real Madrid Club de Fútbol"]
+  },
+  {
+    "common": "Man United",
+    "official": "Manchester UFC",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
+    "aliases": ["Manchester Utd", "Man Utd", "MUFC"]
+  },
+  {
+    "common": "Liverpool",
+    "official": "Liverpool",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+    "aliases": ["LFC", "Liverpool FC"]
+  },
+  {
+    "common": "Bayern",
+    "official": "FC Bayern München",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_München_logo_%282017%29.svg",
+    "aliases": ["Bayern Munich", "Bayern München"]
+  },
+  {
+    "common": "PSG",
+    "official": "Paris Saint-Germain",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
+    "aliases": ["Paris SG", "Paris Saint Germain"]
+  }
+]
