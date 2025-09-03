@@ -43,24 +43,15 @@
     .header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px 8px}
     h2{margin:0;font-size:22px;font-weight:600}
     .theme-toggle{border:0;background:transparent;padding:0;cursor:pointer;line-height:0}
-
-    /* Precise toggle geometry */
     .toggle-track{
-      --pad:2px;             /* inner padding on both sides */
-      --thumb:26px;          /* thumb size */
-      --shift:0px;           /* travel distance when ON */
-      position:relative;
-      width:58px; height:30px;
-      border-radius:999px;
-      background:var(--toggle-track);
-      border:1px solid var(--border);
-      overflow:hidden; display:inline-block;
+      --pad:2px; --thumb:26px; --shift:0px;
+      position:relative; width:58px; height:30px; border-radius:999px;
+      background:var(--toggle-track); border:1px solid var(--border); overflow:hidden; display:inline-block;
       box-shadow:inset 0 2px 6px var(--toggle-shadow);
     }
     .toggle-thumb{
       position:absolute; top:50%; left:var(--pad);
-      width:var(--thumb); height:var(--thumb);
-      border-radius:999px; background:var(--toggle-thumb);
+      width:var(--thumb); height:var(--thumb); border-radius:999px; background:var(--toggle-thumb);
       box-shadow:0 2px 6px rgba(0,0,0,.25);
       transform:translateX(var(--shift)) translateY(-50%);
       transition:transform .28s cubic-bezier(.2,.8,.2,1);
@@ -69,11 +60,7 @@
     .toggle-icon.sun{left:10px;color:#ffb84d}
     .toggle-icon.moon{right:10px;color:#8ea0ff}
     .toggle-icon svg{width:16px;height:16px;display:block}
-
-    /* When light theme is active, move the thumb exactly to the right with 2px padding */
     [data-theme="light"] .toggle-track{ --shift: 28px; } /* 58 - 26 - 2 - 2 = 28 */
-
-    @media (max-width:420px){ .header{padding-right:8px} }
 
     .field{margin-bottom:10px}
     .field-label{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:500;font-size:14px;opacity:.9}
@@ -87,8 +74,7 @@
     .help{
       position:relative;display:inline-flex;align-items:center;justify-content:center;
       width:18px;height:18px;border-radius:50%;border:1px solid var(--accent);
-      color:var(--accent);font-size:12px;line-height:18px;cursor:pointer;user-select:none;
-      touch-action:manipulation;
+      color:var(--accent);font-size:12px;line-height:18px;cursor:pointer;user-select:none;touch-action:manipulation;
     }
     .help .tip{
       position:absolute;bottom:calc(100% + 10px);left:0;
@@ -326,26 +312,47 @@
     const STORAGE_KEY="playerEditorResults", THEME_KEY="playerEditorTheme";
     const YEAR_MIN=1900, YEAR_MAX=2025;
 
-    const clubs=[
-      {name:"Barcelona",logo:"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg"},
-      {name:"Real Madrid",logo:"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg"},
-      {name:"Manchester United",logo:"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"},
-      {name:"Liverpool",logo:"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg"}
-    ];
-
     const root=document.documentElement;
+    const $=id=>document.getElementById(id);
+
+    /* ---------------- Theme ---------------- */
     function applyTheme(t){root.setAttribute("data-theme",t);localStorage.setItem(THEME_KEY,t)}
     function initTheme(){applyTheme(localStorage.getItem(THEME_KEY)||"dark")}
+    document.addEventListener("click",e=>{
+      if(e.target.id==="themeToggle" || e.target.closest("#themeToggle")){
+        applyTheme(root.getAttribute("data-theme")==="light"?"dark":"light");
+      }
+    });
 
-    const $=id=>document.getElementById(id);
-    const resultsEl=$("results"), addBtn=$("addBtn");
-    const undoBtn=$("undoBtn"), redoBtn=$("redoBtn");
+    /* ------------- Clubs via JSON ---------- */
+    let clubs = [];
+    async function loadClubs(){
+      try{
+        const res = await fetch('./clubs.json?ts='+Date.now(), {cache:'no-store'});
+        if(!res.ok) throw new Error(res.status+' '+res.statusText);
+        clubs = await res.json();
+      }catch(e){
+        console.error('clubs.json failed, fallback used', e);
+        clubs = [
+          { common: "Barcelona",      official: "FC Barcelona",      logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg", aliases:["Barca"] },
+          { common: "Real Madrid",    official: "Real Madrid CF",    logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg", aliases:[] }
+        ];
+      }
+    }
 
+    /* ------------- Utilities --------------- */
     function capWords(s){return String(s||"").trim().replace(/\b([a-zA-Z])/g,(m,p)=>p.toUpperCase())}
     function clamp01(n){return Math.max(0,Math.min(100,n))}
     function convertTo200Scale(v){if(v===""||isNaN(+v))return"";const n=clamp01(+v);return Math.round((n/100)*200)}
     const checkSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
     function status(msg){const el=$("copyStatus");el.innerHTML=checkSVG+`<span>${msg}</span>`;el.classList.add("show");clearTimeout(status._t);status._t=setTimeout(()=>{el.classList.remove("show");el.innerHTML=""},2600)}
+
+    /* ------------- Results store ----------- */
+    const resultsEl=$("results"), addBtn=$("addBtn");
+    function getAllLines(){return Array.from(resultsEl.querySelectorAll(".res-text")).map(el=>el.textContent)}
+    function saveResults(){localStorage.setItem(STORAGE_KEY,JSON.stringify(getAllLines()))}
+    function renderFromLines(lines){resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());lines.forEach(t=>{if(t&&String(t).trim()!=="")resultsEl.appendChild(makeLineEl(t))});updateEmptyState()}
+    function loadResults(){const raw=localStorage.getItem(STORAGE_KEY);if(!raw){updateEmptyState();return}let lines=[];try{const p=JSON.parse(raw);lines=Array.isArray(p)?p:String(raw).split(/\n/)}catch{lines=String(raw).split(/\n/)}renderFromLines(lines)}
 
     function updateEmptyState(){const has=!!resultsEl.querySelector(".res-line");resultsEl.classList.toggle("empty",!has);addBtn.classList.toggle("cta",!has)}
 
@@ -375,20 +382,6 @@
       return line;
     }
 
-    function getAllLines(){return Array.from(resultsEl.querySelectorAll(".res-text")).map(el=>el.textContent)}
-    function saveResults(){localStorage.setItem(STORAGE_KEY,JSON.stringify(getAllLines()))}
-    function renderFromLines(lines){resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());lines.forEach(t=>{if(t&&String(t).trim()!=="")resultsEl.appendChild(makeLineEl(t))});updateEmptyState()}
-    function loadResults(){const raw=localStorage.getItem(STORAGE_KEY);if(!raw){updateEmptyState();return}let lines=[];try{const p=JSON.parse(raw);lines=Array.isArray(p)?p:String(raw).split(/\n/)}catch{lines=String(raw).split(/\n/)}renderFromLines(lines)}
-
-    function buildResult(){
-      const v=id=>($(id)?.value||"").trim();
-      const first=capWords(v("firstName")), last=capWords(v("lastName")), curr=capWords(v("currentClub"));
-      if(!first||!last||!curr) return "";
-      const newFirst=capWords(v("newFirstName")), newLast=capWords(v("newLastName")), shortName=capWords(v("newShortName"));
-      const year=v("yearOfBirth"), ca=convertTo200Scale(v("ca")), pa=convertTo200Scale(v("pa")), newClub=capWords(v("newClub"));
-      return `"PLAYER" "${first}" "${last}" "${curr}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
-    }
-
     /* -------- Required & year -------- */
     const requiredInputs=["firstName","lastName","currentClub"];
     function markReqFor(el){const f=el.closest(".field");if(!f) return;f.classList.add("req","shake");setTimeout(()=>f.classList.remove("shake"),260)}
@@ -412,52 +405,154 @@
       const combo=$(comboId), input=$(inputId), logo=$(logoId), panel=combo.querySelector(".combo-panel");
       let visible=[], activeIndex=-1;
       const open=()=>combo.classList.add("open"), close=()=>{combo.classList.remove("open");activeIndex=-1}, isOpen=()=>combo.classList.contains("open");
-      function filter(q){const s=(q||"").toLowerCase().trim();return (s?clubs.filter(c=>c.name.toLowerCase().includes(s)):clubs).slice(0,100)}
-      function render(list){panel.innerHTML="";visible=list;if(!list.length){const d=document.createElement("div");d.className="combo-item";d.style.opacity=".7";d.textContent="No matches";panel.appendChild(d);return}
-        list.forEach((club,idx)=>{const it=document.createElement("div");it.className="combo-item";it.dataset.index=idx;
-          const img=document.createElement("img");if(club.logo){img.src=club.logo;img.alt=club.name;img.onerror=()=>img.style.display="none"}else img.style.display="none";
-          const span=document.createElement("span");span.textContent=club.name;it.append(img,span);it.addEventListener("mousedown",e=>{e.preventDefault();select(idx)});panel.appendChild(it)})}
-      function select(idx){const c=visible[idx];if(!c) return;input.value=c.name;if(c.logo){logo.src=c.logo;combo.classList.add("has-logo");logo.style.display="block";logo.onerror=()=>{combo.classList.remove("has-logo");logo.style.display="none"}}else{combo.classList.remove("has-logo");logo.style.display="none"}close();clearReqFor(input)}
-      function moveActive(d){if(!isOpen())open();const items=panel.querySelectorAll(".combo-item");if(!items.length)return;activeIndex=(activeIndex+d+items.length)%items.length;items.forEach(el=>el.classList.remove("active"));const a=items[activeIndex];a.classList.add("active");const pr=panel.getBoundingClientRect(),ir=a.getBoundingClientRect();if(ir.top<pr.top)panel.scrollTop-=(pr.top-ir.top);if(ir.bottom>pr.bottom)panel.scrollTop+=(ir.bottom-pr.bottom)}
-      input.addEventListener("focus",()=>{render(filter(input.value));open()});
-      input.addEventListener("input",()=>{if(input.value.trim()===""){combo.classList.remove("has-logo");logo.style.display="none"}render(filter(input.value));open();clearReqFor(input)});
-      input.addEventListener("keydown",e=>{if(!isOpen()&&(e.key==="ArrowDown"||e.key==="ArrowUp")){render(filter(input.value));open()}
-        if(e.key==="ArrowDown"){e.preventDefault();moveActive(1)}else if(e.key==="ArrowUp"){e.preventDefault();moveActive(-1)}else if(e.key==="Enter"){if(isOpen()){e.preventDefault();if(activeIndex>=0)select(activeIndex);else if(visible.length)select(0)}}else if(e.key==="Escape"){close()}});
-      document.addEventListener("click",e=>{if(!combo.contains(e.target))close()});
+
+      function filter(q){
+        const s=(q||'').toLowerCase().trim();
+        const list = s ? clubs.filter(c=>{
+          const bag=[c.common,c.official,...(c.aliases||[])].filter(Boolean).map(v=>v.toLowerCase());
+          return bag.some(v=>v.includes(s));
+        }) : clubs;
+        return list.slice(0,100);
+      }
+
+      function render(list){
+        panel.innerHTML=""; visible=list;
+        if(!list.length){
+          const d=document.createElement("div"); d.className="combo-item"; d.style.opacity=".7"; d.textContent="No matches";
+          panel.appendChild(d); return;
+        }
+        list.forEach((club,idx)=>{
+          const it=document.createElement("div"); it.className="combo-item"; it.dataset.index=idx;
+          const img=document.createElement("img");
+          if(club.logo){img.src=club.logo; img.alt=club.common||club.official; img.onerror=()=>img.style.display="none";}
+          else img.style.display="none";
+          const span=document.createElement("span"); span.textContent=club.common||club.official;
+          it.append(img,span);
+          it.addEventListener("mousedown",e=>{e.preventDefault();select(idx)});
+          panel.appendChild(it);
+        });
+      }
+
+      function select(idx){
+        const c=visible[idx]; if(!c) return;
+        input.value = c.common || c.official;        // show COMMON
+        combo.dataset.official = c.official || input.value;  // remember OFFICIAL
+        combo.dataset.common   = c.common   || input.value;
+        combo.dataset.logo     = c.logo     || "";
+        if(c.logo){
+          logo.src=c.logo; combo.classList.add("has-logo"); logo.style.display="block";
+          logo.onerror=()=>{combo.classList.remove("has-logo"); logo.style.display="none";}
+        } else { combo.classList.remove("has-logo"); logo.style.display="none"; }
+        close(); clearReqFor(input);
+      }
+
+      function moveActive(d){
+        if(!isOpen()) open();
+        const items=panel.querySelectorAll(".combo-item"); if(!items.length) return;
+        activeIndex=(activeIndex+d+items.length)%items.length;
+        items.forEach(el=>el.classList.remove("active")); const a=items[activeIndex]; a.classList.add("active");
+        const pr=panel.getBoundingClientRect(), ir=a.getBoundingClientRect();
+        if(ir.top<pr.top)panel.scrollTop-=(pr.top-ir.top);
+        if(ir.bottom>pr.bottom)panel.scrollTop+=(ir.bottom-pr.bottom);
+      }
+
+      input.addEventListener("focus",()=>{render(filter(input.value)); open()});
+      input.addEventListener("input",()=>{
+        combo.dataset.official=""; combo.dataset.common=""; combo.dataset.logo="";
+        if(input.value.trim()===""){combo.classList.remove("has-logo"); logo.style.display="none";}
+        render(filter(input.value)); open(); clearReqFor(input);
+      });
+      input.addEventListener("keydown",e=>{
+        if(!isOpen()&&(e.key==="ArrowDown"||e.key==="ArrowUp")){render(filter(input.value)); open();}
+        if(e.key==="ArrowDown"){e.preventDefault(); moveActive(1)}
+        else if(e.key==="ArrowUp"){e.preventDefault(); moveActive(-1)}
+        else if(e.key==="Enter"){ if(isOpen()){ e.preventDefault(); if(activeIndex>=0)select(activeIndex); else if(visible.length)select(0); } }
+        else if(e.key==="Escape"){ close(); }
+      });
+      document.addEventListener("click",e=>{ if(!combo.contains(e.target)) close(); });
     }
 
     /* -------- Undo / Redo -------- */
     let historyStack=[], redoStack=[];
     function snapshot(){return getAllLines()}
     function beginHistory(){historyStack.push(snapshot());if(historyStack.length>80)historyStack.shift();redoStack=[];updateUndoRedoButtons()}
-    function updateUndoRedoButtons(){undoBtn.disabled=historyStack.length===0;redoBtn.disabled=redoStack.length===0}
-    function undo(){if(!historyStack.length)return;const cur=snapshot(), prev=historyStack.pop();redoStack.push(cur);renderFromLines(prev);saveResults();updateUndoRedoButtons();status("Undo")}
-    function redo(){if(!redoStack.length)return;const cur=snapshot(), next=redoStack.pop();historyStack.push(cur);renderFromLines(next);saveResults();updateUndoRedoButtons();status("Redo")}
-    undoBtn.addEventListener("click",undo); redoBtn.addEventListener("click",redo);
+    function updateUndoRedoButtons(){ $("undoBtn").disabled=historyStack.length===0; $("redoBtn").disabled=redoStack.length===0 }
+    function undo(){ if(!historyStack.length)return; const cur=snapshot(), prev=historyStack.pop(); redoStack.push(cur); renderFromLines(prev); saveResults(); updateUndoRedoButtons(); status("Undo") }
+    function redo(){ if(!redoStack.length)return; const cur=snapshot(), next=redoStack.pop(); historyStack.push(cur); renderFromLines(next); saveResults(); updateUndoRedoButtons(); status("Redo") }
+    $("undoBtn").addEventListener("click",undo); $("redoBtn").addEventListener("click",redo);
+
+    /* -------- Build result line -------- */
+    function buildResult(){
+      const v=id=>($(id)?.value||"").trim();
+      const first=capWords(v("firstName"));
+      const last =capWords(v("lastName"));
+
+      const currCombo = document.getElementById("comboCurrent");
+      const newCombo  = document.getElementById("comboNew");
+      const currOfficial = currCombo?.dataset.official;
+      const newOfficial  = newCombo?.dataset.official;
+
+      const curr = capWords(currOfficial || v("currentClub"));
+      const next = capWords(newOfficial  || v("newClub"));
+
+      if(!first||!last||!curr) return "";
+
+      const newFirst  = capWords(v("newFirstName"));
+      const newLast   = capWords(v("newLastName"));
+      const shortName = capWords(v("newShortName"));
+      const year      = v("yearOfBirth");
+      const ca        = convertTo200Scale(v("ca"));
+      const pa        = convertTo200Scale(v("pa"));
+
+      return `"PLAYER" "${first}" "${last}" "${curr}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${next}"`;
+    }
 
     /* -------- Actions -------- */
     function addResult(){
       if(!validateRequired(true)) return;
-      if(!isYearValidOrEmpty()){ $("yearOfBirth").classList.add("error"); $("yearWarn").style.display="block"; alert("Year must be a 4-digit number between 1900 and 2025 (or empty)."); return; }
+      if(!isYearValidOrEmpty()){
+        $("yearOfBirth").classList.add("error"); $("yearWarn").style.display="block";
+        alert("Year must be a 4-digit number between 1900 and 2025 (or empty)."); return;
+      }
       const line=buildResult(); if(!line) return;
       beginHistory();
       resultsEl.appendChild(makeLineEl(line));
       resultsEl.scrollTop=resultsEl.scrollHeight;
       saveResults(); updateEmptyState(); updateUndoRedoButtons();
 
+      // clear inputs
       ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"].forEach(id=>{const el=$(id);if(el)el.value=""});
-      ["caSlider","paSlider"].forEach(id=>{const s=$(id);if(s){s.value=0;setRangeFill(s)}}); ["comboCurrent","comboNew"].forEach(id=>{const c=$(id);if(c){c.classList.remove("has-logo");const img=c.querySelector(".combo-logo");if(img)img.style.display="none"}});
+      ["caSlider","paSlider"].forEach(id=>{const s=$(id);if(s){s.value=0;setRangeFill(s)}});
+
+      // clear logos + stored official/common
+      ["comboCurrent","comboNew"].forEach(id=>{
+        const c=$(id); if(!c) return;
+        c.classList.remove("has-logo");
+        c.dataset.official=""; c.dataset.common=""; c.dataset.logo="";
+        const img=c.querySelector(".combo-logo"); if(img) img.style.display="none";
+      });
+
       $("yearWarn").style.display="none"; $("yearOfBirth").classList.remove("error");
       $("caOut").textContent="→ 0–200: —"; $("paOut").textContent="→ 0–200: —";
     }
-    function copyResults(){const text=getAllLines().join("\n").trim();if(!text)return;copyToClipboard(text).then(()=>status("Copied all results")).catch(err=>alert("Copy failed: "+err))}
-    function clearResults(){if(!resultsEl.querySelector(".res-line"))return;beginHistory();resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());saveResults();updateEmptyState();updateUndoRedoButtons();status("Cleared")}
 
-    /* -------- Helper tooltips: robust single-tap -------- */
+    function copyResults(){
+      const text=getAllLines().join("\n").trim();
+      if(!text) return;
+      copyToClipboard(text).then(()=>status("Copied all results")).catch(err=>alert("Copy failed: "+err));
+    }
+
+    function clearResults(){
+      if(!resultsEl.querySelector(".res-line")) return;
+      beginHistory();
+      resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());
+      saveResults(); updateEmptyState(); updateUndoRedoButtons(); status("Cleared");
+    }
+
+    /* -------- Helper tooltips: single-tap -------- */
     function initHelpTips(){
       const helps=[...document.querySelectorAll('.help')];
       const timers=new WeakMap();
-
       const open=(h,autohide=true)=>{
         h.classList.add('open'); h.setAttribute('aria-expanded','true');
         clearTimeout(timers.get(h));
@@ -472,7 +567,6 @@
         clearTimeout(timers.get(h)); timers.delete(h);
       };
       const closeAll=(except=null)=>{ helps.forEach(h=>{ if(h!==except) close(h); }); };
-
       helps.forEach(h=>{
         h.addEventListener('pointerdown', e=>{
           e.preventDefault(); e.stopPropagation();
@@ -485,28 +579,15 @@
           }
         });
       });
-
       document.addEventListener('pointerdown', e=>{
         if(!e.target.closest('.help')) closeAll();
       }, {passive:true});
     }
 
-    /* -------- Number + slider link -------- */
-    function setRangeFill(sl){const v=Math.max(0,Math.min(100,Number(sl.value)||0));sl.style.setProperty("--fill",v+"%")}
-    function bindNumberAndSlider(numId,sliderId,outId){
-      const num=$(numId), sl=$(sliderId), out=$(outId);
-      const upd=()=>{const c=convertTo200Scale(num.value);out.textContent="→ 0–200: "+(c===""?"—":c)}
-      const fromNum=()=>{if(num.value===""){sl.value=0;setRangeFill(sl);upd();return}let n=parseInt(num.value,10);if(isNaN(n))n=0;n=Math.max(0,Math.min(100,n));num.value=n;sl.value=n;setRangeFill(sl);upd()}
-      const fromSl =()=>{num.value=sl.value;setRangeFill(sl);upd()}
-      num.addEventListener("input",fromNum); sl.addEventListener("input",fromSl); setRangeFill(sl); upd();
-    }
-
     /* -------- Init -------- */
-    document.addEventListener("DOMContentLoaded",()=>{
+    document.addEventListener("DOMContentLoaded", async ()=>{
       initTheme();
-      $("themeToggle").addEventListener("click",()=>applyTheme(root.getAttribute("data-theme")==="light"?"dark":"light"));
-
-      loadResults();
+      await loadClubs();                        // ← load JSON first
       initCombo("comboCurrent","currentClub","logoCurrent");
       initCombo("comboNew","newClub","logoNew");
 
@@ -528,7 +609,7 @@
       });
 
       initHelpTips();
-      updateEmptyState(); updateUndoRedoButtons();
+      loadResults(); updateEmptyState(); updateUndoRedoButtons();
     });
   })();
   </script>
