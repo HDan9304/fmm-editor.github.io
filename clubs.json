@@ -1,0 +1,44 @@
+[
+{
+    "common": "Arsenal",
+    "official": "Arsenal",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
+    "aliases": ["Arsenal"]
+  },
+{
+    "common": "Aston Villa",
+    "official": "Aston Villa",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/9/9a/Aston_Villa_FC_new_crest.svg",
+    "aliases": ["Villa"]
+  },
+{
+    "common": "Bournemouth",
+    "official": "AFC Bournemouth",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg"
+  },
+{
+    "common": "Brentford",
+    "official": "Brentford",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/2/2a/Brentford_FC_crest.svg"
+  },
+{
+    "common": "Brighton & Hove Albion",
+    "official": "Brighton & Hove Albion",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/d/d0/Brighton_and_Hove_Albion_FC_crest.svg"
+  },
+{
+    "common": "Leeds",
+    "official": "Leeds United",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/5/54/Leeds_United_F.C._logo.svg"
+  },
+{
+    "common": "Man City",
+    "official": "Manchester City",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg"
+  },
+{
+    "common": "Man United",
+    "official": "Manchester UFC",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"
+  }
+]
