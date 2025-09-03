@@ -14,6 +14,7 @@
       --grad-start:#FF7AD9;
       --grad-end:#FF3D7F;
       --accent:#FF5AC8;
+      --error:#FF4D9A;
     }
 
     * { box-sizing: border-box; }
@@ -87,6 +88,14 @@
       background: #2b2c3f;
       box-shadow: 0 0 8px rgba(255, 90, 200, 0.55);
     }
+
+    /* Year warning styles */
+    .error {
+      border-color: var(--error) !important;
+      box-shadow: 0 0 8px rgba(255, 77, 154, 0.6) !important;
+    }
+    .hint { font-size:12px; color:#bdbdbd; margin-top:4px; }
+    .warn { color: var(--error); display:none; }
 
     .result-label {
       margin-top: 10px;
@@ -200,8 +209,6 @@
       background: #18192B;
       border: 1px solid #3a3b4f;
     }
-
-    .hint { font-size:12px; color:#bdbdbd; margin-top:4px; }
   </style>
 </head>
 <body>
@@ -246,9 +253,11 @@
     <div class="field"><label for="newLastName">New Last Name</label><input id="newLastName" type="text" autocomplete="off" /></div>
     <div class="field"><label for="newShortName">New Short Name</label><input id="newShortName" type="text" autocomplete="off" /></div>
 
+    <!-- Year with guardrails -->
     <div class="field">
       <label for="yearOfBirth">Year of Birth (4 digits)</label>
       <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" oninput="limitYear(this)" />
+      <div id="yearWarn" class="hint warn">Year should be between 1900 and 2025.</div>
     </div>
 
     <div class="field">
@@ -278,8 +287,9 @@
 
   <script>
     const STORAGE_KEY = "playerEditorResults";
+    const YEAR_MIN = 1900;
+    const YEAR_MAX = 2025;
 
-    /* Square fallback logo (data URI) using pink accent */
     const FALLBACK_LOGO =
       'data:image/svg+xml;utf8,' +
       encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
@@ -287,7 +297,6 @@
         <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
       </svg>`);
 
-    /* Clubs: mix local and web URLs */
     const clubs = [
       { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
       { name: "Real Madrid", logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" },
@@ -305,6 +314,25 @@
     function limitYear(el){
       // keep digits only and at most 4 chars
       el.value = el.value.replace(/\D+/g, '').slice(0, 4);
+
+      const warn = document.getElementById('yearWarn');
+      const val = el.value;
+      if (val && (val.length !== 4 || Number(val) < YEAR_MIN || Number(val) > YEAR_MAX)) {
+        el.classList.add('error');
+        warn.style.display = 'block';
+      } else {
+        el.classList.remove('error');
+        warn.style.display = 'none';
+      }
+    }
+
+    function isYearValidOrEmpty() {
+      const el = document.getElementById('yearOfBirth');
+      const val = (el.value || '').trim();
+      if (val === '') return true; // empty is allowed
+      if (val.length !== 4) return false;
+      const n = Number(val);
+      return !(isNaN(n) || n < YEAR_MIN || n > YEAR_MAX);
     }
 
     function validatePercent(el) {
@@ -343,6 +371,15 @@
     }
 
     function addResult() {
+      // Block add if year is filled but invalid
+      const yearEl = document.getElementById('yearOfBirth');
+      if (!isYearValidOrEmpty()) {
+        yearEl.classList.add('error');
+        document.getElementById('yearWarn').style.display = 'block';
+        alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).');
+        return;
+      }
+
       const resultsEl = document.getElementById("results");
       const line = buildResult();
       if (line) {
@@ -400,6 +437,9 @@
       // Remove logo & padding state
       document.getElementById("comboCurrent").classList.remove("has-logo");
       document.getElementById("comboNew").classList.remove("has-logo");
+      // Hide year warning
+      document.getElementById('yearWarn').style.display = 'none';
+      document.getElementById('yearOfBirth').classList.remove('error');
     }
 
     /* ===== Searchable dropdown with square logo inside input ===== */
@@ -408,6 +448,8 @@
       const input = document.getElementById(inputId);
       const logo  = document.getElementById(logoId);
       const panel = combo.querySelector(".combo-panel");
+
+      const clubsList = [...clubs]; // local copy
 
       let visibleItems = [];
       let activeIndex = -1;
@@ -418,8 +460,8 @@
 
       function filter(q) {
         const query = (q || "").toLowerCase().trim();
-        if (!query) return clubs.slice(0, 50);
-        return clubs.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
+        if (!query) return clubsList.slice(0, 50);
+        return clubsList.filter(c => c.name.toLowerCase().includes(query)).slice(0, 100);
       }
 
       function render(list) {
@@ -520,6 +562,19 @@
       document.addEventListener("click", (e) => {
         if (!combo.contains(e.target)) close();
       });
+    }
+
+    function setCopyStatus(msg) {
+      document.getElementById("copyStatus").textContent = msg;
+    }
+
+    function saveResults() {
+      localStorage.setItem(STORAGE_KEY, document.getElementById("results").textContent);
+    }
+
+    function loadResults() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) document.getElementById("results").textContent = saved;
     }
 
     // Init combos + load saved results
