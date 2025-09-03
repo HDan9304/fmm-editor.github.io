@@ -103,51 +103,25 @@
     }
 
     /* THEME TOGGLE (animated pill) */
-    .theme-toggle {
-      border: 0;
-      background: transparent;
-      padding: 0;
-      cursor: pointer;
-    }
+    .theme-toggle { border: 0; background: transparent; padding: 0; cursor: pointer; }
     .toggle-track {
-      position: relative;
-      width: 56px;
-      height: 28px;
-      border-radius: 999px;
+      position: relative; width: 56px; height: 28px; border-radius: 999px;
       background: var(--toggle-track);
       box-shadow: 0 2px 8px var(--toggle-shadow) inset, 0 2px 6px var(--toggle-shadow);
-      padding: 2px;
-      display: inline-block;
+      padding: 2px; display: inline-block;
       transition: background .25s ease, box-shadow .25s ease, transform .25s ease;
     }
     .toggle-thumb {
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 24px; height: 24px;
-      border-radius: 999px;
-      background: var(--toggle-thumb);
-      box-shadow: 0 2px 6px rgba(0,0,0,.25);
+      position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 999px;
+      background: var(--toggle-thumb); box-shadow: 0 2px 6px rgba(0,0,0,.25);
       transition: transform .28s cubic-bezier(.2,.8,.2,1), background .25s ease;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
+      display: grid; place-items: center; overflow: hidden;
     }
-    /* icons in track */
-    .toggle-icon {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 14px; height: 14px;
-      opacity: .9;
-      color: #ffb84d; /* sun */
-    }
+    .toggle-icon { position: absolute; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; opacity: .9; }
     .toggle-icon.moon { right: 8px; color: #8ea0ff; }
-    .toggle-icon.sun { left: 8px; }
+    .toggle-icon.sun { left: 8px; color: #ffb84d; }
     .toggle-icon svg { width: 14px; height: 14px; display:block; }
-
-    /* Move thumb to right in light mode */
     [data-theme="light"] .toggle-thumb { transform: translateX(28px); }
-    /* fade icons a bit per mode */
     [data-theme="light"] .toggle-icon.sun  { opacity: 1; }
     [data-theme="light"] .toggle-icon.moon { opacity: .4; }
     [data-theme="dark"]  .toggle-icon.sun  { opacity: .4; }
@@ -175,69 +149,37 @@
     .field.req .combo input { border-color: var(--error); box-shadow: 0 0 10px rgba(255,77,154,0.55); }
     .req-msg { display:none; font-size:12px; color: var(--error); margin-top:6px; }
     .shake { animation: shake 240ms ease-in-out 0s 1; }
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-3px); }
-    }
+    @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 50%{transform:translateX(5px);} 75%{transform:translateX(-3px);} }
 
     .result-label { margin-top: 10px; margin-bottom: 6px; font-size: 15px; font-weight: 600; color: var(--accent); }
 
     /* Results */
     #results {
-      padding: 16px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--input-bg);
-      min-height: 160px;
-      max-height: 300px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      position: relative;
-      margin-bottom: 14px;
+      padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--input-bg);
+      min-height: 160px; max-height: 300px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 12px; position: relative; margin-bottom: 14px;
       transition: background .25s ease, border-color .25s ease;
     }
     #results.empty { justify-content: center; }
 
     .empty-state {
-      display: none;
-      border: 1px solid var(--border);
-      background: var(--empty-bg);
-      color: var(--muted);
-      border-radius: 16px;
-      height: 72px;
-      padding: 0 16px;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      display: none; border: 1px solid var(--border); background: var(--empty-bg); color: var(--muted);
+      border-radius: 16px; height: 72px; padding: 0 16px; align-items: center; justify-content: center; text-align: center;
     }
     #results.empty .empty-state { display: flex; }
 
     .res-line {
-      display: flex; align-items: flex-start; gap: 8px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: var(--input-bg);
-      outline: 1px solid var(--outline-soft);
+      display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border-radius: 14px;
+      background: var(--input-bg); outline: 1px solid var(--outline-soft);
     }
-    .res-text {
-      flex: 1 1 auto; min-height: 18px; line-height: 1.6;
-      font-family: 'Poppins', monospace; font-size: 14px; color: var(--text); outline: none;
-    }
+    .res-text { flex: 1 1 auto; min-height: 18px; line-height: 1.6; font-family: 'Poppins', monospace; font-size: 14px; color: var(--text); outline: none; }
     .res-text[contenteditable="true"]:focus {
       background: rgba(43,44,63,.12);
       box-shadow: inset 0 0 0 1px var(--accent), 0 0 8px rgba(255,90,200,0.35);
       border-radius: 8px; padding: 2px 4px;
     }
 
-    .icon-btn {
-      border: none; background: transparent; color: var(--icon);
-      padding: 6px 8px; border-radius: 8px; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center;
-    }
+    .icon-btn { border: none; background: transparent; color: var(--icon); padding: 6px 8px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
     .icon-btn:hover { background: rgba(255,90,200,0.1); }
     .icon-btn svg { width: 18px; height: 18px; display: block; }
 
@@ -246,29 +188,27 @@
       cursor: pointer; text-align: center; background: linear-gradient(90deg,var(--grad-start),var(--grad-end));
     }
     .btn:hover { filter: brightness(1.06); }
-
     .btn.cta { padding: 16px; font-size: 16px; border-radius: 16px; }
     .btn-secondary { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
     .btn-secondary:hover { background: rgba(255,90,200,0.08); }
-
     .full-width { width: 100%; margin: 6px 0 10px; display: block; }
-
     .actions-row { display: flex; gap: 10px; flex-wrap: wrap; }
     .actions-row .btn { flex: 1 1 0; }
-
     .copy-status { margin-top: 6px; font-size: 12px; color: #9ad29a; min-height: 16px; }
 
-    /* Combo (searchable dropdown with square logo inside input) */
+    /* Combo (searchable dropdown with *just* logo inside input) */
     .combo { position: relative; }
     .combo input { padding: 10px; }
     .combo.has-logo input { padding-left: 42px; }
+
+    /* CLEANER: no placeholder box — only the logo if present */
     .combo-logo {
       position: absolute; top: 50%; left: 10px; transform: translateY(-50%);
-      width: 20px; height: 20px; border-radius: 6px; object-fit: contain; background: var(--panel-bg); border: 1px solid var(--border);
-      pointer-events: none; display: none;
-      transition: background .25s ease, border-color .25s ease;
+      width: 22px; height: 22px; border-radius: 4px; object-fit: contain;
+      background: transparent; border: 0; box-shadow: none; display: none; pointer-events: none;
     }
     .combo.has-logo .combo-logo { display: block; }
+
     .combo-panel {
       position: absolute; left: 0; right: 0; top: calc(100% + 6px);
       background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px;
@@ -277,9 +217,11 @@
       transition: background .25s ease, border-color .25s ease;
     }
     .combo.open .combo-panel { display: block; }
-    .combo-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; color: var(--text); }
+    .combo-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-size: 16px; color: var(--text); }
     .combo-item:hover, .combo-item.active { background: rgba(43,44,63,.12); outline: 1px solid var(--accent); }
-    .combo-item img { width: 22px; height: 22px; border-radius: 6px; object-fit: contain; background: var(--panel-bg); border: 1px solid var(--border); }
+
+    /* CLEANER: dropdown logo — just the image, no bg/border */
+    .combo-item img { width: 28px; height: 28px; border-radius: 4px; object-fit: contain; background: transparent; border: 0; box-shadow: none; }
   </style>
 </head>
 <body>
@@ -290,7 +232,6 @@
       <!-- Theme toggle -->
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
         <span class="toggle-track">
-          <!-- Icons sit inside the track -->
           <span class="toggle-icon sun" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="4"></circle>
@@ -390,12 +331,8 @@
       const THEME_KEY = "playerEditorTheme";
       const YEAR_MIN = 1900, YEAR_MAX = 2025;
 
-      const FALLBACK_LOGO =
-        'data:image/svg+xml;utf8,' +
-        encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
-          <rect width="100%" height="100%" fill="#18192B"/>
-          <rect x="18" y="18" width="28" height="28" rx="6" ry="6" fill="#FF5AC8"/>
-        </svg>`);
+      /* Transparent 1x1 GIF for "no logo" — ensures no visible placeholder */
+      const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
       const clubs = [
         { name: "Barcelona", logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" },
@@ -412,12 +349,7 @@
       }
       function initTheme(){
         const saved = localStorage.getItem(THEME_KEY);
-        if (saved === 'light' || saved === 'dark') {
-          applyTheme(saved);
-        } else {
-          // default to dark (matches previous look)
-          applyTheme('dark');
-        }
+        applyTheme(saved === 'light' || saved === 'dark' ? saved : 'dark');
       }
 
       /* ===== Shortcuts & helpers ===== */
@@ -430,14 +362,12 @@
       function convertTo200Scale(v){ if(v===""||isNaN(+v))return ""; const n=clamp01(+v); return Math.round((n/100)*200); }
       function setCopyStatus(msg){ $('copyStatus').textContent = msg || ''; }
 
-      /* ===== Empty state & CTA sizing ===== */
       function updateEmptyState(){
         const hasLines = resultsEl.querySelector('.res-line') !== null;
         resultsEl.classList.toggle('empty', !hasLines);
         addBtn.classList.toggle('cta', !hasLines);
       }
 
-      /* ===== Minimal icons (inline SVG) ===== */
       function trashSVG(){
         return `
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -460,7 +390,6 @@
 </svg>`;
       }
 
-      /* Clipboard helper with fallback */
       function copyToClipboard(text){
         if (navigator.clipboard && navigator.clipboard.writeText) {
           return navigator.clipboard.writeText(text);
@@ -596,7 +525,7 @@
         let n = parseInt(el.value,10); if (isNaN(n)) { el.value=""; return; } el.value = clamp01(n);
       }
 
-      /* ===== Combo (searchable dropdown with logo) ===== */
+      /* ===== Combo (searchable dropdown with *just* logo) ===== */
       function initCombo(comboId, inputId, logoId) {
         const combo = $(comboId), input = $(inputId), logo = $(logoId), panel = combo.querySelector(".combo-panel");
         let visible = [], activeIndex = -1;
@@ -611,10 +540,16 @@
         }
         function render(list){
           panel.innerHTML = ""; visible = list;
-          if (!list.length){ const d=document.createElement("div"); d.className="combo-item"; d.style.opacity=".7"; d.textContent="No matches"; panel.appendChild(d); return; }
+          if (!list.length){
+            const d=document.createElement("div"); d.className="combo-item"; d.style.opacity=".7"; d.textContent="No matches"; panel.appendChild(d); return;
+          }
           list.forEach((club, idx) => {
             const item = document.createElement("div"); item.className="combo-item"; item.dataset.index=idx;
-            const img = document.createElement("img"); img.src = club.logo || FALLBACK_LOGO; img.alt = club.name; img.onerror=()=>{img.src=FALLBACK_LOGO;};
+            const img = document.createElement("img");
+            if (club.logo) { img.src = club.logo; }
+            else { img.style.display = 'none'; } // no placeholder
+            img.alt = club.name;
+            img.onerror = () => { img.style.display = 'none'; };
             const span = document.createElement("span"); span.textContent = club.name;
             item.append(img, span);
             item.addEventListener("mousedown",(e)=>{ e.preventDefault(); select(idx); });
@@ -623,22 +558,36 @@
         }
         function select(idx){
           const club = visible[idx]; if (!club) return;
-          input.value = club.name; logo.src = club.logo || FALLBACK_LOGO; logo.onerror=()=>{logo.src=FALLBACK_LOGO;};
-          combo.classList.add("has-logo"); close();
+          input.value = club.name;
+          if (club.logo) {
+            logo.src = club.logo;
+            logo.style.display = 'block';
+            combo.classList.add("has-logo");
+            logo.onerror = () => { combo.classList.remove("has-logo"); logo.style.display='none'; };
+          } else {
+            combo.classList.remove("has-logo");
+            logo.style.display = 'none';
+            logo.src = TRANSPARENT_PIXEL;
+          }
+          close();
           clearReqFor(input);
         }
         function moveActive(delta){
           if (!isOpen()) open();
           const items = panel.querySelectorAll(".combo-item"); if (!items.length) return;
           activeIndex = (activeIndex + delta + items.length) % items.length;
-          items.forEach(el => el.classList.remove("active")); const a=items[activeIndex]; a.classList.add("active");
+          items.forEach(el => el.classList.remove("active"));
+          const a=items[activeIndex]; a.classList.add("active");
           const pr = panel.getBoundingClientRect(), ir = a.getBoundingClientRect();
           if (ir.top < pr.top) panel.scrollTop -= (pr.top - ir.top);
           if (ir.bottom > pr.bottom) panel.scrollTop += (ir.bottom - pr.bottom);
         }
 
         input.addEventListener("focus", () => { render(filter(input.value)); open(); });
-        input.addEventListener("input", () => { if (input.value.trim()==="") combo.classList.remove("has-logo"); render(filter(input.value)); open(); clearReqFor(input); });
+        input.addEventListener("input", () => {
+          if (input.value.trim()==="") { combo.classList.remove("has-logo"); logo.style.display='none'; }
+          render(filter(input.value)); open(); clearReqFor(input);
+        });
         input.addEventListener("keydown", (e) => {
           if (!isOpen() && (e.key==="ArrowDown"||e.key==="ArrowUp")) { render(filter(input.value)); open(); }
           switch (e.key) {
@@ -657,31 +606,20 @@
         { id: 'lastName',  field: 'field-last',  msg: 'msg-last' },
         { id: 'currentClub', field: 'field-current', msg: 'msg-current' }
       ];
-
       function markReqFor(inputEl){
-        const fieldEl = inputEl.closest('.field');
-        if (!fieldEl) return;
-        fieldEl.classList.add('req', 'shake');
-        setTimeout(() => fieldEl.classList.remove('shake'), 260);
+        const fieldEl = inputEl.closest('.field'); if (!fieldEl) return;
+        fieldEl.classList.add('req', 'shake'); setTimeout(() => fieldEl.classList.remove('shake'), 260);
       }
       function clearReqFor(inputEl){
-        const fieldEl = inputEl.closest('.field');
-        if (!fieldEl) return;
+        const fieldEl = inputEl.closest('.field'); if (!fieldEl) return;
         fieldEl.classList.remove('req');
       }
-
       function validateRequired(showFeedback = false){
         const missing = [];
-        requiredInputs.forEach(({id}) => {
-          const el = $(id);
-          if (!el || !el.value.trim()) missing.push(el);
-        });
-
+        requiredInputs.forEach(({id}) => { const el = $(id); if (!el || !el.value.trim()) missing.push(el); });
         if (showFeedback && missing.length) {
           missing.forEach(el => markReqFor(el));
-          const first = missing[0];
-          first.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          setTimeout(() => first.focus(), 220);
+          const first = missing[0]; first.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => first.focus(), 220);
         }
         return missing.length === 0;
       }
@@ -689,14 +627,12 @@
       /* ===== Actions ===== */
       function addResult(){
         if (!validateRequired(true)) return;
-
         if (!isYearValidOrEmpty()) {
           $('yearOfBirth').classList.add('error'); $('yearWarn').style.display='block';
           alert('Year must be a 4-digit number between 1900 and 2025 (or leave it empty).');
           return;
         }
-        const line = buildResult();
-        if (!line) return;
+        const line = buildResult(); if (!line) return;
         appendResultLine(line);
         clearAllInputs();
       }
@@ -727,9 +663,7 @@
 
         // Clear req highlighting as user types
         ['firstName','lastName','currentClub'].forEach(id => {
-          $(id).addEventListener('input', (e) => {
-            if (e.target.value.trim()) clearReqFor(e.target);
-          });
+          $(id).addEventListener('input', (e) => { if (e.target.value.trim()) clearReqFor(e.target); });
         });
 
         // Buttons
