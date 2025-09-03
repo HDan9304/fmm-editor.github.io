@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Player Editor</title>
+  <title>Player Data Input</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Poppins font -->
@@ -111,8 +111,11 @@
 
     /* Inputs */
     .field { margin-bottom:10px; }
-    .field label { display:block; margin-bottom:6px; font-weight:500; color:var(--text); font-size:14px; opacity:.9; }
-    .field label .required { color:var(--accent); font-weight:700; }
+    .field-label {
+      display:flex; align-items:center; gap:8px;
+      margin-bottom:6px; font-weight:500; color:var(--text); font-size:14px; opacity:.9;
+    }
+    .field .required { color:var(--accent); font-weight:700; }
 
     .field input {
       width:100%; padding:10px; border:1px solid var(--border); border-radius:12px;
@@ -123,13 +126,51 @@
     .field input:focus { border-color:var(--accent); background:rgba(43,44,63,.12); box-shadow:0 0 8px var(--focus-glow); }
 
     .error { border-color:var(--error)!important; box-shadow:0 0 8px rgba(255,77,154,0.6)!important; }
-    .hint { font-size:12px; color:var(--muted); margin-top:4px; }
-    .warn { color:var(--error); display:none; }
+
+    /* Compact help bubble */
+    .help {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 12px; line-height: 18px;
+      cursor: pointer; user-select: none;
+      transition: background .2s, color .2s, transform .1s;
+    }
+    .help:active { transform: scale(0.96); }
+    .help .tip {
+      position: absolute;
+      left: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width: 220px;
+      max-width: 320px;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      line-height: 1.35;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      display: none;
+      z-index: 1000;
+    }
+    .help .tip::before{
+      content:"";
+      position:absolute; left:-6px; top:50%; transform:translateY(-50%);
+      width:0; height:0; border-top:6px solid transparent; border-bottom:6px solid transparent; border-right:6px solid var(--border);
+    }
+    .help.open .tip,
+    .help:hover .tip,
+    .help:focus-within .tip { display:block; }
 
     /* Required-field feedback */
     .field.req .req-msg { display:block; }
-    .field.req input,
-    .field.req .combo input { border-color:var(--error); box-shadow:0 0 10px rgba(255,77,154,0.55); }
     .req-msg { display:none; font-size:12px; color:var(--error); margin-top:6px; }
     .shake { animation: shake 240ms ease-in-out 0s 1; }
     @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 50%{transform:translateX(5px);} 75%{transform:translateX(-3px);} }
@@ -168,13 +209,13 @@
     .actions-row .btn { flex:1 1 0; }
     .copy-status { margin-top:6px; font-size:12px; color:#9ad29a; min-height:16px; }
 
-    /* Combo (searchable dropdown with just logo) */
+    /* Combo (dropdown with square logo) */
     .combo { position:relative; }
     .combo input { padding:10px; }
-    .combo.has-logo input { padding-left:42px; }
+    .combo.has-logo input { padding-left:36px; }        /* reduced left padding */
     .combo-logo {
       position:absolute; top:50%; left:10px; transform:translateY(-50%);
-      width:22px; height:22px; border-radius:4px; object-fit:contain; background:transparent; border:0; box-shadow:none; display:none; pointer-events:none;
+      width:18px; height:18px; border-radius:4px; object-fit:contain; background:transparent; border:0; box-shadow:none; display:none; pointer-events:none;
     }
     .combo.has-logo .combo-logo { display:block; }
     .combo-panel {
@@ -185,7 +226,7 @@
     .combo.open .combo-panel { display:block; }
     .combo-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:16px; color:var(--text); }
     .combo-item:hover, .combo-item.active { background:rgba(43,44,63,.12); outline:1px solid var(--accent); }
-    .combo-item img { width:28px; height:28px; border-radius:4px; object-fit:contain; background:transparent; border:0; box-shadow:none; }
+    .combo-item img { width:22px; height:22px; border-radius:4px; object-fit:contain; background:transparent; border:0; box-shadow:none; }  /* reduced size */
 
     /* Desktop layout: two columns, sticky results */
     @media (min-width: 960px) {
@@ -226,75 +267,109 @@
     <div class="content-grid">
       <section class="form-col">
         <div class="field" id="field-first">
-          <label for="firstName">First Name <span class="required">*</span></label>
+          <div class="field-label">
+            <label for="firstName">First Name <span class="required">*</span></label>
+          </div>
           <input id="firstName" type="text" autocomplete="off" />
           <div class="req-msg" id="msg-first">This field is required.</div>
         </div>
 
         <div class="field" id="field-last">
-          <label for="lastName">Last Name <span class="required">*</span></label>
+          <div class="field-label">
+            <label for="lastName">Last Name <span class="required">*</span></label>
+          </div>
           <input id="lastName" type="text" autocomplete="off" />
           <div class="req-msg" id="msg-last">This field is required.</div>
         </div>
 
         <div class="field" id="field-current">
-          <label for="currentClub">Current Club <span class="required">*</span></label>
+          <div class="field-label">
+            <label for="currentClub">Current Club <span class="required">*</span></label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">
+              i
+              <span class="tip">Contracted club only. Use full official name (e.g., “Manchester United”). If unattached, enter “free”.</span>
+            </span>
+          </div>
           <div class="combo" id="comboCurrent">
             <img id="logoCurrent" class="combo-logo" alt="">
             <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
             <div class="combo-panel"></div>
           </div>
-          <!-- concise helper -->
-          <div class="hint">
-            Contracted club only; use full official name (e.g., “Manchester United”). If unattached, enter “free”.
-            • Type to search, ↑/↓ move, Enter select.
-          </div>
           <div class="req-msg" id="msg-current">This field is required.</div>
         </div>
 
         <div class="field">
-          <label for="newClub">New Club</label>
+          <div class="field-label">
+            <label for="newClub">New Club</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">
+              i
+              <span class="tip">Use the full official name. Type to search, use ↑/↓ to move, Enter to select.</span>
+            </span>
+          </div>
           <div class="combo" id="comboNew">
             <img id="logoNew" class="combo-logo" alt="">
             <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" />
             <div class="combo-panel"></div>
           </div>
-          <div class="hint">Use full official name. • Type to search, ↑/↓ move, Enter select.</div>
         </div>
 
         <div class="field">
-          <label for="newFirstName">New First Name</label>
+          <div class="field-label">
+            <label for="newFirstName">New First Name</label>
+          </div>
           <input id="newFirstName" type="text" autocomplete="off" />
         </div>
 
         <div class="field">
-          <label for="newLastName">New Last Name</label>
+          <div class="field-label">
+            <label for="newLastName">New Last Name</label>
+          </div>
           <input id="newLastName" type="text" autocomplete="off" />
         </div>
 
         <div class="field">
-          <label for="newShortName">New Short Name</label>
+          <div class="field-label">
+            <label for="newShortName">New Short Name</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">
+              i
+              <span class="tip">Common/short name (e.g., Neymar/Willian). You can add one; you can’t remove an existing one in-game.</span>
+            </span>
+          </div>
           <input id="newShortName" type="text" autocomplete="off" />
-          <div class="hint">Common/short name (e.g., Neymar). You can add one; you can’t remove an existing one in-game.</div>
         </div>
 
         <div class="field">
-          <label for="yearOfBirth">Year of Birth (4 digits)</label>
+          <div class="field-label">
+            <label for="yearOfBirth">Year of Birth (4 digits)</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">
+              i
+              <span class="tip">Must be 4 digits. Player must be at least 16 at game start.</span>
+            </span>
+          </div>
           <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" />
-          <div class="hint">Must be 4 digits; player must be 16+ at game start.</div>
-          <div id="yearWarn" class="hint warn">Year should be between 1900 and 2025.</div>
+          <div id="yearWarn" class="req-msg">Year should be between 1900 and 2025.</div>
         </div>
 
         <div class="field">
-          <label for="ca">CA (0–100)</label>
+          <div class="field-label">
+            <label for="ca">CA (0–100)</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">
+              i
+              <span class="tip">Current Ability. Enter 0–100 here; we convert to 0–200 (max 200).</span>
+            </span>
+          </div>
           <input id="ca" type="number" min="0" max="100" inputmode="numeric" />
-          <div class="hint">Current Ability. Enter 0–100 here; we convert to 0–200 (max 200).</div>
         </div>
 
         <div class="field">
-          <label for="pa">PA (0–100)</label>
+          <div class="field-label">
+            <label for="pa">PA (0–100)</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">
+              i
+              <span class="tip">Potential Ability (past or future). Enter 0–100 here; we convert to 0–200 (max 200).</span>
+            </span>
+          </div>
           <input id="pa" type="number" min="0" max="100" inputmode="numeric" />
-          <div class="hint">Potential Ability. Enter 0–100 here; we convert to 0–200 (max 200).</div>
         </div>
       </section>
 
@@ -361,7 +436,7 @@
         });
       }
 
-      /* Results */
+      /* Results rendering */
       function makeLineEl(text){
         const line = document.createElement('div'); line.className = 'res-line';
         const span = document.createElement('span'); span.className='res-text'; span.contentEditable='true'; span.textContent=text;
@@ -423,7 +498,7 @@
       }
       function clampPercent(el){ if (el.value === "") return; let n=parseInt(el.value,10); if(isNaN(n)){el.value=""; return;} el.value=Math.max(0, Math.min(100, n)); }
 
-      /* Combo (searchable dropdown with just logo) */
+      /* Combo (searchable dropdown) */
       function initCombo(comboId, inputId, logoId) {
         const combo = $(comboId), input = $(inputId), logo = $(logoId), panel = combo.querySelector(".combo-panel");
         let visible = [], activeIndex = -1;
@@ -485,6 +560,23 @@
         document.addEventListener("click", (e) => { if (!combo.contains(e.target)) close(); });
       }
 
+      /* Help bubble behavior (tap/click to toggle) */
+      function initHelpBubbles(){
+        const helps = document.querySelectorAll('.help');
+        helps.forEach(h => {
+          h.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = h.classList.toggle('open');
+            h.setAttribute('aria-expanded', open ? 'true' : 'false');
+          });
+        });
+        document.addEventListener('click', () => {
+          document.querySelectorAll('.help.open').forEach(h => {
+            h.classList.remove('open'); h.setAttribute('aria-expanded','false');
+          });
+        });
+      }
+
       /* Actions */
       function addResult(){
         if (!validateRequired(true)) return;
@@ -509,6 +601,7 @@
         loadResults();
         initCombo("comboCurrent", "currentClub", "logoCurrent");
         initCombo("comboNew",     "newClub",     "logoNew");
+        initHelpBubbles();
 
         $('yearOfBirth').addEventListener('input', e => limitYear(e.target));
         $('ca').addEventListener('input', e => clampPercent(e.target));
