@@ -11,16 +11,17 @@
       --text:#f5f5f5; --muted:#bdbdbd;
       --grad-start:#FF7AD9; --grad-end:#FF3D7F; --accent:#FF5AC8; --error:#FF4D9A; --icon:#ff9bd9;
       --outline-soft:rgba(255,90,200,.16); --focus-glow:rgba(255,90,200,.55); --empty-bg:#202233;
-      --toggle-track:#202233; --toggle-thumb:#fff; --toggle-shadow:rgba(0,0,0,.35);
+      --toggle-track:#202233; --toggle-thumb:#fff; --toggle-shadow:rgba(0,0,0,.25);
       --success:#76d39b; --success-bg:rgba(118,211,155,.12); --success-border:rgba(118,211,155,.65);
     }
     [data-theme="light"]{
       --bg:#E5E6FA; --bg-pattern:rgba(26,27,46,.08); --panel-bg:#fff; --input-bg:#F4F5FF; --border:#cfd1f4;
       --text:#1a1b2e; --muted:#585b8a;
       --outline-soft:rgba(255,90,200,.22); --focus-glow:rgba(255,90,200,.45); --empty-bg:#F1F2FF;
-      --toggle-track:#e7e8ff; --toggle-thumb:#fff; --toggle-shadow:rgba(50,50,93,.2);
+      --toggle-track:#e7e8ff; --toggle-thumb:#fff; --toggle-shadow:rgba(50,50,93,.15);
       --success:#25b36a; --success-bg:rgba(37,179,106,.1); --success-border:rgba(37,179,106,.55);
     }
+
     *{box-sizing:border-box}
     body{
       font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -38,26 +39,39 @@
       box-shadow:0 4px 12px rgba(0,0,0,.4); display:flex; flex-direction:column; gap:8px;
     }
 
-    /* Header + Theme toggle (fixed & clipped) */
-    .header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 6px 8px}
+    /* Header + Theme toggle (re-centered & clipped) */
+    .header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px 8px}
     h2{margin:0;font-size:22px;font-weight:600}
     .theme-toggle{border:0;background:transparent;padding:0;cursor:pointer;line-height:0}
     .toggle-track{
-      position:relative;width:56px;height:28px;border-radius:999px;background:var(--toggle-track);
-      box-shadow:0 2px 8px var(--toggle-shadow) inset,0 2px 6px var(--toggle-shadow);
-      padding:2px; overflow:hidden; border:1px solid var(--border);
+      --shift:0px;               /* updated by theme */
+      position:relative;
+      width:58px; height:30px;   /* slightly taller for perfect centering across devices */
+      border-radius:999px;
+      background:var(--toggle-track);
+      border:1px solid var(--border);
+      overflow:hidden;           /* clip thumb cleanly */
       display:inline-block;
+      box-shadow:inset 0 2px 6px var(--toggle-shadow);
     }
     .toggle-thumb{
-      position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:999px;background:var(--toggle-thumb);
-      box-shadow:0 2px 6px rgba(0,0,0,.25);transition:transform .28s cubic-bezier(.2,.8,.2,1)
+      position:absolute; left:2px; top:50%;
+      width:26px; height:26px; border-radius:999px;
+      background:var(--toggle-thumb);
+      box-shadow:0 2px 6px rgba(0,0,0,.25);
+      transform:translate(var(--shift), -50%); /* X via CSS var, Y perfectly centered */
+      transition:transform .28s cubic-bezier(.2,.8,.2,1);
     }
-    .toggle-icon{position:absolute;top:50%;transform:translateY(-50%);width:14px;height:14px;opacity:.9;pointer-events:none}
-    .toggle-icon.sun{left:8px;color:#ffb84d}.toggle-icon.moon{right:8px;color:#8ea0ff}
-    .toggle-icon svg{width:14px;height:14px;display:block}
-    [data-theme="light"] .toggle-thumb{transform:translateX(28px)}
-    /* small safety margin so the toggle never kisses the container border on tiny screens */
-    @media (max-width:420px){ .header { padding-right:10px } }
+    .toggle-icon{
+      position:absolute; top:50%; transform:translateY(-50%);
+      width:16px; height:16px; opacity:.9; pointer-events:none
+    }
+    .toggle-icon.sun{left:10px;color:#ffb84d}
+    .toggle-icon.moon{right:10px;color:#8ea0ff}
+    .toggle-icon svg{width:16px;height:16px;display:block}
+    [data-theme="light"] .toggle-track{--shift:26px} /* travel distance = 58 - 2*2 - 26 = 26 */
+
+    @media (max-width:420px){ .header { padding-right:8px } }
 
     .field{margin-bottom:10px}
     .field-label{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:500;font-size:14px;opacity:.9}
@@ -92,7 +106,6 @@
     .res-text{flex:1 1 auto;min-height:18px;line-height:1.6;font-family:Poppins,monospace;font-size:14px;color:var(--text);outline:none}
     .res-text[contenteditable=true]:focus{background:rgba(43,44,63,.12);box-shadow:inset 0 0 0 1px var(--accent),0 0 8px rgba(255,90,200,.35);border-radius:8px;padding:2px 4px}
 
-    /* Buttons: fixed height */
     .btn{border:none;color:#fff;padding:16px;border-radius:16px;font-size:16px;font-weight:600;cursor:pointer;text-align:center;background:linear-gradient(90deg,var(--grad-start),var(--grad-end));height:56px}
     .btn:hover{filter:brightness(1.06)}
     .btn.cta{box-shadow:0 0 0 2px rgba(255,90,200,.22) inset}
@@ -141,10 +154,14 @@
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
         <span class="toggle-track">
           <span class="toggle-icon sun" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
           </span>
           <span class="toggle-icon moon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
           </span>
           <span class="toggle-thumb"></span>
         </span>
@@ -253,14 +270,15 @@
         <div class="result-header">
           <div class="result-label">Results</div>
           <div class="result-tools">
+            <!-- Single-path curved arrows -->
             <button id="undoBtn" class="icon-btn" title="Undo (Ctrl/⌘+Z)" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 14 4 9 9 4"></polyline><path d="M20 20a8 8 0 0 0-8-8H4"></path>
+                <path d="M9 4 L4 9 L9 14 M4 9h7a8 8 0 1 1 0 16"/>
               </svg>
             </button>
             <button id="redoBtn" class="icon-btn" title="Redo (Ctrl/⌘+Shift+Z)" disabled>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 14 20 9 15 4"></polyline><path d="M4 20a8 8 0 0 1 8-8h8"></path>
+                <path d="M15 4 L20 9 L15 14 M20 9h-7a8 8 0 1 0 0 16"/>
               </svg>
             </button>
           </div>
@@ -288,10 +306,12 @@
     const STORAGE_KEY="playerEditorResults", THEME_KEY="playerEditorTheme";
     const YEAR_MIN=1900, YEAR_MAX=2025;
 
-    const clubs=[{name:"Barcelona",logo:"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg"},
+    const clubs=[
+      {name:"Barcelona",logo:"https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg"},
       {name:"Real Madrid",logo:"https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg"},
       {name:"Manchester United",logo:"https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"},
-      {name:"Liverpool",logo:"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg"}];
+      {name:"Liverpool",logo:"https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg"}
+    ];
 
     const root=document.documentElement;
     function applyTheme(t){root.setAttribute("data-theme",t);localStorage.setItem(THEME_KEY,t)}
@@ -392,6 +412,15 @@
     function redo(){if(!redoStack.length)return;const cur=snapshot(), next=redoStack.pop();historyStack.push(cur);renderFromLines(next);saveResults();updateUndoRedoButtons();status("Redo")}
     undoBtn.addEventListener("click",undo); redoBtn.addEventListener("click",redo);
 
+    function buildResult(){
+      const v=id=>($(id)?.value||"").trim();
+      const first=capWords(v("firstName")), last=capWords(v("lastName")), curr=capWords(v("currentClub"));
+      if(!first||!last||!curr) return "";
+      const newFirst=capWords(v("newFirstName")), newLast=capWords(v("newLastName")), shortName=capWords(v("newShortName"));
+      const year=v("yearOfBirth"), ca=convertTo200Scale(v("ca")), pa=convertTo200Scale(v("pa")), newClub=capWords(v("newClub"));
+      return `"PLAYER" "${first}" "${last}" "${curr}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${newClub}"`;
+    }
+
     function addResult(){
       if(!validateRequired(true)) return;
       if(!isYearValidOrEmpty()){ $("yearOfBirth").classList.add("error"); $("yearWarn").style.display="block"; alert("Year must be a 4-digit number between 1900 and 2025 (or empty)."); return; }
@@ -437,6 +466,20 @@
 
       updateEmptyState(); updateUndoRedoButtons();
     });
+
+    /* Helpers used above */
+    function getAllLines(){return Array.from(resultsEl.querySelectorAll(".res-text")).map(el=>el.textContent)}
+    function saveResults(){localStorage.setItem(STORAGE_KEY,JSON.stringify(getAllLines()))}
+    function renderFromLines(lines){resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());lines.forEach(t=>{if(t&&String(t).trim()!=="")resultsEl.appendChild(makeLineEl(t))});updateEmptyState()}
+    function validateRequired(show=false){const miss=[];["firstName","lastName","currentClub"].forEach(id=>{const el=$(id);if(!el.value.trim())miss.push(el)});if(show&&miss.length){miss.forEach(el=>{const f=el.closest(".field");f.classList.add("req","shake");setTimeout(()=>f.classList.remove("shake"),260)});const f=miss[0];f.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>f.focus(),220)}return miss.length===0}
+    function setRangeFill(sl){const v=Math.max(0,Math.min(100,Number(sl.value)||0));sl.style.setProperty("--fill",v+"%")}
+    function bindNumberAndSlider(numId,sliderId,outId){
+      const num=$(numId), sl=$(sliderId), out=$(outId);
+      const upd=()=>{const c=convertTo200Scale(num.value);out.textContent="→ 0–200: "+(c===""?"—":c)}
+      const fromNum=()=>{if(num.value===""){sl.value=0;setRangeFill(sl);upd();return}let n=parseInt(num.value,10);if(isNaN(n))n=0;n=Math.max(0,Math.min(100,n));num.value=n;sl.value=n;setRangeFill(sl);upd()}
+      const fromSl =()=>{num.value=sl.value;setRangeFill(sl);upd()}
+      num.addEventListener("input",fromNum); sl.addEventListener("input",fromSl); setRangeFill(sl); upd();
+    }
   })();
   </script>
 </body>
