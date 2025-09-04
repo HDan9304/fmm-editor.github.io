@@ -2,266 +2,650 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Player Editor (Main + Reserves)</title>
+  <title>Player Data Input</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Poppins -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root{
-      --bg:#101123;           /* page bg */
-      --card:#18192B;         /* container */
-      --field:#242537;        /* input bg */
-      --ink:#f5f5f5;          /* text */
-      --muted:#bdbddd;        /* helper text */
-      --accent:#FE6F21;       /* orange accent */
-      --border:#2e2f45;
+      --bg:#101123; --bg-pattern:#2b2c3f; --panel-bg:#18192B; --input-bg:#242537; --border:#444;
+      --text:#f5f5f5; --muted:#bdbdbd;
+      --grad-start:#FF7AD9; --grad-end:#FF3D7F; --accent:#FF5AC8; --error:#FF4D9A; --icon:#ff9bd9;
+      --outline-soft:rgba(255,90,200,.16); --focus-glow:rgba(255,90,200,.55); --empty-bg:#202233;
+      --toggle-track:#202233; --toggle-thumb:#fff; --toggle-shadow:rgba(0,0,0,.25);
+      --success:#76d39b; --success-bg:rgba(118,211,155,.12); --success-border:rgba(118,211,155,.65);
     }
-    *{ box-sizing:border-box }
+    [data-theme="light"]{
+      --bg:#E5E6FA; --bg-pattern:rgba(26,27,46,.08); --panel-bg:#fff; --input-bg:#F4F5FF; --border:#cfd1f4;
+      --text:#1a1b2e; --muted:#585b8a;
+      --outline-soft:rgba(255,90,200,.22); --focus-glow:rgba(255,90,200,.45); --empty-bg:#F1F2FF;
+      --toggle-track:#e7e8ff; --toggle-thumb:#fff; --toggle-shadow:rgba(50,50,93,.15);
+      --success:#25b36a; --success-bg:rgba(37,179,106,.1); --success-border:rgba(37,179,106,.55);
+    }
+
+    *{box-sizing:border-box}
     body{
-      font-family:'Poppins',sans-serif;
-      background: radial-gradient(#2b2c3f 1px, transparent 1px) 0 0/20px 20px, var(--bg);
-      margin:0; padding:20px; min-height:100vh;
-      display:flex; justify-content:center; align-items:flex-start; color:var(--ink);
+      font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      background-image:radial-gradient(var(--bg-pattern) 1px,transparent 1px);
+      background-size:20px 20px;
+      margin:0; display:flex; justify-content:center; align-items:flex-start;
+      padding:20px; min-height:100vh; color:var(--text);
     }
     .container{
-      width:100%; max-width:520px; background:var(--card);
-      border:2px solid var(--accent); border-radius:16px;
-      box-shadow:0 6px 18px rgba(0,0,0,.35);
-      padding:18px; display:flex; flex-direction:column; gap:14px;
+      border-radius:22px;
+      background:linear-gradient(var(--panel-bg),var(--panel-bg)) padding-box,
+                 linear-gradient(90deg,var(--grad-start),var(--grad-end)) border-box;
+      border:2px solid transparent; padding:16px 16px 20px; max-width:520px; width:100%;
+      box-shadow:0 4px 12px rgba(0,0,0,.4); display:flex; flex-direction:column; gap:8px;
     }
-    h2{ margin:0; text-align:center; font-size:22px; font-weight:600 }
-    .field{ display:flex; flex-direction:column; gap:6px }
-    .label{ font-size:13px; color:#e9e9f5 }
-    .required{ color:var(--accent); font-weight:700; margin-left:4px }
-    .hint{ font-size:12px; color:var(--muted) }
 
-    input[type="text"], input[type="number"]{
-      width:100%; padding:10px 12px; border-radius:10px;
-      border:1px solid var(--border); background:var(--field); color:var(--ink);
-      font-size:14px; outline:none; transition:border-color .2s, box-shadow .2s, background .2s;
-      text-transform:capitalize;  /* visual capitalization */
+    /* Header + Theme toggle */
+    .header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 6px 8px}
+    h2{margin:0;font-size:22px;font-weight:600}
+    .theme-toggle{border:0;background:transparent;padding:0;cursor:pointer;line-height:0}
+    .toggle-track{
+      --pad:2px; --thumb:26px; --shift:0px;
+      position:relative; width:58px; height:30px; border-radius:999px;
+      background:var(--toggle-track); border:1px solid var(--border); overflow:hidden; display:inline-block;
+      box-shadow:inset 0 2px 6px var(--toggle-shadow);
     }
-    input[type="text"]:focus, input[type="number"]:focus, #result:focus{
-      border-color:var(--accent); background:#2b2c3f; box-shadow:0 0 6px rgba(254,111,33,.5);
+    .toggle-thumb{
+      position:absolute; top:50%; left:var(--pad);
+      width:var(--thumb); height:var(--thumb); border-radius:999px; background:var(--toggle-thumb);
+      box-shadow:0 2px 6px rgba(0,0,0,.25);
+      transform:translateX(var(--shift)) translateY(-50%);
+      transition:transform .28s cubic-bezier(.2,.8,.2,1);
     }
-    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
-    .split-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
-    @media (max-width:480px){ .split-2{ grid-template-columns:1fr } }
+    .toggle-icon{position:absolute;top:50%;transform:translateY(-50%);width:16px;height:16px;opacity:.9;pointer-events:none}
+    .toggle-icon.sun{left:10px;color:#ffb84d}
+    .toggle-icon.moon{right:10px;color:#8ea0ff}
+    .toggle-icon svg{width:16px;height:16px;display:block}
+    [data-theme="light"] .toggle-track{ --shift: 28px; } /* 58 - 26 - 2 - 2 = 28 */
 
+    .field{margin-bottom:10px}
+    .field-label{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:500;font-size:14px;opacity:.9}
+    .required{color:var(--accent);font-weight:700}
+    .field input{width:100%;padding:10px;border:1px solid var(--border);border-radius:12px;font-size:16px;background:var(--input-bg);color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s,background .2s}
+    .field input[type=text]{text-transform:capitalize}
+    .field input:focus{border-color:var(--accent);background:rgba(43,44,63,.12);box-shadow:0 0 8px var(--focus-glow)}
+    .error{border-color:var(--error)!important;box-shadow:0 0 8px rgba(255,77,154,.6)!important}
+
+    /* helper badge + tooltip */
+    .help{
+      position:relative;display:inline-flex;align-items:center;justify-content:center;
+      width:18px;height:18px;border-radius:50%;border:1px solid var(--accent);
+      color:var(--accent);font-size:12px;line-height:18px;cursor:pointer;user-select:none;touch-action:manipulation;
+    }
+    .help .tip{
+      position:absolute;bottom:calc(100% + 10px);left:0;
+      min-width:220px;max-width:320px;background:var(--input-bg);color:var(--text);
+      border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.35;
+      box-shadow:0 10px 24px rgba(0,0,0,.35);z-index:4000;
+      visibility:hidden;opacity:0;transform:translateY(-6px) scale(.98);
+      transition:opacity .18s,transform .18s,visibility 0s .18s;
+      pointer-events:none;
+    }
+    .help.open .tip{
+      visibility:visible;opacity:1;transform:translateY(0) scale(1);
+      transition:opacity .22s,transform .22s,visibility 0s;
+    }
+
+    .mini-note{margin-left:auto;font-size:12px;color:var(--muted)}
+    .req-msg{display:none;font-size:12px;color:var(--error);margin-top:6px}
+    .field.req .req-msg{display:block}
+    .shake{animation:shake .24s}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+
+    .result-header{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+    .result-label{font-size:15px;font-weight:600;color:var(--accent)}
+    .result-tools{display:flex;gap:8px;align-items:center}
+    .icon-btn{border:none;background:transparent;color:var(--icon);padding:6px 8px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:0}
+    .icon-btn:hover{background:rgba(255,90,200,.1)}
+    .icon-btn[disabled]{opacity:.35;pointer-events:none}
+    .icon-btn svg{width:18px;height:18px;display:block;stroke:currentColor}
+
+    #results{padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--input-bg);min-height:160px;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+    #results.empty{justify-content:center}
+    .empty-state{display:none;border:1px solid var(--border);background:var(--empty-bg);color:var(--muted);border-radius:16px;height:72px;padding:0 16px;align-items:center;justify-content:center;text-align:center}
+    #results.empty .empty-state{display:flex}
+
+    .res-line{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:14px;background:var(--input-bg);outline:1px solid var(--outline-soft)}
+    .res-text{flex:1 1 auto;min-height:18px;line-height:1.6;font-family:Poppins,monospace;font-size:14px;color:var(--text);outline:none}
+    .res-text[contenteditable=true]:focus{background:rgba(43,44,63,.12);box-shadow:inset 0 0 0 1px var(--accent),0 0 8px rgba(255,90,200,.35);border-radius:8px;padding:2px 4px}
+
+    .btn{border:none;color:#fff;padding:16px;border-radius:16px;font-size:16px;font-weight:600;cursor:pointer;text-align:center;background:linear-gradient(90deg,var(--grad-start),var(--grad-end));height:56px}
+    .btn:hover{filter:brightness(1.06)}
+    .btn.cta{box-shadow:0 0 0 2px rgba(255,90,200,.22) inset}
+    .btn-secondary{background:transparent;border:2px solid var(--accent);color:var(--accent);height:56px}
+    .btn-secondary:hover{background:rgba(255,90,200,.08)}
+    .full-width{width:100%;margin:6px 0 10px;display:block}
+    .actions-row{display:flex;gap:10px;flex-wrap:wrap}
+    .actions-row .btn{flex:1 1 0}
+
+    .copy-status{display:inline-flex;align-items:center;gap:8px;min-height:20px;font-size:13px;color:var(--success);margin-top:6px;border-radius:10px;padding:0;opacity:0;transition:opacity .25s,transform .25s,padding .15s}
+    .copy-status svg{width:16px;height:16px;stroke:var(--success)}
+    .copy-status.show{background:var(--success-bg);border:1px solid var(--success-border);padding:4px 8px;opacity:1;animation:fadeOut 2.6s forwards}
+    @keyframes fadeOut{0%,80%{opacity:1}100%{opacity:0}}
+
+    .combo{position:relative}.combo input{padding:10px}.combo.has-logo input{padding-left:36px}
+    .combo-logo{position:absolute;top:50%;left:10px;transform:translateY(-50%);width:18px;height:18px;border-radius:4px;object-fit:contain;display:none}
+    .combo.has-logo .combo-logo{display:block}
+    .combo-panel{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--input-bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.35);max-height:260px;overflow-y:auto;padding:6px;display:none;z-index:3000}
+    .combo.open .combo-panel{display:block}
+    .combo-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:16px}
+    .combo-item:hover,.combo-item.active{background:rgba(43,44,63,.12);outline:1px solid var(--accent)}
+    .combo-item img{width:22px;height:22px;border-radius:4px;object-fit:contain}
+
+    .num-range{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center}
+    @media (max-width:560px){.num-range{grid-template-columns:1fr}}
+
+    input[type=range]{--fill:0%;appearance:none;-webkit-appearance:none;width:100%;height:28px;background:transparent;border:none;padding:0}
+    input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--grad-start),var(--grad-end)) 0/var(--fill) 100% no-repeat,#3a3b52;border:1px solid var(--border)}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.35);margin-top:-4px;cursor:pointer}
+    input[type=range]::-moz-range-track{height:10px;border-radius:999px;background:#3a3b52;border:1px solid var(--border)}
+    input[type=range]::-moz-range-progress{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--grad-start),var(--grad-end))}
+    input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:pointer}
+
+    /* Two-line (reserves) options */
     .options{
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-      padding:10px; border:1px solid var(--border); border-radius:12px; background:#1f2136;
+      padding:10px;border:1px solid var(--border);border-radius:12px;background:#1f2136;margin:-2px 0 8px 0;
+      display:flex;flex-wrap:wrap;gap:10px;align-items:center
     }
-    .options .spacer{ flex:1 }
-    .switch{
-      display:inline-flex; align-items:center; gap:8px; font-size:13px; color:#e9e9f5;
+    .options .spacer{flex:1}
+    .row{display:flex;gap:8px;align-items:center}
+    .options label{font-size:14px}
+    .options input[type="text"]{width:160px}
+    
+    @media (min-width:960px){
+      .container{max-width:1120px;padding:20px 22px 24px}
+      .content-grid{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:22px;align-items:start}
+      .results-col{position:sticky;top:12px;height:calc(100vh - 120px);display:flex;flex-direction:column}
+      .results-col #results{flex:1 1 auto;min-height:0;max-height:none}
     }
-    .switch input{ transform:scale(1.1) }
-
-    .result-label{ margin-top:6px; font-weight:600; color:var(--accent) }
-    #result{
-      white-space:pre-wrap; word-break:break-word;
-      min-height:140px; padding:14px; border-radius:12px;
-      border:1px solid var(--border); background:var(--field);
-      font-size:14px; font-family:'Poppins',monospace; outline:none;
-    }
-    .btn{
-      width:100%; border:none; border-radius:10px; padding:12px;
-      background:var(--accent); color:#fff; font-weight:600; cursor:pointer;
-    }
-    .btn:hover{ filter:brightness(1.05) }
-    .btn-row{ display:flex; gap:10px }
-    .btn.secondary{
-      background:transparent; border:2px solid var(--accent); color:var(--accent);
-    }
-
-    .tooltip{ position:relative; display:flex; justify-content:center; width:100% }
-    .tooltip .tooltiptext{
-      position:absolute; bottom:150%; left:50%; transform:translateX(-50%);
-      background:#555; color:#fff; padding:6px 8px; border-radius:6px; font-size:12px;
-      opacity:0; visibility:hidden; transition:opacity .25s;
-      white-space:nowrap;
-    }
-    .tooltip:hover .tooltiptext{ opacity:1; visibility:visible }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Player Data Input</h2>
-
-    <div class="split-2">
-      <div class="field">
-        <div class="label">First Name <span class="required">*</span></div>
-        <input id="firstName" type="text" oninput="capAndUpdate(this)">
-      </div>
-      <div class="field">
-        <div class="label">Last Name <span class="required">*</span></div>
-        <input id="lastName" type="text" oninput="capAndUpdate(this)">
-      </div>
+    <div class="header">
+      <h2>Player Data Input</h2>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+        <span class="toggle-track">
+          <span class="toggle-icon sun" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+          </span>
+          <span class="toggle-icon moon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </span>
+          <span class="toggle-thumb"></span>
+        </span>
+      </button>
     </div>
 
-    <div class="field">
-      <div class="label">Current Club <span class="required">*</span></div>
-      <input id="currentClub" type="text" oninput="capAndUpdate(this)">
-      <div class="hint">Example: Arsenal (reserve line will be “Arsenal Reserves” by default)</div>
-    </div>
+    <div class="content-grid">
+      <!-- LEFT: form -->
+      <section class="form-col">
+        <div class="field" id="field-first">
+          <div class="field-label"><label for="firstName">First Name <span class="required">*</span></label></div>
+          <input id="firstName" type="text" autocomplete="off" />
+          <div class="req-msg" id="msg-first">This field is required.</div>
+        </div>
 
-    <div class="split-2">
-      <div class="field">
-        <div class="label">New First Name</div>
-        <input id="newFirstName" type="text" oninput="capAndUpdate(this)">
-      </div>
-      <div class="field">
-        <div class="label">New Last Name</div>
-        <input id="newLastName" type="text" oninput="capAndUpdate(this)">
-      </div>
-    </div>
+        <div class="field" id="field-last">
+          <div class="field-label"><label for="lastName">Last Name <span class="required">*</span></label></div>
+          <input id="lastName" type="text" autocomplete="off" />
+          <div class="req-msg" id="msg-last">This field is required.</div>
+        </div>
 
-    <div class="field">
-      <div class="label">New Short Name</div>
-      <input id="newShortName" type="text" oninput="capAndUpdate(this)">
-    </div>
+        <div class="field" id="field-current">
+          <div class="field-label">
+            <label for="currentClub">Current Club <span class="required">*</span></label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
+              <span class="tip">Contracted club only. Use full official name (e.g., “Manchester United”). If unattached, enter “free”.</span>
+            </span>
+          </div>
+          <div class="combo" id="comboCurrent">
+            <img id="logoCurrent" class="combo-logo" alt="">
+            <input id="currentClub" type="text" placeholder="Search club…" autocomplete="off" />
+            <div class="combo-panel"></div>
+          </div>
+          <div class="req-msg" id="msg-current">This field is required.</div>
+        </div>
 
-    <div class="split-2">
-      <div class="field">
-        <div class="label">Year of Birth</div>
-        <input id="yearOfBirth" type="number" inputmode="numeric" oninput="limitYear(this); updateResult();">
-        <div class="hint">4 digits; player must be 15+ at game start</div>
-      </div>
-      <div class="field">
-        <div class="label">New Club</div>
-        <input id="newClub" type="text" oninput="capAndUpdate(this)">
-      </div>
-    </div>
+        <!-- NEW: main+reserves option -->
+        <div class="options">
+          <label class="row"><input type="checkbox" id="includeReserves" checked> Include reserve line</label>
+          <div class="row">
+            <span class="mini-note">Suffix</span>
+            <input id="reserveSuffix" type="text" value="Reserves" />
+          </div>
+          <div class="spacer"></div>
+          <span class="mini-note">Example: Arsenal → “Arsenal” & “Arsenal Reserves”</span>
+        </div>
 
-    <div class="split-2">
-      <div class="field">
-        <div class="label">CA (0–100)</div>
-        <input id="ca" type="number" min="0" max="100" inputmode="numeric" oninput="limitPercent(this); updateResult();">
-        <div class="hint">Converted to 0–200 in result</div>
-      </div>
-      <div class="field">
-        <div class="label">PA (0–100)</div>
-        <input id="pa" type="number" min="0" max="100" inputmode="numeric" oninput="limitPercent(this); updateResult();">
-        <div class="hint">Converted to 0–200 in result</div>
-      </div>
-    </div>
+        <div class="field">
+          <div class="field-label">
+            <label for="newClub">New Club</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
+              <span class="tip">Use the full official name. Type to search, use ↑/↓ to move, Enter to select.</span>
+            </span>
+          </div>
+          <div class="combo" id="comboNew">
+            <img id="logoNew" class="combo-logo" alt="">
+            <input id="newClub" type="text" placeholder="Search club…" autocomplete="off" />
+            <div class="combo-panel"></div>
+          </div>
+        </div>
 
-    <!-- Options: include reserves & suffix -->
-    <div class="options">
-      <label class="switch">
-        <input id="includeReserves" type="checkbox" checked onchange="updateResult()">
-        Include reserve line
-      </label>
-      <div class="row" style="gap:6px">
-        <span class="label" style="margin:0">Suffix</span>
-        <input id="reserveSuffix" type="text" value="Reserves" style="width:150px" oninput="capAndUpdate(this)">
-      </div>
-      <div class="spacer"></div>
-      <div class="hint">Outputs two lines: main squad + current club with the suffix (e.g., “Arsenal Reserves”).</div>
-    </div>
+        <div class="field"><div class="field-label"><label for="newFirstName">New First Name</label></div><input id="newFirstName" type="text" autocomplete="off" /></div>
+        <div class="field"><div class="field-label"><label for="newLastName">New Last Name</label></div><input id="newLastName" type="text" autocomplete="off" /></div>
 
-    <div class="result-label">Result</div>
-    <div id="result" contenteditable="true"></div>
+        <div class="field">
+          <div class="field-label">
+            <label for="newShortName">New Short Name</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
+              <span class="tip">Common/short name (e.g., Neymar/Willian). You can add one; you can’t remove an existing one in-game.</span>
+            </span>
+          </div>
+          <input id="newShortName" type="text" autocomplete="off" />
+        </div>
 
-    <div class="btn-row">
-      <div class="tooltip" style="flex:1">
-        <button class="btn" onclick="copyResult()" onmouseout="resetTip()">Copy Result</button>
-        <span class="tooltiptext" id="tip">Copy to clipboard</span>
-      </div>
-      <button class="btn secondary" onclick="clearAll()">Clear Inputs</button>
+        <div class="field">
+          <div class="field-label">
+            <label for="yearOfBirth">Year of Birth</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
+              <span class="tip">Must be a 4-digit year. Player must be at least 16 at game start.</span>
+            </span>
+          </div>
+          <input id="yearOfBirth" type="text" inputmode="numeric" pattern="\d{4}" />
+          <div id="yearWarn" class="req-msg">Year should be between 1900 and 2025.</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="ca">CA</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
+              <span class="tip">Current Ability. Enter 0–100; we convert to 0–200.</span>
+            </span>
+            <span class="mini-note" id="caOut">→ 0–200: —</span>
+          </div>
+          <div class="num-range">
+            <input id="ca" type="number" min="0" max="100" inputmode="numeric" />
+            <input id="caSlider" type="range" min="0" max="100" step="1" />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="pa">PA</label>
+            <span class="help" tabindex="0" role="button" aria-expanded="false">i
+              <span class="tip">Potential Ability. Enter 0–100; we convert to 0–200.</span>
+            </span>
+            <span class="mini-note" id="paOut">→ 0–200: —</span>
+          </div>
+          <div class="num-range">
+            <input id="pa" type="number" min="0" max="100" inputmode="numeric" />
+            <input id="paSlider" type="range" min="0" max="100" step="1" />
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: results -->
+      <section class="results-col">
+        <div class="result-header">
+          <div class="result-label">Results</div>
+          <div class="result-tools">
+            <button id="undoBtn" class="icon-btn" title="Undo (Ctrl/⌘+Z)" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 4 L4 9 L9 14 M4 9h7a8 8 0 1 1 0 16"/>
+              </svg>
+            </button>
+            <button id="redoBtn" class="icon-btn" title="Redo (Ctrl/⌘+Shift+Z)" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 4 L20 9 L15 14 M20 9h-7a8 8 0 1 0 0 16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="results" class="empty">
+          <div class="empty-state">No results yet</div>
+        </div>
+
+        <button class="btn full-width cta" id="addBtn">Add Result</button>
+        <div class="actions-row">
+          <button class="btn" id="copyBtn">Copy All</button>
+          <button class="btn btn-secondary" id="clearBtn">Clear</button>
+        </div>
+
+        <div id="copyStatus" class="copy-status" aria-live="polite"></div>
+      </section>
     </div>
   </div>
 
   <script>
-    // --- helpers ---
-    function capAndUpdate(el){
-      if (el.value) el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
-      updateResult();
-    }
-    function limitPercent(el){
-      if(el.value === "") return;
-      const v = Math.max(0, Math.min(100, Number(el.value)));
-      el.value = isNaN(v) ? "" : v;
-    }
-    function limitYear(el){
-      // keep only digits and cap length 4; also clamp reasonable range if present
-      el.value = el.value.replace(/\D/g,'').slice(0,4);
-    }
-    function to200scale(x){
-      if(x === "" || isNaN(Number(x))) return "";
-      const n = Math.max(0, Math.min(100, Number(x)));
-      return Math.round((n/100)*200);
-    }
+  (function(){
+    "use strict";
 
-    // Build a single line given a specific "club" value
-    function lineForClub(club){
-      const first   = document.getElementById("firstName").value.trim();
-      const last    = document.getElementById("lastName").value.trim();
-      const newFirst= document.getElementById("newFirstName").value;
-      const newLast = document.getElementById("newLastName").value;
-      const shortNm = document.getElementById("newShortName").value;
-      const year    = document.getElementById("yearOfBirth").value;
-      const ca200   = to200scale(document.getElementById("ca").value);
-      const pa200   = to200scale(document.getElementById("pa").value);
-      const newClub = document.getElementById("newClub").value;
+    const STORAGE_KEY="playerEditorResults", THEME_KEY="playerEditorTheme";
+    const YEAR_MIN=1900, YEAR_MAX=2025;
 
-      return `"PLAYER" "${first}" "${last}" "${club}" "${newFirst}" "${newLast}" "${shortNm}" "${year}" "${ca200}" "${pa200}" "${newClub}"`;
-    }
+    const root=document.documentElement;
+    const $=id=>document.getElementById(id);
 
-    function updateResult(){
-      const first = document.getElementById("firstName").value.trim();
-      const last = document.getElementById("lastName").value.trim();
-      const currentClub = document.getElementById("currentClub").value.trim();
-      const includeRes = document.getElementById("includeReserves").checked;
-      const suffix = document.getElementById("reserveSuffix").value.trim() || "Reserves";
-
-      const resultEl = document.getElementById("result");
-
-      // only show result if important fields are filled
-      if(!first || !last || !currentClub){
-        resultEl.textContent = "";
-        return;
+    /* ---------------- Theme ---------------- */
+    function applyTheme(t){root.setAttribute("data-theme",t);localStorage.setItem(THEME_KEY,t)}
+    function initTheme(){applyTheme(localStorage.getItem(THEME_KEY)||"dark")}
+    document.addEventListener("click",e=>{
+      if(e.target.id==="themeToggle" || e.target.closest("#themeToggle")){
+        applyTheme(root.getAttribute("data-theme")==="light"?"dark":"light");
       }
+    });
+
+    /* ------------- Clubs via JSON ---------- */
+    let clubs = [];
+    async function loadClubs(){
+      try{
+        const res = await fetch('./clubs.json?ts='+Date.now(), {cache:'no-store'});
+        if(!res.ok) throw new Error(res.status+' '+res.statusText);
+        clubs = await res.json();
+      }catch(e){
+        console.error('clubs.json failed, fallback used', e);
+        clubs = [
+          { common: "Barcelona",      official: "FC Barcelona",      logo: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg", aliases:["Barca"] },
+          { common: "Real Madrid",    official: "Real Madrid CF",    logo: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg", aliases:[] }
+        ];
+      }
+    }
+
+    /* ------------- Utilities --------------- */
+    function capWords(s){return String(s||"").trim().replace(/\b([a-zA-Z])/g,(m,p)=>p.toUpperCase())}
+    function clamp01(n){return Math.max(0,Math.min(100,n))}
+    function convertTo200Scale(v){if(v===""||isNaN(+v))return"";const n=clamp01(+v);return Math.round((n/100)*200)}
+    const checkSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    function status(msg){const el=$("copyStatus");el.innerHTML=checkSVG+`<span>${msg}</span>`;el.classList.add("show");clearTimeout(status._t);status._t=setTimeout(()=>{el.classList.remove("show");el.innerHTML=""},2600)}
+
+    /* ------------- Results store ----------- */
+    const resultsEl=$("results"), addBtn=$("addBtn");
+    function getAllLines(){return Array.from(resultsEl.querySelectorAll(".res-text")).map(el=>el.textContent)}
+    function saveResults(){localStorage.setItem(STORAGE_KEY,JSON.stringify(getAllLines()))}
+    function renderFromLines(lines){resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());lines.forEach(t=>{if(t&&String(t).trim()!=="")resultsEl.appendChild(makeLineEl(t))});updateEmptyState()}
+    function loadResults(){const raw=localStorage.getItem(STORAGE_KEY);if(!raw){updateEmptyState();return}let lines=[];try{const p=JSON.parse(raw);lines=Array.isArray(p)?p:String(raw).split(/\n/)}catch{lines=String(raw).split(/\n/)}renderFromLines(lines)}
+
+    function updateEmptyState(){const has=!!resultsEl.querySelector(".res-line");resultsEl.classList.toggle("empty",!has);addBtn.classList.toggle("cta",!has)}
+
+    function trashSVG(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`}
+    function copyIconSVG(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>`}
+
+    function copyToClipboard(text){
+      if(navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+      return new Promise((res,rej)=>{try{const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);res()}catch(e){rej(e)}})
+    }
+
+    function makeLineEl(text){
+      const line=document.createElement("div");line.className="res-line";
+      const span=document.createElement("span");span.className="res-text";span.contentEditable="true";span.textContent=text;
+      const copyBtn=document.createElement("button");copyBtn.className="icon-btn";copyBtn.title="Copy line";copyBtn.innerHTML=copyIconSVG();
+      const delBtn=document.createElement("button");delBtn.className="icon-btn";delBtn.title="Delete line";delBtn.innerHTML=trashSVG();
+
+      let editing=false, editTimer=null;
+      span.addEventListener("input",()=>{if(!editing){beginHistory();editing=true}
+        clearTimeout(editTimer);editTimer=setTimeout(()=>{saveResults();editing=false},600)});
+      span.addEventListener("blur",()=>{if(editing){saveResults();editing=false}});
+
+      copyBtn.addEventListener("click",()=>copyToClipboard(span.textContent.trim()).then(()=>status("Copied line")).catch(e=>alert("Copy failed: "+e)));
+      delBtn.addEventListener("click",()=>{beginHistory();line.remove();saveResults();updateEmptyState();updateUndoRedoButtons()});
+
+      line.append(span,copyBtn,delBtn);
+      return line;
+    }
+
+    /* -------- Required & year -------- */
+    const requiredInputs=["firstName","lastName","currentClub"];
+    function markReqFor(el){const f=el.closest(".field");if(!f) return;f.classList.add("req","shake");setTimeout(()=>f.classList.remove("shake"),260)}
+    function clearReqFor(el){const f=el.closest(".field");if(!f) return;f.classList.remove("req")}
+    function validateRequired(show=false){const miss=[];requiredInputs.forEach(id=>{const el=$(id);if(!el.value.trim())miss.push(el)});if(show&&miss.length){miss.forEach(el=>markReqFor(el));const f=miss[0];f.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>f.focus(),220)}return miss.length===0}
+    function limitYear(el){el.value=el.value.replace(/\D+/g,"").slice(0,4);const warn=$("yearWarn");const val=el.value;if(val&&(val.length!==4||+val<YEAR_MIN||+val>YEAR_MAX)){el.classList.add("error");warn.style.display="block"}else{el.classList.remove("error");warn.style.display="none"}}
+    function isYearValidOrEmpty(){const s=($("yearOfBirth").value||"").trim();if(!s)return true;if(s.length!==4)return false;const n=+s;return !(isNaN(n)||n<YEAR_MIN||n>YEAR_MAX)}
+
+    /* -------- Number + slider link -------- */
+    function setRangeFill(sl){const v=Math.max(0,Math.min(100,Number(sl.value)||0));sl.style.setProperty("--fill",v+"%")}
+    function bindNumberAndSlider(numId,sliderId,outId){
+      const num=$(numId), sl=$(sliderId), out=$(outId);
+      const upd=()=>{const c=convertTo200Scale(num.value);out.textContent="→ 0–200: "+(c===""?"—":c)}
+      const fromNum=()=>{if(num.value===""){sl.value=0;setRangeFill(sl);upd();return}let n=parseInt(num.value,10);if(isNaN(n))n=0;n=Math.max(0,Math.min(100,n));num.value=n;sl.value=n;setRangeFill(sl);upd()}
+      const fromSl =()=>{num.value=sl.value;setRangeFill(sl);upd()}
+      num.addEventListener("input",fromNum); sl.addEventListener("input",fromSl); setRangeFill(sl); upd();
+    }
+
+    /* -------- Combobox (club search) -------- */
+    function initCombo(comboId,inputId,logoId){
+      const combo=$(comboId), input=$(inputId), logo=$(logoId), panel=combo.querySelector(".combo-panel");
+      let visible=[], activeIndex=-1;
+      const open=()=>combo.classList.add("open"), close=()=>{combo.classList.remove("open");activeIndex=-1}, isOpen=()=>combo.classList.contains("open");
+
+      function filter(q){
+        const s=(q||'').toLowerCase().trim();
+        const list = s ? clubs.filter(c=>{
+          const bag=[c.common,c.official,...(c.aliases||[])].filter(Boolean).map(v=>v.toLowerCase());
+          return bag.some(v=>v.includes(s));
+        }) : clubs;
+        return list.slice(0,100);
+      }
+
+      function render(list){
+        panel.innerHTML=""; visible=list;
+        if(!list.length){
+          const d=document.createElement("div"); d.className="combo-item"; d.style.opacity=".7"; d.textContent="No matches";
+          panel.appendChild(d); return;
+        }
+        list.forEach((club,idx)=>{
+          const it=document.createElement("div"); it.className="combo-item"; it.dataset.index=idx;
+          const img=document.createElement("img");
+          if(club.logo){img.src=club.logo; img.alt=club.common||club.official; img.onerror=()=>img.style.display="none";}
+          else img.style.display="none";
+          const span=document.createElement("span"); span.textContent=club.common||club.official;
+          it.append(img,span);
+          it.addEventListener("mousedown",e=>{e.preventDefault();select(idx)});
+          panel.appendChild(it);
+        });
+      }
+
+      function select(idx){
+        const c=visible[idx]; if(!c) return;
+        input.value = c.common || c.official;        // show COMMON
+        combo.dataset.official = c.official || input.value;  // remember OFFICIAL
+        combo.dataset.common   = c.common   || input.value;
+        combo.dataset.logo     = c.logo     || "";
+        if(c.logo){
+          logo.src=c.logo; combo.classList.add("has-logo"); logo.style.display="block";
+          logo.onerror=()=>{combo.classList.remove("has-logo"); logo.style.display="none";}
+        } else { combo.classList.remove("has-logo"); logo.style.display="none"; }
+        close(); clearReqFor(input);
+      }
+
+      function moveActive(d){
+        if(!isOpen()) open();
+        const items=panel.querySelectorAll(".combo-item"); if(!items.length) return;
+        activeIndex=(activeIndex+d+items.length)%items.length;
+        items.forEach(el=>el.classList.remove("active")); const a=items[activeIndex]; a.classList.add("active");
+        const pr=panel.getBoundingClientRect(), ir=a.getBoundingClientRect();
+        if(ir.top<pr.top)panel.scrollTop-=(pr.top-ir.top);
+        if(ir.bottom>pr.bottom)panel.scrollTop+=(ir.bottom-pr.bottom);
+      }
+
+      input.addEventListener("focus",()=>{render(filter(input.value)); open()});
+      input.addEventListener("input",()=>{
+        combo.dataset.official=""; combo.dataset.common=""; combo.dataset.logo="";
+        if(input.value.trim()===""){combo.classList.remove("has-logo"); logo.style.display="none";}
+        render(filter(input.value)); open(); clearReqFor(input);
+      });
+      input.addEventListener("keydown",e=>{
+        if(!isOpen()&&(e.key==="ArrowDown"||e.key==="ArrowUp")){render(filter(input.value)); open();}
+        if(e.key==="ArrowDown"){e.preventDefault(); moveActive(1)}
+        else if(e.key==="ArrowUp"){e.preventDefault(); moveActive(-1)}
+        else if(e.key==="Enter"){ if(isOpen()){ e.preventDefault(); if(activeIndex>=0)select(activeIndex); else if(visible.length)select(0); } }
+        else if(e.key==="Escape"){ close(); }
+      });
+      document.addEventListener("click",e=>{ if(!combo.contains(e.target)) close(); });
+    }
+
+    /* -------- Undo / Redo -------- */
+    let historyStack=[], redoStack=[];
+    function snapshot(){return getAllLines()}
+    function beginHistory(){historyStack.push(snapshot());if(historyStack.length>80)historyStack.shift();redoStack=[];updateUndoRedoButtons()}
+    function updateUndoRedoButtons(){ $("undoBtn").disabled=historyStack.length===0; $("redoBtn").disabled=redoStack.length===0 }
+    function undo(){ if(!historyStack.length)return; const cur=snapshot(), prev=historyStack.pop(); redoStack.push(cur); renderFromLines(prev); saveResults(); updateUndoRedoButtons(); status("Undo") }
+    function redo(){ if(!redoStack.length)return; const cur=snapshot(), next=redoStack.pop(); historyStack.push(cur); renderFromLines(next); saveResults(); updateUndoRedoButtons(); status("Redo") }
+    $("undoBtn").addEventListener("click",undo); $("redoBtn").addEventListener("click",redo);
+
+    /* -------- Build result lines (main + reserves) -------- */
+    function buildLines(){
+      const v=id=>($(id)?.value||"").trim();
+      const first=capWords(v("firstName"));
+      const last =capWords(v("lastName"));
+
+      const currCombo = document.getElementById("comboCurrent");
+      const newCombo  = document.getElementById("comboNew");
+      const currOfficial = currCombo?.dataset.official;
+      const newOfficial  = newCombo?.dataset.official;
+
+      const curr = capWords(currOfficial || v("currentClub"));
+      const next = capWords(newOfficial  || v("newClub"));
+
+      if(!first||!last||!curr) return [];
+
+      const newFirst  = capWords(v("newFirstName"));
+      const newLast   = capWords(v("newLastName"));
+      const shortName = capWords(v("newShortName"));
+      const year      = v("yearOfBirth");
+      const ca        = convertTo200Scale(v("ca"));
+      const pa        = convertTo200Scale(v("pa"));
+
+      const base = `"PLAYER" "${first}" "${last}" "${CURR}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${next}"`;
 
       const lines = [];
-      // main line
-      lines.push(lineForClub(currentClub));
+      // main
+      lines.push(base.replace('"{CURR}"', `"${curr}"`));
 
-      // reserve line
+      // reserves (optional)
+      const includeRes = $('includeReserves').checked;
       if(includeRes){
-        const reserveClub = `${currentClub} ${suffix}`.trim();
-        lines.push(lineForClub(reserveClub));
+        const suffix = capWords(($('reserveSuffix').value || 'Reserves').trim());
+        const reserveClub = `${curr}${suffix ? ' ' + suffix : ''}`;
+        lines.push(base.replace('"{CURR}"', `"${reserveClub}"`));
       }
-
-      // add a blank line after (two newlines)
-      resultEl.textContent = lines.join("\n") + "\n\n";
+      return lines;
     }
 
-    async function copyResult(){
-      const text = document.getElementById("result").textContent.trim();
+    /* -------- Actions -------- */
+    function addResult(){
+      if(!validateRequired(true)) return;
+      if(!isYearValidOrEmpty()){
+        $("yearOfBirth").classList.add("error"); $("yearWarn").style.display="block";
+        alert("Year must be a 4-digit number between 1900 and 2025 (or empty)."); return;
+      }
+      const lines=buildLines(); if(!lines.length) return;
+      beginHistory();
+      lines.forEach(line=>resultsEl.appendChild(makeLineEl(line)));
+      resultsEl.scrollTop=resultsEl.scrollHeight;
+      saveResults(); updateEmptyState(); updateUndoRedoButtons();
+
+      // clear inputs
+      ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"].forEach(id=>{const el=$(id);if(el)el.value=""});
+      ["caSlider","paSlider"].forEach(id=>{const s=$(id);if(s){s.value=0;setRangeFill(s)}});
+
+      // clear logos + stored official/common
+      ["comboCurrent","comboNew"].forEach(id=>{
+        const c=$(id); if(!c) return;
+        c.classList.remove("has-logo");
+        c.dataset.official=""; c.dataset.common=""; c.dataset.logo="";
+        const img=c.querySelector(".combo-logo"); if(img) img.style.display="none";
+      });
+
+      $("yearWarn").style.display="none"; $("yearOfBirth").classList.remove("error");
+      $("caOut").textContent="→ 0–200: —"; $("paOut").textContent="→ 0–200: —";
+    }
+
+    function copyResults(){
+      const text=getAllLines().join("\n").trim();
       if(!text) return;
-      try{
-        await navigator.clipboard.writeText(text);
-        const tip = document.getElementById("tip");
-        tip.textContent = "Copied!";
-      }catch(e){
-        alert("Copy failed: " + e);
-      }
-    }
-    function resetTip(){ document.getElementById("tip").textContent = "Copy to clipboard"; }
-
-    function clearAll(){
-      const ids = ["firstName","lastName","currentClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa","newClub"];
-      ids.forEach(id => document.getElementById(id).value = "");
-      // keep includeReserves & suffix as user preference
-      document.getElementById("result").textContent = "";
+      copyToClipboard(text).then(()=>status("Copied all results")).catch(err=>alert("Copy failed: "+err));
     }
 
-    // initialize
-    updateResult();
+    function clearResults(){
+      if(!resultsEl.querySelector(".res-line")) return;
+      beginHistory();
+      resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());
+      saveResults(); updateEmptyState(); updateUndoRedoButtons(); status("Cleared");
+    }
+
+    /* -------- Helper tooltips: single-tap -------- */
+    function initHelpTips(){
+      const helps=[...document.querySelectorAll('.help')];
+      const timers=new WeakMap();
+      const open=(h,autohide=true)=>{
+        h.classList.add('open'); h.setAttribute('aria-expanded','true');
+        clearTimeout(timers.get(h));
+        if(autohide){
+          const len=(h.querySelector('.tip')?.textContent||'').trim().length;
+          const dur=Math.min(7000, Math.max(1600, 40*len));
+          timers.set(h, setTimeout(()=>close(h), dur));
+        }
+      };
+      const close=(h)=>{
+        h.classList.remove('open'); h.setAttribute('aria-expanded','false');
+        clearTimeout(timers.get(h)); timers.delete(h);
+      };
+      const closeAll=(except=null)=>{ helps.forEach(h=>{ if(h!==except) close(h); }); };
+      helps.forEach(h=>{
+        h.addEventListener('pointerdown', e=>{
+          e.preventDefault(); e.stopPropagation();
+          h.classList.contains('open') ? close(h) : (closeAll(h), open(h,true));
+        }, {passive:false});
+        h.addEventListener('keydown', e=>{
+          if(e.key==='Enter'||e.key===' '){
+            e.preventDefault();
+            h.classList.contains('open') ? close(h) : (closeAll(h), open(h,true));
+          }
+        });
+      });
+      document.addEventListener('pointerdown', e=>{
+        if(!e.target.closest('.help')) closeAll();
+      }, {passive:true});
+    }
+
+    /* -------- Init -------- */
+    document.addEventListener("DOMContentLoaded", async ()=>{
+      initTheme();
+      await loadClubs();                        // ← load JSON first
+      initCombo("comboCurrent","currentClub","logoCurrent");
+      initCombo("comboNew","newClub","logoNew");
+
+      $("yearOfBirth").addEventListener("input",e=>limitYear(e.target));
+      bindNumberAndSlider("ca","caSlider","caOut");
+      bindNumberAndSlider("pa","paSlider","paOut");
+
+      ["firstName","lastName","currentClub"].forEach(id=>$(id).addEventListener("input",e=>{if(e.target.value.trim())clearReqFor(e.target)}));
+
+      $("addBtn").addEventListener("click",addResult);
+      $("copyBtn").addEventListener("click",copyResults);
+      $("clearBtn").addEventListener("click",clearResults);
+
+      document.addEventListener("keydown",e=>{
+        if(e.key.toLowerCase()==="z"&&(e.ctrlKey||e.metaKey)){e.preventDefault(); if(e.shiftKey) redo(); else undo(); return;}
+        if(e.key!=="Enter") return;
+        const a=document.activeElement; const editing=a&&a.classList?.contains("res-text")&&a.isContentEditable; const openCombo=document.querySelector(".combo.open");
+        if(!editing && !openCombo){ e.preventDefault(); addResult(); }
+      });
+
+      initHelpTips();
+      loadResults(); updateEmptyState(); updateUndoRedoButtons();
+    });
+  })();
   </script>
 </body>
 </html>
