@@ -227,6 +227,11 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/9/97/Logo_Parma_Calcio_1913_%28adozione_2016%29.svg"
   },
 {
+    "common": "Pisa",
+    "official": "Pisa",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/6/6b/Pisa_SC_crest.svg"
+  },
+{
     "common": "PSG",
     "official": "Paris Saint-Germain",
     "logo": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg"
@@ -235,6 +240,16 @@
     "common": "Rennes",
     "official": "Stade Rennais FC",
     "logo": "https://upload.wikimedia.org/wikipedia/en/9/9e/Stade_Rennais_FC.svg"
+  },
+{
+    "common": "Roma",
+    "official": "Associazione Sportiva Roma",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg"
+  },
+{
+    "common": "Sassuolo",
+    "official": "U.S. Sassuolo",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/1/1c/US_Sassuolo_Calcio_logo.svg"
   },
 {
     "common": "Strasbourg",
@@ -247,6 +262,11 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/7/77/Logo_Sunderland.svg"
   },
 {
+    "common": "Torino",
+    "official": "Torino",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/2/2e/Torino_FC_Logo.svg"
+  },
+{
     "common": "Tottenham",
     "official": "Tottenham Hotspur",
     "logo": "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg"
@@ -255,6 +275,11 @@
     "common": "Toulouse",
     "official": "Toulouse FC",
     "logo": "https://upload.wikimedia.org/wikipedia/en/6/63/Toulouse_FC_2018_logo.svg"
+  },
+{
+    "common": "Udinese",
+    "official": "Udinese Calcio",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/c/ce/Udinese_Calcio_logo.svg"
   },
 {
     "common": "West Ham",
