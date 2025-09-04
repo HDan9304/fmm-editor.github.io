@@ -157,6 +157,16 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg"
   },
 {
+    "common": "Rennes",
+    "official": "Stade Rennais FC",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/9/9e/Stade_Rennais_FC.svg"
+  },
+{
+    "common": "Strasbourg",
+    "official": "RC Strasbourg Alsace",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/8/80/Racing_Club_de_Strasbourg_logo.svg"
+  },
+{
     "common": "Sunderland",
     "official": "Sunderland",
     "logo": "https://upload.wikimedia.org/wikipedia/en/7/77/Logo_Sunderland.svg"
@@ -165,6 +175,11 @@
     "common": "Tottenham",
     "official": "Tottenham Hotspur",
     "logo": "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg"
+  },
+{
+    "common": "Toulouse",
+    "official": "Toulouse FC",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/6/63/Toulouse_FC_2018_logo.svg"
   },
 {
     "common": "West Ham",
