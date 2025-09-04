@@ -97,9 +97,34 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/4/4a/FC_Metz_2021_Logo.svg"
   },
 {
+    "common": "Fiorentina",
+    "official": "ACF Fiorentina",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/8/8c/ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg"
+  },
+{
     "common": "Fulham",
     "official": "Fulham",
     "logo": "https://upload.wikimedia.org/wikipedia/en/e/eb/Fulham_FC_%28shield%29.svg"
+  },
+{
+    "common": "Genoa",
+    "official": "Genoa CFC",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/2/2c/Genoa_CFC_crest.svg"
+  },
+{
+    "common": "Hellas Verona",
+    "official": "Hellas Verona",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/9/92/Hellas_Verona_FC_logo_%282020%29.svg"
+  },
+{
+    "common": "Inter Milan",
+    "official": "FC Internazionale Milano",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg"
+  },
+{
+    "common": "Juventus",
+    "official": "Juventus",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Juventus_FC_-_logo_black_%28Italy%2C_2020%29.svg"
   },
 {
     "common": "Le Havre",
