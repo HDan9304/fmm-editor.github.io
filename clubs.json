@@ -22,9 +22,19 @@
     "aliases": ["Villa"]
   },
 {
+    "common": "Atalanta",
+    "official": "Atalanta",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/6/66/AtalantaBC.svg"
+  },
+{
     "common": "Auxerre",
     "official": "AJ Auxerre",
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/51/AJAuxerreLogo.svg"
+  },
+{
+    "common": "Bologna",
+    "official": "Bologna FC 1909",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg"
   },
 {
     "common": "Bournemouth",
@@ -52,9 +62,24 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/6/6d/Burnley_FC_Logo.svg"
   },
 {
+    "common": "Cagliari",
+    "official": "Cagliari Calcio",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/6/61/Cagliari_Calcio_1920.svg"
+  },
+{
     "common": "Chelsea",
     "official": "Chelsea",
     "logo": "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg"
+  },
+{
+    "common": "Como",
+    "official": "Como 1907",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/9/99/Calcio_Como_-_logo_%28Italy%2C_2019-%29.svg"
+  },
+{
+    "common": "Cremonese",
+    "official": "Cremonese",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/e/e1/US_Cremonese_logo.svg"
   },
 {
     "common": "Crystal Palace",
