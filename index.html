@@ -83,10 +83,7 @@
       transition:opacity .18s,transform .18s,visibility 0s .18s;
       pointer-events:none;
     }
-    .help.open .tip{
-      visibility:visible;opacity:1;transform:translateY(0) scale(1);
-      transition:opacity .22s,transform .22s,visibility 0s;
-    }
+    .help.open .tip{visibility:visible;opacity:1;transform:translateY(0) scale(1);transition:opacity .22s,transform .22s,visibility 0s}
 
     .mini-note{margin-left:auto;font-size:12px;color:var(--muted)}
     .req-msg{display:none;font-size:12px;color:var(--error);margin-top:6px}
@@ -149,16 +146,16 @@
       display:grid;
       grid-template-columns: 1fr auto;
       gap:12px 16px;
-      padding:14px;
+      padding:12px 14px;
       border:1px solid var(--border);
       border-radius:16px;
       background:var(--panel-bg);
       margin:2px 0 10px;
       align-items:center;
-      transition:padding .2s ease, border-color .2s ease, background .2s ease;
+      transition:padding .2s ease, border-color .2s ease, background .2s ease, margin .2s ease;
     }
     .opt-check{display:flex; align-items:center; gap:10px; font-weight:600; font-size:16px;}
-    .opt-check input[type="checkbox"]{width:22px; height:22px; accent-color:var(--accent); cursor:pointer;}
+    .opt-check input[type="checkbox"]{width:20px; height:20px; accent-color:var(--accent); cursor:pointer;}
     .opt-suffix{display:grid; grid-template-columns:auto 1fr; gap:8px; align-items:center;}
     .opt-suffix label{ font-size:14px; color:var(--muted); }
     .options input[type="text"]{
@@ -169,16 +166,24 @@
     .options input[type="text"]:focus{border-color:var(--accent);background:rgba(43,44,63,.12);box-shadow:0 0 8px var(--focus-glow)}
     .opt-example{grid-column: 1 / -1; font-size:14px; color:var(--muted);}
 
-    /* collapsed state */
-    .options.compact{padding:12px;}
+    /* collapsed (super slim) */
+    .options.compact{
+      padding:0;
+      margin:4px 0 8px;
+      border:0;
+      background:transparent;
+      grid-template-columns: 1fr;
+    }
+    .options.compact .opt-check{gap:8px; font-size:15px;}
+    .options.compact .opt-check input{width:18px;height:18px}
     .options.compact .opt-suffix,
     .options.compact .opt-example{
       max-height:0; overflow:hidden; opacity:0; pointer-events:none; margin:0; padding:0;
-      transition:max-height .25s ease, opacity .2s ease;
+      transition:max-height .2s ease, opacity .18s ease;
     }
     .options:not(.compact) .opt-suffix,
     .options:not(.compact) .opt-example{
-      max-height:140px; opacity:1; transition:max-height .25s ease, opacity .2s ease;
+      max-height:140px; opacity:1; transition:max-height .25s ease, opacity .22s ease;
     }
     .options.compact .opt-suffix input{opacity:.45}
 
@@ -250,7 +255,7 @@
         <!-- Collapsible reserve options -->
         <div class="options compact" id="reserveOptions">
           <label class="opt-check" for="includeReserves">
-            <input type="checkbox" id="includeReserves" checked>
+            <input type="checkbox" id="includeReserves">
             <span>Include reserve line</span>
           </label>
 
