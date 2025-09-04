@@ -11,6 +11,11 @@
     "aliases": ["Arsenal"]
   },
 {
+    "common": "AS Monaco",
+    "official": "AS Monaco",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/c/cf/LogoASMonacoFC2021.svg"
+  },
+{
     "common": "Aston Villa",
     "official": "Aston Villa",
     "logo": "https://upload.wikimedia.org/wikipedia/en/9/9a/Aston_Villa_FC_new_crest.svg",
@@ -122,14 +127,34 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg"
   },
 {
+    "common": "Nantes",
+    "official": "FC Nantes",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/4/45/Logo_FC_Nantes_%28avec_fond%29_-_2019.svg"
+  },
+{
     "common": "Newcastle",
     "official": "Newcastle United",
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg"
   },
 {
+    "common": "Nice",
+    "official": "OGC Nice",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/2/2e/OGC_Nice_logo.svg"
+  },
+{
     "common": "Nottingham Forest",
     "official": "Nottingham Forest",
     "logo": "https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_F.C._logo.svg"
+  },
+{
+    "common": "Paris FC",
+    "official": "Paris FC",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/9/9f/Paris_FC_logo.svg"
+  },
+{
+    "common": "PSG",
+    "official": "Paris Saint-Germain",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg"
   },
 {
     "common": "Sunderland",
