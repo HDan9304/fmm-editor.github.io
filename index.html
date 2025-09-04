@@ -146,16 +146,46 @@
     input[type=range]::-moz-range-progress{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--grad-start),var(--grad-end))}
     input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:pointer}
 
-    /* Two-line (reserves) options — now theme-aware */
+    /* >>> Redesigned reserves options (theme-aware, aligned) */
     .options{
-      padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--panel-bg); /* changed from hard-coded */
-      margin:-2px 0 8px 0; display:flex;flex-wrap:wrap;gap:10px;align-items:center
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:12px 16px;
+      padding:14px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:var(--panel-bg);
+      margin:2px 0 10px;
+      align-items:center;
     }
-    .options .spacer{flex:1}
-    .row{display:flex;gap:8px;align-items:center}
-    .options label{font-size:14px}
-    .options input[type="text"]{width:160px}
-    
+    .opt-check{
+      display:flex; align-items:center; gap:10px; font-weight:600; font-size:16px;
+    }
+    .opt-check input[type="checkbox"]{
+      width:22px; height:22px; accent-color:var(--accent); cursor:pointer;
+    }
+    .opt-suffix{
+      display:grid; grid-template-columns:auto 1fr; gap:8px; align-items:center;
+    }
+    .opt-suffix label{ font-size:14px; color:var(--muted); }
+    .options input[type="text"]{
+      /* match other inputs */
+      width:100%; padding:10px; border:1px solid var(--border); border-radius:12px;
+      font-size:16px; background:var(--input-bg); color:var(--text); outline:none;
+      transition:border-color .2s,box-shadow .2s,background .2s;
+    }
+    .options input[type="text"]:focus{border-color:var(--accent);background:rgba(43,44,63,.12);box-shadow:0 0 8px var(--focus-glow)}
+    .opt-example{
+      grid-column: 1 / -1;
+      font-size:14px; color:var(--muted);
+    }
+    @media (max-width:560px){
+      .options{ grid-template-columns: 1fr; }
+      .opt-suffix{ grid-template-columns: 1fr; }
+      .opt-suffix label{ margin-top:4px; }
+    }
+    /* <<< end redesigned options */
+
     @media (min-width:960px){
       .container{max-width:1120px;padding:20px 22px 24px}
       .content-grid{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:22px;align-items:start}
@@ -215,15 +245,19 @@
           <div class="req-msg" id="msg-current">This field is required.</div>
         </div>
 
-        <!-- Two-line (reserves) option -->
+        <!-- Redesigned reserves option -->
         <div class="options">
-          <label class="row"><input type="checkbox" id="includeReserves" checked> Include reserve line</label>
-          <div class="row">
-            <span class="mini-note">Suffix</span>
+          <label class="opt-check" for="includeReserves">
+            <input type="checkbox" id="includeReserves" checked>
+            <span>Include reserve line</span>
+          </label>
+
+          <div class="opt-suffix">
+            <label for="reserveSuffix">Suffix</label>
             <input id="reserveSuffix" type="text" value="Reserves" />
           </div>
-          <div class="spacer"></div>
-          <span class="mini-note">Example: Arsenal → “Arsenal” & “Arsenal Reserves”</span>
+
+          <div class="opt-example">Example: Arsenal → “Arsenal” & “Arsenal Reserves”</div>
         </div>
 
         <div class="field">
@@ -336,7 +370,6 @@
     const root=document.documentElement;
     const $=id=>document.getElementById(id);
 
-    /* ---------------- Theme ---------------- */
     function applyTheme(t){root.setAttribute("data-theme",t);localStorage.setItem(THEME_KEY,t)}
     function initTheme(){applyTheme(localStorage.getItem(THEME_KEY)||"dark")}
     document.addEventListener("click",e=>{
@@ -345,7 +378,6 @@
       }
     });
 
-    /* ------------- Clubs via JSON ---------- */
     let clubs = [];
     async function loadClubs(){
       try{
@@ -361,20 +393,17 @@
       }
     }
 
-    /* ------------- Utilities --------------- */
     function capWords(s){return String(s||"").trim().replace(/\b([a-zA-Z])/g,(m,p)=>p.toUpperCase())}
     function clamp01(n){return Math.max(0,Math.min(100,n))}
     function convertTo200Scale(v){if(v===""||isNaN(+v))return"";const n=clamp01(+v);return Math.round((n/100)*200)}
     const checkSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
     function status(msg){const el=$("copyStatus");el.innerHTML=checkSVG+`<span>${msg}</span>`;el.classList.add("show");clearTimeout(status._t);status._t=setTimeout(()=>{el.classList.remove("show");el.innerHTML=""},2600)}
 
-    /* ------------- Results store ----------- */
     const resultsEl=$("results"), addBtn=$("addBtn");
     function getAllLines(){return Array.from(resultsEl.querySelectorAll(".res-text")).map(el=>el.textContent)}
     function saveResults(){localStorage.setItem(STORAGE_KEY,JSON.stringify(getAllLines()))}
     function renderFromLines(lines){resultsEl.querySelectorAll(".res-line").forEach(el=>el.remove());lines.forEach(t=>{if(t&&String(t).trim()!=="")resultsEl.appendChild(makeLineEl(t))});updateEmptyState()}
     function loadResults(){const raw=localStorage.getItem(STORAGE_KEY);if(!raw){updateEmptyState();return}let lines=[];try{const p=JSON.parse(raw);lines=Array.isArray(p)?p:String(raw).split(/\n/)}catch{lines=String(raw).split(/\n/)}renderFromLines(lines)}
-
     function updateEmptyState(){const has=!!resultsEl.querySelector(".res-line");resultsEl.classList.toggle("empty",!has);addBtn.classList.toggle("cta",!has)}
 
     function trashSVG(){return`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`}
@@ -403,7 +432,6 @@
       return line;
     }
 
-    /* -------- Required & year -------- */
     const requiredInputs=["firstName","lastName","currentClub"];
     function markReqFor(el){const f=el.closest(".field");if(!f) return;f.classList.add("req","shake");setTimeout(()=>f.classList.remove("shake"),260)}
     function clearReqFor(el){const f=el.closest(".field");if(!f) return;f.classList.remove("req")}
@@ -411,7 +439,6 @@
     function limitYear(el){el.value=el.value.replace(/\D+/g,"").slice(0,4);const warn=$("yearWarn");const val=el.value;if(val&&(val.length!==4||+val<YEAR_MIN||+val>YEAR_MAX)){el.classList.add("error");warn.style.display="block"}else{el.classList.remove("error");warn.style.display="none"}}
     function isYearValidOrEmpty(){const s=($("yearOfBirth").value||"").trim();if(!s)return true;if(s.length!==4)return false;const n=+s;return !(isNaN(n)||n<YEAR_MIN||n>YEAR_MAX)}
 
-    /* -------- Number + slider link -------- */
     function setRangeFill(sl){const v=Math.max(0,Math.min(100,Number(sl.value)||0));sl.style.setProperty("--fill",v+"%")}
     function bindNumberAndSlider(numId,sliderId,outId){
       const num=$(numId), sl=$(sliderId), out=$(outId);
@@ -421,7 +448,6 @@
       num.addEventListener("input",fromNum); sl.addEventListener("input",fromSl); setRangeFill(sl); upd();
     }
 
-    /* -------- Combobox (club search) -------- */
     function initCombo(comboId,inputId,logoId){
       const combo=$(comboId), input=$(inputId), logo=$(logoId), panel=combo.querySelector(".combo-panel");
       let visible=[], activeIndex=-1;
@@ -456,8 +482,8 @@
 
       function select(idx){
         const c=visible[idx]; if(!c) return;
-        input.value = c.common || c.official;        // show COMMON
-        combo.dataset.official = c.official || input.value;  // remember OFFICIAL
+        input.value = c.common || c.official;
+        combo.dataset.official = c.official || input.value;
         combo.dataset.common   = c.common   || input.value;
         combo.dataset.logo     = c.logo     || "";
         if(c.logo){
@@ -473,7 +499,7 @@
         activeIndex=(activeIndex+d+items.length)%items.length;
         items.forEach(el=>el.classList.remove("active")); const a=items[activeIndex]; a.classList.add("active");
         const pr=panel.getBoundingClientRect(), ir=a.getBoundingClientRect();
-        if(ir.top<pr.top)panel.scrollTop-=(pr.top-ir.top);
+        if(ir.top<pr.top)panel.scrollTop-+=(pr.top-ir.top);
         if(ir.bottom>pr.bottom)panel.scrollTop+=(ir.bottom-pr.bottom);
       }
 
@@ -493,16 +519,15 @@
       document.addEventListener("click",e=>{ if(!combo.contains(e.target)) close(); });
     }
 
-    /* -------- Undo / Redo -------- */
     let historyStack=[], redoStack=[];
     function snapshot(){return getAllLines()}
     function beginHistory(){historyStack.push(snapshot());if(historyStack.length>80)historyStack.shift();redoStack=[];updateUndoRedoButtons()}
     function updateUndoRedoButtons(){ $("undoBtn").disabled=historyStack.length===0; $("redoBtn").disabled=redoStack.length===0 }
     function undo(){ if(!historyStack.length)return; const cur=snapshot(), prev=historyStack.pop(); redoStack.push(cur); renderFromLines(prev); saveResults(); updateUndoRedoButtons(); status("Undo") }
     function redo(){ if(!redoStack.length)return; const cur=snapshot(), next=redoStack.pop(); historyStack.push(cur); renderFromLines(next); saveResults(); updateUndoRedoButtons(); status("Redo") }
+
     $("undoBtn").addEventListener("click",undo); $("redoBtn").addEventListener("click",redo);
 
-    /* -------- Build result lines (main + reserves) -------- */
     function buildLines(){
       const v=id=>($(id)?.value||"").trim();
       const first=capWords(v("firstName"));
@@ -525,27 +550,20 @@
       const ca        = convertTo200Scale(v("ca"));
       const pa        = convertTo200Scale(v("pa"));
 
-      // Use template literals (backticks) so values interpolate correctly
-      const makeLine = (clubName) => (
-        `"PLAYER" "${first}" "${last}" "${clubName}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${next}"`
-      );
+      const makeLine = (clubName) =>
+        `"PLAYER" "${first}" "${last}" "${clubName}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${next}"`;
 
       const lines = [];
-      // main
       lines.push(makeLine(curr));
 
-      // reserves (optional)
-      const includeRes = $('includeReserves').checked;
-      if(includeRes){
-        const suffixRaw = ($('reserveSuffix').value || 'Reserves').trim();
-        const suffix = capWords(suffixRaw);
+      if($('includeReserves').checked){
+        const suffix = capWords(($('reserveSuffix').value || 'Reserves').trim());
         const reserveClub = suffix ? `${curr} ${suffix}` : curr;
         lines.push(makeLine(reserveClub));
       }
       return lines;
     }
 
-    /* -------- Actions -------- */
     function addResult(){
       if(!validateRequired(true)) return;
       if(!isYearValidOrEmpty()){
@@ -558,11 +576,9 @@
       resultsEl.scrollTop=resultsEl.scrollHeight;
       saveResults(); updateEmptyState(); updateUndoRedoButtons();
 
-      // clear inputs
       ["firstName","lastName","currentClub","newClub","newFirstName","newLastName","newShortName","yearOfBirth","ca","pa"].forEach(id=>{const el=$(id);if(el)el.value=""});
       ["caSlider","paSlider"].forEach(id=>{const s=$(id);if(s){s.value=0;setRangeFill(s)}});
 
-      // clear logos + stored official/common
       ["comboCurrent","comboNew"].forEach(id=>{
         const c=$(id); if(!c) return;
         c.classList.remove("has-logo");
@@ -579,7 +595,6 @@
       if(!text) return;
       copyToClipboard(text).then(()=>status("Copied all results")).catch(err=>alert("Copy failed: "+err));
     }
-
     function clearResults(){
       if(!resultsEl.querySelector(".res-line")) return;
       beginHistory();
@@ -587,7 +602,6 @@
       saveResults(); updateEmptyState(); updateUndoRedoButtons(); status("Cleared");
     }
 
-    /* -------- Helper tooltips: single-tap -------- */
     function initHelpTips(){
       const helps=[...document.querySelectorAll('.help')];
       const timers=new WeakMap();
@@ -622,10 +636,9 @@
       }, {passive:true});
     }
 
-    /* -------- Init -------- */
     document.addEventListener("DOMContentLoaded", async ()=>{
       initTheme();
-      await loadClubs();                        // ← load JSON first
+      await loadClubs();
       initCombo("comboCurrent","currentClub","logoCurrent");
       initCombo("comboNew","newClub","logoNew");
 
