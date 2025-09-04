@@ -282,6 +282,11 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/c/ce/Udinese_Calcio_logo.svg"
   },
 {
+    "common": "Valencia",
+    "official": "Valencia",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg"
+  },
+{
     "common": "West Ham",
     "official": "West Ham United",
     "logo": "https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg"
