@@ -1,5 +1,10 @@
 [
 {
+    "common": "AC Milan",
+    "official": "Associazione Calcio Milan",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg"
+  },
+{
     "common": "Angers",
     "official": "Angers SCO",
     "logo": "https://upload.wikimedia.org/wikipedia/en/d/d4/Angers_SCO_logo.svg"
@@ -127,9 +132,19 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Juventus_FC_-_logo_black_%28Italy%2C_2020%29.svg"
   },
 {
+    "common": "Lazio",
+    "official": "S.S. Lazio",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/c/ce/S.S._Lazio_badge.svg"
+  },
+{
     "common": "Le Havre",
     "official": "Havre AC",
     "logo": "https://upload.wikimedia.org/wikipedia/en/f/fc/Le_Havre_AC_logo.svg"
+  },
+{
+    "common": "Lecce",
+    "official": "Salento",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/2/23/US_Lecce_crest.svg"
   },
 {
     "common": "Leeds",
@@ -182,6 +197,11 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/4/45/Logo_FC_Nantes_%28avec_fond%29_-_2019.svg"
   },
 {
+    "common": "Napoli",
+    "official": "Parthenope",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/4/4d/SSC_Napoli_2025_%28white_and_azure%29.svg"
+  },
+{
     "common": "Newcastle",
     "official": "Newcastle United",
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg"
@@ -200,6 +220,11 @@
     "common": "Paris FC",
     "official": "Paris FC",
     "logo": "https://upload.wikimedia.org/wikipedia/en/9/9f/Paris_FC_logo.svg"
+  },
+{
+    "common": "Parma",
+    "official": "Parma Calcio 1913",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/9/97/Logo_Parma_Calcio_1913_%28adozione_2016%29.svg"
   },
 {
     "common": "PSG",
