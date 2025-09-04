@@ -146,10 +146,10 @@
     input[type=range]::-moz-range-progress{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--grad-start),var(--grad-end))}
     input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:pointer}
 
-    /* Two-line (reserves) options */
+    /* Two-line (reserves) options — now theme-aware */
     .options{
-      padding:10px;border:1px solid var(--border);border-radius:12px;background:#1f2136;margin:-2px 0 8px 0;
-      display:flex;flex-wrap:wrap;gap:10px;align-items:center
+      padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--panel-bg); /* changed from hard-coded */
+      margin:-2px 0 8px 0; display:flex;flex-wrap:wrap;gap:10px;align-items:center
     }
     .options .spacer{flex:1}
     .row{display:flex;gap:8px;align-items:center}
@@ -215,7 +215,7 @@
           <div class="req-msg" id="msg-current">This field is required.</div>
         </div>
 
-        <!-- NEW: main+reserves option -->
+        <!-- Two-line (reserves) option -->
         <div class="options">
           <label class="row"><input type="checkbox" id="includeReserves" checked> Include reserve line</label>
           <div class="row">
@@ -525,18 +525,22 @@
       const ca        = convertTo200Scale(v("ca"));
       const pa        = convertTo200Scale(v("pa"));
 
-      const base = `"PLAYER" "${first}" "${last}" "${CURR}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${next}"`;
+      // Use template literals (backticks) so values interpolate correctly
+      const makeLine = (clubName) => (
+        `"PLAYER" "${first}" "${last}" "${clubName}" "${newFirst}" "${newLast}" "${shortName}" "${year}" "${ca}" "${pa}" "${next}"`
+      );
 
       const lines = [];
       // main
-      lines.push(base.replace('"{CURR}"', `"${curr}"`));
+      lines.push(makeLine(curr));
 
       // reserves (optional)
       const includeRes = $('includeReserves').checked;
       if(includeRes){
-        const suffix = capWords(($('reserveSuffix').value || 'Reserves').trim());
-        const reserveClub = `${curr}${suffix ? ' ' + suffix : ''}`;
-        lines.push(base.replace('"{CURR}"', `"${reserveClub}"`));
+        const suffixRaw = ($('reserveSuffix').value || 'Reserves').trim();
+        const suffix = capWords(suffixRaw);
+        const reserveClub = suffix ? `${curr} ${suffix}` : curr;
+        lines.push(makeLine(reserveClub));
       }
       return lines;
     }
