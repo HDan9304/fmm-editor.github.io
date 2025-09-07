@@ -5,6 +5,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg"
   },
 {
+    "common": "Al-Hilal",
+    "official": "Al-Hilal Saudi Football Club",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/5/55/Al_Hilal_SFC_Logo.svg",
+    "aliases": ["Al-Hilal", "Al Hilal", "AlHilal", "Al-Hilal", "Al–Hilal", "Al‐Hilal", "الهلال", "نادي الهلال", "الهلال السعودي", "نادي الهلال السعودي", "Al Hilal SFC", "Al-Hilal SFC", "Al Hilal FC", "Al-Hilal FC", "Al Hilal Football Club", "Al Hilal Saudi Football Club", "Al Hilal Saudi Club", "Al Hilal Saudi", "Al Hilal Saudi Club Company", "Al Hilal Riyadh", "Al-Hilal Riyadh", "Hilal Riyadh", "Hilal SFC", "Hilal FC", "Hilal", "Al Hilal KSA", "Al-Hilal KSA", "Al Hilal SA", "AlHilalFC", "Al-HilalFC", "Al Hilal Club", "AlHilal Club", "Realistic typos: AI Hilal", "A1 Hilal", "A1-Hilal", "Al Hlal", "Al Hial", "Al HiIal", "Al Hiial", "Al Hilall", "Al Hila", "Al Hilaa", "Al Hilaal", "Al Hilak", "Al Hilap", "Al Hilao", "Al Hikal", "Al Hinal", "Al Hilsl", "Al Hialal", "Al-Hlial", "Al-Hial", "Al-Hilsl", "Al-Hilao", "Al-Hilap", "Al-Hilah", "Alhilal", "al-hilal", "alhilal."]
+  },
+{
     "common": "Angers",
     "official": "Angers SCO",
     "logo": "https://upload.wikimedia.org/wikipedia/en/d/d4/Angers_SCO_logo.svg"
@@ -258,7 +264,7 @@
     "common": "Real Betis",
     "official": "Real Hispalis",
     "logo": "https://upload.wikimedia.org/wikipedia/en/1/13/Real_betis_logo.svg",
-    "aliases": ["Real Betis", "Real Betis Balompié", "Real Betis Balompie", "Real Betis Balompié S.A.D.", "Real Betis Balompie SAD", "Real Betis S.A.D.", "Real Betis CF", "Real Betis C.F.", "Real Betis FC", "Real Betis F.C.", "Real Betis Club de Fútbol", "Real Betis Club de Futbol", "Betis", "R. Betis", "RB Betis", "RBB", "Verdiblancos", "Los Verdiblancos", "Betis Sevilla", "Real Betis Sevilla", "Real Betis Seville", "Betis Seville", "RealBetis", "Real-Betis", "BetisFC", "RealBetisCF", "Real Bētis", "ReaI Betis", "R eal Betis", "Reql Betis", "Rwal Betis", "Rael Betis", "Reao Betis", "Real Betis", "Real Batis", "Real Betes", "Real Beti", "Real Betid", "Real Betiz", "Real Betiss", "Real Beties", "Real Betios", "Real Bet1s", "Real Betus", "Real Betos", "Real Betia", "Real Betix", "Betis Balompié", "Betis Balompie", "Betis Balonpie", "Betis Balompíe", "Betis Balomipé", "Betis Balompje", "Betis Bal0mpie", "Betis Balompiee", "Betis Balompei", "Betis Balomple", "Real Betiz Balompie", "Real Betis Balonpie", "Real Betis Balompie", "Real Betus Balompie", "Real Betis Balompje", "Real Betis Balompei."]
+    "aliases": ["Real Betis", "Real Betis Balompié", "Real Betis Balompie", "Real Betis Balompié S.A.D.", "Real Betis Balompie SAD", "Real Betis S.A.D.", "Real Betis CF", "Real Betis C.F.", "Real Betis FC", "Real Betis F.C.", "Real Betis Club de Fútbol", "Real Betis Club de Futbol", "Betis", "R. Betis", "RB Betis", "RBB", "Verdiblancos", "Los Verdiblancos", "Betis Sevilla", "Real Betis Sevilla", "Real Betis Seville", "Betis Seville", "RealBetis", "Real-Betis", "BetisFC", "RealBetisCF", "Real Bētis", "ReaI Betis", "R eal Betis", "Reql Betis", "Rwal Betis", "Rael Betis", "Reao Betis", "Real Batis", "Real Betes", "Real Beti", "Real Betid", "Real Betiz", "Real Betiss", "Real Beties", "Real Betios", "Real Bet1s", "Real Betus", "Real Betos", "Real Betia", "Real Betix", "Betis Balompié", "Betis Balompie", "Betis Balonpie", "Betis Balompíe", "Betis Balomipé", "Betis Balompje", "Betis Bal0mpie", "Betis Balompiee", "Betis Balompei", "Betis Balomple", "Real Betiz Balompie", "Real Betis Balonpie", "Real Betus Balompie", "Real Betis Balompje", "Real Betis Balompei."]
   },
 {
     "common": "Real Madrid",
