@@ -342,6 +342,12 @@
     "aliases": ["Shelbourne", "Shelbourne FC", "Shelbourne F.C.", "Shelbourne Football Club", "Shelbourne Dublin", "Shelbourne FC Dublin", "Shels", "The Reds", "ShelbourneFC", "Shelbourne-FC", "FC Shelbourne", "F.C. Shelbourne", "Shelbourne F C", "Shelbourne Football", "Shelbourne (Ireland)", "Shellbourne", "Shelbourn", "Shelburne", "Selbourne", "Shlebourne", "Shelboune", "Shelboure", "Shelbourn e", "Shelbournee", "Shelbournee", "Shelbo urne", "Shelbou rne", "Shelbouren", "Shelbounre", "Shelbournf", "Shelbourme", "Shelbokrne", "Snelbourne", "Shekbourne", "Shelpourne", "Shelbourne", "Shelbourne FC.", "Shellbourne FC", "Shelburne FC", "Shels FC."]
   },
 {
+    "common": "Sporting CP",
+    "official": "Sporting Clube de Portugal",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/9/95/Sporting_CP_crest.svg",
+    "aliases": ["Sporting CP", "Sporting C.P.", "Sporting C P", "SCP", "Sporting", "Sporting Clube de Portugal", "Sporting Club de Portugal", "Sporting Clube Portugal", "Sporting Portugal", "Sporting Lisboa", "Sporting Lisbon", "Sporting Lisbon FC", "Sporting Clube de Portugal – Futebol"]
+  },
+{
     "common": "Strasbourg",
     "official": "RC Strasbourg Alsace",
     "logo": "https://upload.wikimedia.org/wikipedia/en/8/80/Racing_Club_de_Strasbourg_logo.svg"
