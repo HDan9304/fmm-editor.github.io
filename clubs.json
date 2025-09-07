@@ -37,6 +37,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/51/AJAuxerreLogo.svg"
   },
 {
+    "common": "Bayer Leverkusen",
+    "official": "Bayer 04 Leverkusen",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg",
+    "aliases": ["Bayer Leverkusen", "Bayer 04 Leverkusen", "Bayer 04", "Bayer04", "B04", "Leverkusen", "Bayer Leverkusen FC", "Bayer 04 Leverkusen FC", "Leverkusen FC", "Bayer Leverkusen Football Club", "TSV Bayer 04 Leverkusen", "TSV Bayer 04", "Bayer 04 Leverkusen Fußball GmbH", "Bayer 04 Leverkusen Fussball GmbH", "Bayer 04 Fußball", "Bayer 04 Fussball", "Werkself", "Die Werkself", "Bayer 04 Leverkusen F.C.", "Bayer04 Leverkusen", "Bayer-04 Leverkusen", "Bayer 04-Leverkusen", "Bayern Leverkusen", "Bayer Leverkuzen", "Bayer Leverkusen 04"]
+  },
+{
     "common": "Bologna",
     "official": "Bologna FC 1909",
     "logo": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg"
