@@ -43,6 +43,12 @@
     "aliases": ["Bayer Leverkusen", "Bayer 04 Leverkusen", "Bayer 04", "Bayer04", "B04", "Leverkusen", "Bayer Leverkusen FC", "Bayer 04 Leverkusen FC", "Leverkusen FC", "Bayer Leverkusen Football Club", "TSV Bayer 04 Leverkusen", "TSV Bayer 04", "Bayer 04 Leverkusen Fußball GmbH", "Bayer 04 Leverkusen Fussball GmbH", "Bayer 04 Fußball", "Bayer 04 Fussball", "Werkself", "Die Werkself", "Bayer 04 Leverkusen F.C.", "Bayer04 Leverkusen", "Bayer-04 Leverkusen", "Bayer 04-Leverkusen", "Bayern Leverkusen", "Bayer Leverkuzen", "Bayer Leverkusen 04"]
   },
 {
+    "common": "Bayern",
+    "official": "FC Bayern München",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/8/8d/FC_Bayern_M%C3%BCnchen_logo_%282024%29.svg",
+    "aliases": ["Bayern Munich", "FC Bayern Munich", "Bayern München", "FC Bayern München", "Bayern Muenchen", "FC Bayern Muenchen", "Bayern Munchen", "FC Bayern Munchen", "Bayern", "FC Bayern", "Bayern München e.V.", "FC Bayern München AG", "FCB", "F.C.B.", "BayernMunich", "Bayern-Munich", "FCBayern", "FC-Bayern", "München Bayern", "Munich Bayern", "Die Roten", "Rekordmeister", "Mia san mia", "Bayern München Fußball", "Bayern Muenchen Fussball", "Bayren Munich", "Bayen Munich", "Bayerrn Munich", "Bsyern Munich", "Baywern Munich", "Bayerm Munich", "Bayerm Munic", "Bayerm Muncih", "Bayerm Munchin", "Bzyern Munich", "Bqyern Munich", "Basyern Munich", "Bsyern Muncih", "Bayern Munic", "Bayern Muncih", "Bayern Munchin", "Bayern Munieh", "Bayern Munuch", "Bayern Munuchh", "Bayern Muncjh", "Bayern Munvich", "Bayern Muvnich", "Bayern Munixh", "Bayern Muinch", "Bayern Munchi", "Bayern Münich", "Bayern Müchen", "Bayern Müncehn", "Bayern Münschen", "Bayern Münxhen", "Bayern Münvhen", "Bayern Müncjen", "Bayern Muenich", "Bayern Muenchne", "Bayern Meunchen", "Bayern Meu nchen", "Bayern Muenhcen", "Munic Bayern", "Muncih Bayern", "Munchin Bayern", "Munieh Bayern", "Munchen Bayern", "Muenchen Bayern", "Monich Bayern", "Minich Bayern", "Bayen", "Bayerm", "Bayem", "Bsyern", "Bqyern", "Bayerr", "Bayrern", "Bayersn", "Munic", "Muncih", "Munchin", "Munieh", "Munuch", "Mun8ch", "M9nich", "Mjnich", "Minich", "Monich", "Müchen", "Münich", "Müncehn", "Muenich", "Muenchen", "Munchen"]
+  },
+{
     "common": "Bologna",
     "official": "Bologna FC 1909",
     "logo": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg"
