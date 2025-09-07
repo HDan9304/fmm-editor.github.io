@@ -60,6 +60,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg"
   },
 {
+    "common": "Borussia Dortmund",
+    "official": "Borussia Dortmund",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
+    "aliases": ["Borussia Dortmund", "Borussia Dortmund FC", "Borussia Dortmund F.C.", "Borussia Dortmund Football Club", "Borussia 09 Dortmund", "BV Borussia Dortmund 09", "Ballspielverein Borussia 09 e.V. Dortmund", "BVB", "BVB 09", "BVB09", "Die Schwarzgelben", "Die Borussen", "Borussen", "BorussiaDortmund", "Borussia-Dortmund", "Dortmund", "Dortmund FC", "Borussia D.", "Borussia Dtmd", "Borusia Dortmund", "Borrusia Dortmund", "Borrussia Dortmund", "Boru ssia Dortmund", "BorussIa Dortmund", "Borussua Dortmund", "Borossia Dortmund", "Borusia Dortmun d", "Borusi a Dortmund", "Borussia Dortmun", "Borussia Dortmud", "Borussia Dortmnd", "Borussia Dortmunt", "Borussia Dor tmund", "Borussia Dortrmund", "Borussia Drotmund", "Borussia D0rtmund", "Borussia Dortmumd", "Borussia Dortmnud", "Borussia Dortmumd", "Borussia Dortmind", "Borrusia Dortumund", "BVB Dortmund", "BVB-09", "BVB09 Dortmund", "Schwarzgelben Dortmund."]
+  },
+{
     "common": "Bournemouth",
     "official": "AFC Bournemouth",
     "logo": "https://upload.wikimedia.org/wikipedia/en/e/e5/AFC_Bournemouth_%282013%29.svg"
@@ -312,7 +318,7 @@
     "common": "RCD Mallorca",
     "official": "Mallorca",
     "logo": "https://upload.wikimedia.org/wikipedia/en/e/e0/Rcd_mallorca.svg",
-    "aliases": ["Mallorca", "RCD Mallorca", "R.C.D. Mallorca", "R C D Mallorca", "Real Mallorca", "Real C.D. Mallorca", "Real Club Deportivo Mallorca", "RCD Mallorca S.A.D.", "RCD Mallorca SAD", "Real Mallorca S.A.D.", "Real Mallorca SAD", "Mallorca FC", "Mallorca F.C.", "CF Mallorca", "Club de Fútbol Mallorca", "Club de Futbol Mallorca", "Mallorca Club de Fútbol", "Mallorca Club de Futbol", "RCD-Mallorca", "RCDMallorca", "Real-Mallorca", "RealMallorca", "Majorca", "Real Majorca", "RCD Majorca", "Majorca FC", "Majorka", "Mallorka", "Malorca", "Malloca", "Mallora", "Mallor", "Mallorcca", "Mallorrca", "Mallorica", "Malloraca", "Mallorac", "Mallorque", "Mallorcq", "Mallorcka", "Mallorc a", "Mallo rca", "Mallorcaa", "Mall0rca", "Mallorc4", "MaIlorca", "Maylorca", "Mayorca", "Mallroca", "Mallorca FC.", "Mallorca SAD."]
+    "aliases": ["Mallorca", "RCD Mallorca", "R.C.D. Mallorca", "R C D Mallorca", "Real Mallorca", "Real C.D. Mallorca", "Real Club Deportivo Mallorca", "RCD Mallorca S.A.D.", "RCD Mallorca SAD", "Real Mallorca S.A.D.", "Real Mallorca SAD", "Mallorca FC", "Mallorca F.C.", "CF Mallorca", "Club de Fútbol Mallorca", "Club de Futbol Mallorca", "Mallorca Club de Fútbol", "Mallorca Club de Futbol", "RCD-Mallorca", "RCDMallorca", "Real-Mallorca", "RealMallorca", "Majorca", "Real Majorca", "RCD Majorca", "Majorca FC", "Majorka", "Mallorka", "Malorca", "Malloca", "Mallora", "Mallor", "Mallorcca", "Mallorrca", "Mallorica", "Malloraca", "Mallorac", "Mallorque", "Mallorcq", "Mallorcka", "Mallorc a", "Mallo rca", "Mallorcaa", "Mall0rca", "Mallorc4", "MaIlorca", "Maylorca", "Mayorca", "Mallroca", "Mallorca FC"]
   },
 {
     "common": "Real Betis",
