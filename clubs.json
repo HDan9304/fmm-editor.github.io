@@ -200,6 +200,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/9/92/Hellas_Verona_FC_logo_%282020%29.svg"
   },
 {
+    "common": "Huddersfield",
+    "official": "Huddersfield Town",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/4/43/Huddersfield_Town_AFC_crest.svg",
+    "aliases": ["Huddersfield Town", "Huddersfield Town AFC", "Huddersfield Town A.F.C.", "Huddersfield Town Football Club", "Huddersfield", "Huddersfield FC", "Huddersfield F.C.", "FC Huddersfield Town", "FC Huddersfield", "HTAFC", "H T A F C", "HuddersfieldTown", "Huddersfield-Town", "Huddersfeild", "Huddersfiled", "Huddersfeld", "Huddersfild", "Huddersfied", "Huddersfiel", "Huddersfeid", "Huddersfiekd", "Huddersfi eld", "Huddersf ield", "Huddersfie ld", "Huddersfiel d", "Hudersfield", "Huddersfeild Town", "Huddersfiled Town", "Hudersfeild", "Hudersfiled", "Huddesfield", "Hiddersfield", "Huddresfield", "Hudd ersfield", "Huddresfeild", "Hudderfield", "Huddrsfield", "Huddrersfield", "Huddersield", "Huddersfild Town", "Huddersfeild T0wn", "Huddersfield Tow n", "Huddersfield T own", "Huddersfield To wn", "Huddersfield Towm", "Huddersfield Tewn", "Huddersfield Tovn", "Huddersfield T0wn", "Huddersfield-Town FC", "HuddersfieldTownFC."]
+  },
+{
     "common": "Inter Milan",
     "official": "FC Internazionale Milano",
     "logo": "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg"
