@@ -134,6 +134,12 @@
     "aliases": ["Dundee FC", "Dundee F.C.", "Dundee Football Club", "Dundee", "DFC", "The Dark Blues", "The Dee", "DundeeFC", "Dundee-FC", "FC Dundee", "F.C. Dundee", "Dundee F C", "Dundee Fc", "Dundee fc", "Dendee FC", "Dandee FC", "Dunndee FC", "Dundeee FC", "Dunedee FC", "Dunde FC", "Dundde FC", "Dunde e FC", "Dunde3 FC", "Dund3e FC", "Dyndee FC", "Diendee FC", "Dunfee FC", "Dunsee FC", "Dunxee FC", "Dunmee FC", "Dunbee FC", "Dunhee FC", "Dundwe FC", "Dundre FC", "Dundee F.C", "Dundee. FC", "Dundee Footbal Club", "Dundee Futbol Club", "Dundee Futebol Club", "Dundee Cl ub", "DundeeFooball Club", "Dundee Foootball Club", "DundeeCity FC", "Town Dundee FC", "Dundee-FC", "DundeeFC.", "Dundee FC.", "Dundee Club"]
   },
 {
+    "common": "Dundee Utd",
+    "official": "Dundee United",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/b/bf/Dundee_United_FC_crest.svg",
+    "aliases": ["Dundee United", "Dundee United FC", "Dundee United F.C.", "Dundee United Football Club", "Dundee Utd", "Dundee Utd FC", "Dundee Utd F.C.", "DUFC", "DundeeUnited", "Dundee-United", "United Dundee", "Dundee U", "Dundee U.", "The Terrors", "The Tangerines", "The Arabs", "Tannadice club", "Dendee United", "Dandee United", "Dunndee United", "Dundeee United", "Dunedee United", "Dunde United", "Dundde United", "Dunde e United", "Dunde3 United", "Dund3e United", "Dyndee United", "Dundee Untied", "Dundee Unitted", "Dundee Unietd", "Dundee Unit ed", "Dundee Uinited", "Dundee Uniited", "Dundee Utnited", "Dundee Uited", "Dundee Unied", "Dundee Unitd", "Dundee Utd.", "Dundee Utd FC", "Dundee UDT", "DU FC", "D U F C", "Dunde Utd", "Dunndee Utd", "Dendee Utd", "Dunde3 Utd", "Dund3e Utd", "Dnidee United", "Dhndee United", "Dunxee United", "Dunmee United", "Dunsee United", "Dunhee United", "Dunde Unitted", "Dundee Unoted", "Dundee Uni ted."]
+  },
+{
     "common": "Everton",
     "official": "Everton",
     "logo": "https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg"
@@ -350,16 +356,4 @@
     "common": "West Brom",
     "official": "West Bromwich Albion",
     "logo": "https://upload.wikimedia.org/wikipedia/en/8/8b/West_Bromwich_Albion.svg",
-    "aliases": ["West Brom", "West Bromwich Albion", "West Bromwich Albion FC", "West Bromwich Albion F.C.", "West Bromwich Albion Football Club", "West Brom Albion", "West Bromwich", "WBA", "WB Albion", "Albion", "The Baggies", "Baggies", "The Throstles", "WestBrom", "West-Brom", "WestBromwich", "West-Bromwich", "WestBromwichAlbion", "West-Bromwich-Albion", "West Brom FC", "West Brom F.C.", "West Bromwich FC", "West Bromwich F.C.", "W. Brom", "W Brom", "West Bromwich A F C", "West Bromwich A.F.C.", "West Bromwich Alb", "West Bromwich Alb.", "Realistic typos: Wset Brom", "Wes Brom", "West Bromm", "West Bro m", "West Bromw", "West Br om", "West Bromwic", "West Bromwicj", "West Bromwcih", "West Bromwich", "West Bromwhich", "West Bromwihc", "West Bromiwch", "West Bromich", "West Bromwicnh", "West Bromwichh", "West Bromwich Ablion", "West Bromwich Albino", "West Bromwich Albio", "West Bromwich Albio n", "West Bromwich Alb ion", "West Bromwhere Albion", "West Bromwich Alboin", "West Bromwich Albiom", "West Bromwich Alboim", "West Bromwich Albkon", "West Bromwhich Albion", "West Bromiwch Albion", "West Bromich Albion", "West Bromwic Albion", "West Brom Albion", "West Brom A lbion", "WBA FC", "WBA F.C.", "WB A", "WBAA"]
-  },
-{
-    "common": "West Ham",
-    "official": "West Ham United",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg"
-  },
-{
-    "common": "Wolves",
-    "official": "Wolverhampton Wanderers",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/c/c9/Wolverhampton_Wanderers_FC_crest.svg"
-  }
-]
+    "aliases": ["West Brom", "West Bromwich Albion", "West Bromwich Albion FC", "West Bromwich Albion F.C.", "West Bromwich Albion Football Club", "West Brom Albion", "West Bromwich", "WBA", "WB Albion", "Albion", "The Baggies", "Baggies", "The Throstles", "WestBrom", "West-Brom", "WestBromwich", "West-Bromwich", "WestBromwichAlbion", "West-Bromwich-Albion", "West Brom FC", "West Brom F.C.", "West Bromwich FC", "West Bromwich F.C.", "W. Brom", "W Brom", "West Bromwich A F C", "West Bromwich A.F.C.", "West Bromwich Alb", "West Bromwich A
