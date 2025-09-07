@@ -377,6 +377,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg"
   },
 {
+    "common": "Villarreal",
+    "official": "Villarreal",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/b/b9/Villarreal_CF_logo-en.svg",
+    "aliases": ["Villarreal", "Villarreal CF", "Villarreal C.F.", "Villarreal Club de Fútbol", "Villarreal Club de Futbol", "Villarreal CF S.A.D.", "Villarreal SAD", "CF Villarreal", "Villarreal FC", "Villarreal F.C.", "VillarrealCF", "Villarreal-CF", "Vila-real", "Vila-real CF", "Vila Real", "Villa Real", "Villa-Real", "Yellow Submarine", "The Yellow Submarine", "Submarino Amarillo", "El Submarino Amarillo", "Groguets", "Submarí Groguet", "Villareal", "Villareall", "Villerreal", "Vilarreal", "Villariel", "Villarreall", "Villarrreal", "Villarreal l", "Villarrealc f", "Villarrealcf", "Villarreal c.f", "Villarreal C F", "Villareal CF", "Villa Real CF", "Vila real CF", "Vllarreal", "Vllareal", "Vilareal", "Villarral", "Villarreall", "Villarreal FC SAD"]
+  },
+{
     "common": "West Brom",
     "official": "West Bromwich Albion",
     "logo": "https://upload.wikimedia.org/wikipedia/en/8/8b/West_Bromwich_Albion.svg",
