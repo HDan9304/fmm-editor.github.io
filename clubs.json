@@ -249,6 +249,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg"
   },
 {
+    "common": "Real Madrid",
+    "official": "R. Madrid",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+    "aliases": ["Real Madrid", "Real Madrid CF", "Real Madrid C.F.", "Real Madrid Club de Fútbol", "Real Madrid Club de Futbol", "RealMadrid", "Real-Madrid", "RM", "RMCF", "Los Blancos", "real madrid", "Rreal Madrid", "Rael Madrid", "Rea Madrid", "Reak Madrid", "Rwal Madrid", "Rral Madrid", "Real Maddrid", "Real Maddrid", "Real Madrrid", "Real Madriid", "Real Madrdi", "Real Madird", "Real Mardid", "Real Madrd", "Real Madid", "Real Madri", "Real Madrod", "Real Madrud", "Real Nadrid", "Real Nadird", "Real Nadrdi", "Real Madriz", "Real Madritz", "Realmadrid", "Real-Madird", "Real Mdarid", "Real Marid", "Real Mandrid"]
+  },
+{
     "common": "Rennes",
     "official": "Stade Rennais FC",
     "logo": "https://upload.wikimedia.org/wikipedia/en/9/9e/Stade_Rennais_FC.svg"
