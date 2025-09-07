@@ -5,12 +5,6 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg"
   },
 {
-    "common": "Ajax",
-    "official": "AFC Ajax",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/0/01/AFC_Ajax_crest.svg",
-    "aliases": ["Ajax", "AFC Ajax", "A.F.C. Ajax", "Amsterdamsche Football Club Ajax", "Amsterdamsche FC Ajax", "Ajax Amsterdam", "Ajax (Amsterdam)", "Ajax (Netherlands)", "Ajax FC", "Ajax Football Club", "CF Ajax", "AFC-Ajax", "AjaxAmsterdam", "Ajax-Amsterdam", "Ajax NL", "Ajax Holland", "Ajax Nederland", "de Godenzonen", "Godenzonen", "Amsterdammers", "Ajaz", "Ajex", "Ajac", "Ajaks", "Ayax", "Aiax", "Ajayx", "Ajx", "Aajx", "Ajxx", "Ajzx", "Ajgx", "A jax", "Aj ax", "Ajaxx", "Ajaxs", "Ajaxz", "Ajaxc", "Ajajx", "Ajacx", "AFC Ajaz", "AFC Ajex", "AFC Ajx", "Ajax Amsterdan", "Ajax Amstedam", "Ajax Amst erdam", "Ajax-Amsterdan", "Ajax-Amstedam", "Ajax-Amst erdam"]
-  },
-{
     "common": "Al-Hilal",
     "official": "Al-Hilal Saudi Football Club",
     "logo": "https://upload.wikimedia.org/wikipedia/commons/5/55/Al_Hilal_SFC_Logo.svg",
@@ -49,12 +43,6 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/51/AJAuxerreLogo.svg"
   },
 {
-    "common": "Barcelona",
-    "official": "Barcelona",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
-    "aliases": ["Barcelona", "FC Barcelona", "F.C. Barcelona", "Futbol Club Barcelona", "Fútbol Club Barcelona", "Barcelona FC", "Barcelona F.C.", "CF Barcelona", "C.F. Barcelona", "FCBarcelona", "FC-Barcelona", "BarcelonaFC", "Barcelona-FC", "Futbol Club Barcleona", "Futbol Club Barcalona", "Futbol Club Bacelona", "Futbol Club Bareclona", "Barcelonaa", "Barcelon", "Barceona", "Barceolna", "Barcelona", "Barcalona", "Barcleona", "Bacelona", "Bareclona", "Barchelona", "Barxelona", "Barzelona", "Bsrcelona", "Bqrcelona", "Barcel0na", "Barce1ona", "Barcel0n4", "Barc3lona", "Barceloan", "Barcelo na", "Barce lona", "Barcel ona", "Barcelon a", "Fútbol Club Barcelon", "Futbol Club Barcelon", "Futbol Club Barceloan", "FC Barcleona", "FC Barcalona", "FC Bacelona", "FC Bareclona", "Barcelona C.F."]
-  },
-{
     "common": "Bayer Leverkusen",
     "official": "Bayer 04 Leverkusen",
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg",
@@ -70,12 +58,6 @@
     "common": "Bologna",
     "official": "Bologna FC 1909",
     "logo": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Bologna_F.C._1909_logo.svg"
-  },
-{
-    "common": "Borussia Dortmund",
-    "official": "Borussia Dortmund",
-    "logo": "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
-    "aliases": ["Borussia Dortmund", "Borussia Dortmund FC", "Borussia Dortmund F.C.", "Borussia Dortmund Football Club", "Borussia 09 Dortmund", "BV Borussia Dortmund 09", "Ballspielverein Borussia 09 e.V. Dortmund", "BVB", "BVB 09", "BVB09", "Die Schwarzgelben", "Die Borussen", "Borussen", "BorussiaDortmund", "Borussia-Dortmund", "Dortmund", "Dortmund FC", "Borussia D.", "Borussia Dtmd", "Borusia Dortmund", "Borrusia Dortmund", "Borrussia Dortmund", "Boru ssia Dortmund", "BorussIa Dortmund", "Borussua Dortmund", "Borossia Dortmund", "Borusia Dortmun d", "Borusi a Dortmund", "Borussia Dortmun", "Borussia Dortmud", "Borussia Dortmnd", "Borussia Dortmunt", "Borussia Dor tmund", "Borussia Dortrmund", "Borussia Drotmund", "Borussia D0rtmund", "Borussia Dortmumd", "Borussia Dortmnud", "Borussia Dortmumd", "Borussia Dortmind", "Borrusia Dortumund", "BVB Dortmund", "BVB-09", "BVB09 Dortmund", "Schwarzgelben Dortmund."]
   },
 {
     "common": "Bournemouth",
@@ -177,6 +159,12 @@
     "common": "Fiorentina",
     "official": "ACF Fiorentina",
     "logo": "https://upload.wikimedia.org/wikipedia/commons/8/8c/ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg"
+  },
+{
+    "common": "Fluminense",
+    "official": "FLU",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/1/1d/FFC_crest.svg",
+    "aliases": ["Fluminense", "Fluminense FC", "Fluminense F.C.", "Fluminense Football Club", "Fluminense Football Clube", "Fluminense Futebol Clube", "Fluminense Rio de Janeiro", "Fluminense RJ", "Fluminense-RJ", "Fluminense (RJ)", "CF Fluminense", "FC Fluminense", "F.C. Fluminense", "FluminenseFC", "Fluminense-FC", "Fluminense C.F.", "Fluminense F C", "FFC", "F.F.C.", "FFC Rio", "FFC-RJ", "Fluminense", "Fluminese", "Flumnense", "Flumiense", "Fluminse", "Fluminnese", "Fluminens e", "Fluminensse", "Fluminence", "Fluminenese", "Flumniense", "Fluminesee", "Flumin3nse", "Fluminemse", "Fluminenc e", "Fluminese FC", "Fluminense FC", "Fluminense Rj", "Fluminense de Rio de Janeiro", "Fluminense Clube"]
   },
 {
     "common": "Forest Green",
@@ -301,12 +289,6 @@
     "aliases": ["Padova", "Calcio Padova", "A.C. Padova", "AC Padova", "Associazione Calcio Padova", "Padova Calcio", "calcio Padova", "CalcioPadova", "PadovaCalcio", "Padova FC", "FC Padova", "Padua", "Padua FC", "Padua Calcio", "Padua Football Club", "Calcio Padua", "Biancoscudati Padova", "Biancoscudati", "A.C.Padova", "ACPadova", "Padova F.C.", "Padava", "Padovia"]
   },
 {
-    "common": "Palmeiras",
-    "official": "SPO",
-    "logo": "https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg",
-    "aliases": ["Palmeiras", "Sociedade Esportiva Palmeiras", "S.E. Palmeiras", "SE Palmeiras", "Sociedade Esportiva Palm eiras", "Palmeiras FC", "Palmeiras F.C.", "Palmeiras Futebol", "Palmeiras-SP", "Verdão", "O Verdão", "Alviverde", "A Academia", "Porco", "Porcada", "SEP", "S.E.P.", "Verdão SEP", "Palmeiras Brasil", "Palmeiras São Paulo", "Palmeiras Sao Paulo", "Sociedade Esportiva Palmeiras (SEP)", "Realistic typos: Palmieras", "Palmeiras", "Palemeiras", "Palemeir as", "Palmei ras", "Palmeiars", "Palmeiass", "Palmeirasz", "Palmeiiras", "Palmmeiras", "Palneiras", "Plameiras", "Paml eiras", "Pamlieras", "Palemiras", "Palmir eiras", "Palmirias", "Palmierras", "Palmera", "Palmeras", "Palmers", "Palmeiraz", "Palmeiraz", "Palmei4as", "Pa1meiras", "Palm3iras", "Palmei9as", "Pal"]
-  },
-{
     "common": "Paris FC",
     "official": "Paris FC",
     "logo": "https://upload.wikimedia.org/wikipedia/en/9/9f/Paris_FC_logo.svg"
@@ -360,12 +342,6 @@
     "aliases": ["Shelbourne", "Shelbourne FC", "Shelbourne F.C.", "Shelbourne Football Club", "Shelbourne Dublin", "Shelbourne FC Dublin", "Shels", "The Reds", "ShelbourneFC", "Shelbourne-FC", "FC Shelbourne", "F.C. Shelbourne", "Shelbourne F C", "Shelbourne Football", "Shelbourne (Ireland)", "Shellbourne", "Shelbourn", "Shelburne", "Selbourne", "Shlebourne", "Shelboune", "Shelboure", "Shelbourn e", "Shelbournee", "Shelbournee", "Shelbo urne", "Shelbou rne", "Shelbouren", "Shelbounre", "Shelbournf", "Shelbourme", "Shelbokrne", "Snelbourne", "Shekbourne", "Shelpourne", "Shelbourne", "Shelbourne FC.", "Shellbourne FC", "Shelburne FC", "Shels FC."]
   },
 {
-    "common": "Sporting CP",
-    "official": "Sporting Clube de Portugal",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/9/95/Sporting_CP_crest.svg",
-    "aliases": ["Sporting CP", "Sporting C.P.", "Sporting C P", "SCP", "Sporting", "Sporting Clube de Portugal", "Sporting Club de Portugal", "Sporting Clube Portugal", "Sporting Portugal", "Sporting Lisboa", "Sporting Lisbon", "Sporting Lisbon FC", "Sporting Clube de Portugal – Futebol"]
-  },
-{
     "common": "Strasbourg",
     "official": "RC Strasbourg Alsace",
     "logo": "https://upload.wikimedia.org/wikipedia/en/8/80/Racing_Club_de_Strasbourg_logo.svg"
@@ -405,12 +381,6 @@
     "common": "Valencia",
     "official": "Valencia",
     "logo": "https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg"
-  },
-{
-    "common": "Villarreal",
-    "official": "Villarreal",
-    "logo": "https://upload.wikimedia.org/wikipedia/en/b/b9/Villarreal_CF_logo-en.svg",
-    "aliases": ["Villarreal", "Villarreal CF", "Villarreal C.F.", "Villarreal Club de Fútbol", "Villarreal Club de Futbol", "Villarreal CF S.A.D.", "Villarreal SAD", "CF Villarreal", "Villarreal FC", "Villarreal F.C.", "VillarrealCF", "Villarreal-CF", "Vila-real", "Vila-real CF", "Vila Real", "Villa Real", "Villa-Real", "Yellow Submarine", "The Yellow Submarine", "Submarino Amarillo", "El Submarino Amarillo", "Groguets", "Submarí Groguet", "Villareal", "Villareall", "Villerreal", "Vilarreal", "Villariel", "Villarreall", "Villarrreal", "Villarreal l", "Villarrealc f", "Villarrealcf", "Villarreal c.f", "Villarreal C F", "Villareal CF", "Villa Real CF", "Vila real CF", "Vllarreal", "Vllareal", "Vilareal", "Villarral", "Villarreall", "Villarreal FC SAD"]
   },
 {
     "common": "West Brom",
