@@ -230,6 +230,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/5/54/Leeds_United_F.C._logo.svg"
   },
 {
+    "common": "Leicester",
+    "official": "Leicester City",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/2/2d/Leicester_City_crest.svg",
+    "aliases": ["Leicester City", "Leicester City FC", "Leicester City F.C.", "Leicester City Football Club", "Leicester FC", "Leicester F.C.", "FC Leicester City", "FC Leicester", "LCFC", "L C F C", "LeicesterCity", "Leicester-City", "Leicester City Football", "Leicester City Club", "Leicester City UK", "Leicester", "Lester City", "Leister City", "Leicester Cty", "Leicester Cty FC", "Leicester Ctiy", "Leicester Cit y", "Leicester Citj", "Leicester Citu", "Leicester Cit7", "LeicesterCityFC", "Leicester-City-FC", "Leicster City", "Liecester City", "Leciester City", "Leceister City", "Leiecester City", "Lecicester City", "Leiceste r City", "Leicest er City", "Leicester Cuty", "Leicester Ciry", "Leicester Citu", "Leicestsr City", "Leicestwr City", "Leicestdr City", "Leicestfr City", "Leicetsre City", "Leiecster City", "Leiester City", "Leicestet City", "Leicecter City", "Leicestre City", "Leicestar City", "Leicester CTY", "Leicster", "Liecester", "Leciester", "Leceister", "Leiecester", "Lecicester", "Leicest er", "Leiceste r", "Leicster", "Leiceter", "Leicseter", "Leiceser", "Leiceste", "Leiecster", "Leicetsre", "Leicesrer", "Leicestet", "Leicecter", "Leicestre", "Leicestar", "Leicesterr", "Le1cester", "Leic3ster", "Leicest3r", "Leicestsr", "Leicestwr", "Leicestdr", "Leicestfr", "Leicestwr", "Leicestwr", "Leicester- City", "LeciesterFC", "LiecesterFC", "LeicesterFC", "Leicester-FC."]
+  },
+{
     "common": "Lens",
     "official": "RC Lens",
     "logo": "https://upload.wikimedia.org/wikipedia/en/c/cc/RC_Lens_logo.svg"
@@ -373,7 +379,7 @@
     "common": "Swansea",
     "official": "Swansea City",
     "logo": "https://upload.wikimedia.org/wikipedia/en/f/f9/Swansea_City_AFC_logo.svg",
-    "aliases": ["Swansea City", "Swansea City AFC", "Swansea City A.F.C.", "Swansea City Football Club", "Swansea", "Swansea FC", "Swansea F.C.", "City Swansea", "Swansea City Association Football Club", "SwanseaCity", "Swansea-City", "Swansea City A F C", "AFC Swansea City", "Swansea AFC", "A.F.C. Swansea City", "Swansea City FC", "Swansea City F.C.", "Abertawe", "CF Swansea City", "Clwb Pêl-droed Dinas Abertawe", "Swanse a", "Swanse", "Swanesa", "Swnsea", "Swaensea", "Sawnsea", "Swansea", "Swansei", "Swansey", "Swansey", "Swanea", "Swanwea", "Swanseaa", "Swansea Cit y", "Swansea Ctiy", "Swansea Cuty", "Swansea Ciry", "Swansea Citj", "Swansea Citu", "Swansea Cit7", "Swansea Citg", "Swansea Cit6", "Swansea-City AFC", "SwanseaCityAFC", "Swansea-City-FC", "SwanseaCityFC."]
+    "aliases": ["Swansea City", "Swansea City AFC", "Swansea City A.F.C.", "Swansea City Football Club", "Swansea", "Swansea FC", "Swansea F.C.", "City Swansea", "Swansea City Association Football Club", "SwanseaCity", "Swansea-City", "Swansea City A F C", "AFC Swansea City", "Swansea AFC", "A.F.C. Swansea City", "Swansea City FC", "Swansea City F.C.", "Abertawe", "CF Swansea City", "Clwb Pêl-droed Dinas Abertawe", "Swanse a", "Swanse", "Swanesa", "Swnsea", "Swaensea", "Sawnsea", "Swansei", "Swansey", "Swanea", "Swanwea", "Swanseaa", "Swansea Cit y", "Swansea Ctiy", "Swansea Cuty", "Swansea Ciry", "Swansea Citj", "Swansea Citu", "Swansea Cit7", "Swansea Citg", "Swansea Cit6", "Swansea-City AFC", "SwanseaCityAFC", "Swansea-City-FC", "SwanseaCityFC."]
   },
 {
     "common": "The New Saints",
