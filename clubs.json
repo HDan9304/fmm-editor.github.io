@@ -217,6 +217,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/en/e/e5/Nottingham_Forest_F.C._logo.svg"
   },
 {
+    "common": "Padova",
+    "official": "Padova",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/8/85/Calcio_Padova_crest.svg",
+    "aliases": ["Padova", "Calcio Padova", "A.C. Padova", "AC Padova", "Associazione Calcio Padova", "Padova Calcio", "calcio Padova", "CalcioPadova", "PadovaCalcio", "Padova FC", "FC Padova", "Padua", "Padua FC", "Padua Calcio", "Padua Football Club", "Calcio Padua", "Biancoscudati Padova", "Biancoscudati", "A.C.Padova", "ACPadova", "Padova F.C.", "Padava", "Padovia"]
+  },
+{
     "common": "Paris FC",
     "official": "Paris FC",
     "logo": "https://upload.wikimedia.org/wikipedia/en/9/9f/Paris_FC_logo.svg"
