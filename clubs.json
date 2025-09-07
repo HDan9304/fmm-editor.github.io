@@ -5,6 +5,12 @@
     "logo": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg"
   },
 {
+    "common": "Ajax",
+    "official": "AFC Ajax",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/0/01/AFC_Ajax_crest.svg",
+    "aliases": ["Ajax", "AFC Ajax", "A.F.C. Ajax", "Amsterdamsche Football Club Ajax", "Amsterdamsche FC Ajax", "Ajax Amsterdam", "Ajax (Amsterdam)", "Ajax (Netherlands)", "Ajax FC", "Ajax Football Club", "CF Ajax", "AFC-Ajax", "AjaxAmsterdam", "Ajax-Amsterdam", "Ajax NL", "Ajax Holland", "Ajax Nederland", "de Godenzonen", "Godenzonen", "Amsterdammers", "Ajaz", "Ajex", "Ajac", "Ajaks", "Ayax", "Aiax", "Ajayx", "Ajx", "Aajx", "Ajxx", "Ajzx", "Ajgx", "A jax", "Aj ax", "Ajaxx", "Ajaxs", "Ajaxz", "Ajaxc", "Ajajx", "Ajacx", "AFC Ajaz", "AFC Ajex", "AFC Ajx", "Ajax Amsterdan", "Ajax Amstedam", "Ajax Amst erdam", "Ajax-Amsterdan", "Ajax-Amstedam", "Ajax-Amst erdam"]
+  },
+{
     "common": "Al-Hilal",
     "official": "Al-Hilal Saudi Football Club",
     "logo": "https://upload.wikimedia.org/wikipedia/commons/5/55/Al_Hilal_SFC_Logo.svg",
